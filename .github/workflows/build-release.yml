@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install yarn dependencies
-      - uses: borales/actions-yarn@v3.0.0
+        uses: borales/actions-yarn@v3.0.0
         with:
           cmd: install
   build-android:
@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install yarn dependencies
-      - uses: borales/actions-yarn@v3.0.0
+        uses: borales/actions-yarn@v3.0.0
         with:
           cmd: install
       - name: Build Android Release
