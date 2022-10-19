@@ -51,8 +51,6 @@ jobs:
           key: ${{ runner.os }}-gradle-caches-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-caches-
-      - name: Make Gradlew Executable
-        run: cd android && ./gradlew
 
       - name: Generate App APK
         run: |
