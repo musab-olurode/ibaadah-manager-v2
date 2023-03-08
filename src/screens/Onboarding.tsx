@@ -25,18 +25,25 @@ import Input from '../components/Input';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootNavigatorParamList} from '../navigators/RootNavigator';
+import {setOnboardingState} from '../utils/onboarding';
+import {setUser} from '../utils/storage';
+import {useAppDispatch} from '../redux/hooks';
+import {setUserDetails} from '../redux/user/userSlice';
 
 const AnimatedPagerView = Animated.createAnimatedComponent(PagerView);
 
 const Onboarding = () => {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
+  const [name, setName] = useState('');
 
   const pagerRef = useRef<PagerView>(null);
   const homeNavigation =
     useNavigation<NativeStackNavigationProp<RootNavigatorParamList>>();
 
   const width = Dimensions.get('window').width;
+
+  const dispatch = useAppDispatch();
 
   const ONBOARDING_DATA = [
     {
@@ -139,7 +146,11 @@ const Onboarding = () => {
     setModalVisible(true);
   };
 
-  const handleOnSubmitName = () => {
+  const handleOnSubmitName = async () => {
+    dispatch(setUserDetails({name}));
+    await setUser({name});
+    await setOnboardingState('true');
+
     homeNavigation.reset({
       index: 0,
       routes: [{name: 'Home'}],
@@ -193,7 +204,11 @@ const Onboarding = () => {
         <Modal.Content>
           <View style={styles.modalBody}>
             <Text style={globalStyles.text}>What should we call you</Text>
-            <Input placeholder="Enter your name" style={styles.nameInput} />
+            <Input
+              placeholder="Enter your name"
+              style={styles.nameInput}
+              onChangeText={text => setName(text)}
+            />
             <Button
               text="Save"
               variant="solid"

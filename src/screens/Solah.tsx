@@ -1,12 +1,22 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {StyleSheet, ScrollView, View} from 'react-native';
 import {globalStyles} from '../styles/global';
 import ActivityItem from '../components/ActivityItem';
 import Accordion from 'react-native-collapsible/Accordion';
-import {SOLAH} from '../utils/activities';
+import {
+  ActivityCategory,
+  getActivitiesForCurrentDay,
+  SOLAH,
+  updateActivitiesForCurrentDay,
+} from '../utils/activities';
+import {Activity} from '../types/global';
+import {useIsFocused} from '@react-navigation/native';
 
 const Solah = () => {
   const [activeSections, setActiveSections] = useState<number[]>([]);
+  const [solahActivities, setSolahActivities] = useState<Activity[]>([]);
+
+  const isFocused = useIsFocused();
 
   const updateSections = (sections: number[]) => {
     setActiveSections(sections);
@@ -21,6 +31,27 @@ const Solah = () => {
     } else {
       updateSections([index]);
     }
+  };
+
+  const handleOnCheckboxChange = async (
+    isSelected: boolean,
+    title: string,
+    activity: string,
+  ) => {
+    const _solahActivities = [...solahActivities];
+    const changedActivityIndex = _solahActivities.findIndex(
+      solahActivity =>
+        solahActivity.activity === activity && solahActivity.title === title,
+    );
+    _solahActivities[changedActivityIndex] = {
+      ..._solahActivities[changedActivityIndex],
+      completed: isSelected,
+    };
+    setSolahActivities(_solahActivities);
+    await updateActivitiesForCurrentDay(
+      _solahActivities,
+      ActivityCategory.Solah,
+    );
   };
 
   const renderHeader = (
@@ -40,25 +71,41 @@ const Solah = () => {
     );
   };
 
-  const renderContent = (
-    {content}: {content: typeof SOLAH[0]['content']},
-    _index: number,
-  ) => {
+  const renderContent = ({title}: {title: string}, _index: number) => {
     return (
       <View style={styles.content}>
-        {content.map((contentItem, contentIndex) => (
-          <ActivityItem
-            key={contentIndex}
-            icon={contentItem.icon}
-            activity={contentItem.activity}
-            style={styles.contentItemActivity}
-            showEndIcon={true}
-            endIcon={'checkbox'}
-          />
-        ))}
+        {solahActivities
+          .filter(activity => activity.title === title)
+          .map((contentItem, contentIndex) => (
+            <ActivityItem
+              key={contentIndex}
+              icon={contentItem.icon}
+              activity={contentItem.activity}
+              style={styles.contentItemActivity}
+              showEndIcon={true}
+              endIcon={'checkbox'}
+              bindItemToCheckbox
+              defaultCheckboxState={contentItem.completed}
+              checkboxValue={`${contentItem.title}-${contentItem.activity}`}
+              onCheckboxChange={isSelected =>
+                handleOnCheckboxChange(isSelected, title, contentItem.activity)
+              }
+            />
+          ))}
       </View>
     );
   };
+
+  useEffect(() => {
+    const getSolahActivities = async () => {
+      const allActivities = await getActivitiesForCurrentDay();
+      const _solahActivities = allActivities.data.filter(
+        activity => activity.category === ActivityCategory.Solah,
+      );
+      setSolahActivities(_solahActivities);
+    };
+    getSolahActivities();
+  }, [isFocused]);
 
   return (
     <ScrollView style={globalStyles.container}>
@@ -87,6 +134,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: 'rgba(187, 218, 206, 0.7)',
     marginBottom: 24,
+    backgroundColor: 'white',
   },
   contentItemActivity: {
     elevation: 0,

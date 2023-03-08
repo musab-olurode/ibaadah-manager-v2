@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {StyleSheet, ScrollView, View} from 'react-native';
 import {globalStyles} from '../styles/global';
 import SolahIconImg from '../assets/icons/solah.png';
@@ -9,12 +9,19 @@ import PlusIconImg from '../assets/icons/plus.svg';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useIsFocused} from '@react-navigation/native';
 import {RootNavigatorParamList} from '../navigators/RootNavigator';
-import {DAILY_ACTIVITIES} from '../utils/activities';
+import {
+  ActivityCategory,
+  DAILY_ACTIVITIES,
+  getActivitiesForCurrentDay,
+  updateActivitiesForCurrentDay,
+} from '../utils/activities';
+import {Activity} from '../types/global';
 
 const DailyActivities = ({
   navigation,
 }: NativeStackScreenProps<RootNavigatorParamList>) => {
   const [activeSections, setActiveSections] = useState<number[]>([]);
+  const [dailyActivities, setDailyActivities] = useState<Activity[]>([]);
 
   const isFocused = useIsFocused();
 
@@ -41,6 +48,27 @@ const DailyActivities = ({
     navigation.push('ManageActivities', {category: 'Daily'});
   };
 
+  const handleOnCheckboxChange = async (
+    isSelected: boolean,
+    title: string,
+    activity: string,
+  ) => {
+    const _dailyActivities = [...dailyActivities];
+    const changedActivityIndex = _dailyActivities.findIndex(
+      solahActivity =>
+        solahActivity.activity === activity && solahActivity.title === title,
+    );
+    _dailyActivities[changedActivityIndex] = {
+      ..._dailyActivities[changedActivityIndex],
+      completed: isSelected,
+    };
+    setDailyActivities(_dailyActivities);
+    await updateActivitiesForCurrentDay(
+      _dailyActivities,
+      ActivityCategory.Daily,
+    );
+  };
+
   const renderHeader = (
     section: typeof DAILY_ACTIVITIES[0],
     index: number,
@@ -58,25 +86,41 @@ const DailyActivities = ({
     );
   };
 
-  const renderContent = (
-    {content}: {content: typeof DAILY_ACTIVITIES[0]['content']},
-    _index: number,
-  ) => {
+  const renderContent = ({title}: {title: string}, _index: number) => {
     return (
       <View style={styles.content}>
-        {content.map((contentItem, contentIndex) => (
-          <ActivityItem
-            key={contentIndex}
-            icon={contentItem.icon}
-            activity={contentItem.activity}
-            style={styles.contentItemActivity}
-            showEndIcon={true}
-            endIcon={'checkbox'}
-          />
-        ))}
+        {dailyActivities
+          .filter(activity => activity.title === title)
+          .map((contentItem, contentIndex) => (
+            <ActivityItem
+              key={contentIndex}
+              icon={contentItem.icon}
+              activity={contentItem.activity}
+              style={styles.contentItemActivity}
+              showEndIcon={true}
+              endIcon={'checkbox'}
+              bindItemToCheckbox
+              defaultCheckboxState={contentItem.completed}
+              checkboxValue={`${contentItem.title}-${contentItem.activity}`}
+              onCheckboxChange={isSelected =>
+                handleOnCheckboxChange(isSelected, title, contentItem.activity)
+              }
+            />
+          ))}
       </View>
     );
   };
+
+  useEffect(() => {
+    const getDailyActivities = async () => {
+      const allActivities = await getActivitiesForCurrentDay();
+      const _dailyActivities = allActivities.data.filter(
+        activity => activity.category === ActivityCategory.Daily,
+      );
+      setDailyActivities(_dailyActivities);
+    };
+    getDailyActivities();
+  }, [isFocused]);
 
   return (
     <ScrollView style={globalStyles.container}>

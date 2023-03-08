@@ -24,9 +24,11 @@ export interface ActivityItemProps {
   showEndIcon?: boolean;
   endIcon?: 'chevron-up' | 'chevron-down' | 'checkbox';
   checkboxValue?: string;
-  onCheckboxChange?: () => void;
+  onCheckboxChange?: (isSelected: boolean) => void;
   customEndIcon?: ReactElement;
   disableCheckbox?: boolean;
+  defaultCheckboxState?: boolean;
+  bindItemToCheckbox?: boolean;
 }
 
 const ActivityItem = ({
@@ -42,11 +44,22 @@ const ActivityItem = ({
   onCheckboxChange,
   customEndIcon,
   disableCheckbox,
+  defaultCheckboxState,
+  bindItemToCheckbox,
 }: ActivityItemProps) => {
+  const handleOnPressItem = () => {
+    if (!disabled && onPress) {
+      onPress();
+    }
+    if (bindItemToCheckbox && onCheckboxChange) {
+      onCheckboxChange(!defaultCheckboxState);
+    }
+  };
+
   return (
     <Pressable
       style={[styles.activityItem, disabled && styles.disabled, style]}
-      onPress={() => !disabled && onPress && onPress()}>
+      onPress={handleOnPressItem}>
       {!hideStartIcon && <Image source={icon || ZhurIconImg} />}
       <Text style={[styles.activity, hideStartIcon && styles.noStartIcon]}>
         {activity}
@@ -61,6 +74,7 @@ const ActivityItem = ({
             <Checkbox
               value={checkboxValue || 'checkbox'}
               onChange={onCheckboxChange}
+              isChecked={defaultCheckboxState}
               accessibilityLabel={activity}
               isDisabled={disableCheckbox}
             />

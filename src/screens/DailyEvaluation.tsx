@@ -1,33 +1,54 @@
+import {useIsFocused} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React from 'react';
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {ScrollView, StyleSheet, Text} from 'react-native';
 import DailyActivityEvaluationCard from '../components/DailyActivityEvaluationCard';
 import {ProfileNavigatorParamList} from '../navigators/ProfileNavigator';
 import {globalStyles} from '../styles/global';
-import {SOLAH} from '../utils/activities';
+import {GroupedActivityEvaluation} from '../types/global';
+import {getActivitiesForCurrentDay, groupActivities} from '../utils/activities';
 
 const DailyEvaluation = ({
   route,
 }: NativeStackScreenProps<ProfileNavigatorParamList>) => {
-  const {activity} =
+  const {activity: activityTitle} =
     route.params as ProfileNavigatorParamList['DailyEvaluation'];
+  const [dailyActivitiesEvaluation, setDailyActivitiesEvaluation] = useState<
+    GroupedActivityEvaluation[]
+  >([]);
+
+  const isFocused = useIsFocused();
 
   const formatDate = () => {
     return new Date().toDateString();
   };
 
+  useEffect(() => {
+    const getDailyActivities = async () => {
+      const allActivities = await getActivitiesForCurrentDay();
+      const _dailyActivities = allActivities.data.filter(
+        activity =>
+          activity.title === activityTitle ||
+          activity.category === activityTitle,
+      );
+      const groupedActivities = groupActivities(_dailyActivities);
+      setDailyActivitiesEvaluation(groupedActivities);
+    };
+    getDailyActivities();
+  }, [isFocused]);
+
   return (
     <ScrollView style={globalStyles.container}>
       <Text style={[globalStyles.text, styles.date]}>{formatDate()}</Text>
-
-      {SOLAH.map((solah, index) => (
+      {dailyActivitiesEvaluation.map((activity, index) => (
         <DailyActivityEvaluationCard
           key={`activity-${index}`}
           style={styles.card}
-          activity={solah.title}
-          actions={solah.content.map(action => ({
+          activity={activity.title}
+          progress={activity.progress}
+          actions={activity.content.map(action => ({
             name: action.activity,
-            completed: true,
+            completed: action.completed,
           }))}
         />
       ))}

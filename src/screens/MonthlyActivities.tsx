@@ -1,15 +1,22 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {StyleSheet, ScrollView, View} from 'react-native';
 import {globalStyles} from '../styles/global';
 import ActivityItem from '../components/ActivityItem';
 import Accordion from 'react-native-collapsible/Accordion';
-import {MONTHLY_ACTIVITIES} from '../utils/activities';
+import {
+  ActivityCategory,
+  getActivitiesForCurrentDay,
+  MONTHLY_ACTIVITIES,
+  updateActivitiesForCurrentDay,
+} from '../utils/activities';
 import PlusIconImg from '../assets/icons/plus.svg';
 import {Fab} from 'native-base';
 import {useIsFocused} from '@react-navigation/native';
+import {Activity} from '../types/global';
 
 const MonthlyActivities = () => {
   const [activeSections, setActiveSections] = useState<number[]>([]);
+  const [monthlyActivities, setMonthlyActivities] = useState<Activity[]>([]);
 
   const isFocused = useIsFocused();
 
@@ -27,7 +34,29 @@ const MonthlyActivities = () => {
       updateSections([index]);
     }
   };
+
   const onPressAddActivity = () => {};
+
+  const handleOnCheckboxChange = async (
+    isSelected: boolean,
+    title: string,
+    activity: string,
+  ) => {
+    const _monthlyActivities = [...monthlyActivities];
+    const changedActivityIndex = _monthlyActivities.findIndex(
+      solahActivity =>
+        solahActivity.activity === activity && solahActivity.title === title,
+    );
+    _monthlyActivities[changedActivityIndex] = {
+      ..._monthlyActivities[changedActivityIndex],
+      completed: isSelected,
+    };
+    setMonthlyActivities(_monthlyActivities);
+    await updateActivitiesForCurrentDay(
+      _monthlyActivities,
+      ActivityCategory.Monthly,
+    );
+  };
 
   const renderHeader = (
     section: typeof MONTHLY_ACTIVITIES[0],
@@ -46,25 +75,41 @@ const MonthlyActivities = () => {
     );
   };
 
-  const renderContent = (
-    {content}: {content: typeof MONTHLY_ACTIVITIES[0]['content']},
-    _index: number,
-  ) => {
+  const renderContent = ({title}: {title: string}, _index: number) => {
     return (
       <View style={styles.content}>
-        {content.map((contentItem, contentIndex) => (
-          <ActivityItem
-            key={contentIndex}
-            icon={contentItem.icon}
-            activity={contentItem.activity}
-            style={styles.contentItemActivity}
-            showEndIcon={true}
-            endIcon={'checkbox'}
-          />
-        ))}
+        {monthlyActivities
+          .filter(activity => activity.title === title)
+          .map((contentItem, contentIndex) => (
+            <ActivityItem
+              key={contentIndex}
+              icon={contentItem.icon}
+              activity={contentItem.activity}
+              style={styles.contentItemActivity}
+              showEndIcon={true}
+              endIcon={'checkbox'}
+              bindItemToCheckbox
+              defaultCheckboxState={contentItem.completed}
+              checkboxValue={`${contentItem.title}-${contentItem.activity}`}
+              onCheckboxChange={isSelected =>
+                handleOnCheckboxChange(isSelected, title, contentItem.activity)
+              }
+            />
+          ))}
       </View>
     );
   };
+
+  useEffect(() => {
+    const getDailyActivities = async () => {
+      const allActivities = await getActivitiesForCurrentDay();
+      const _monthlyActivities = allActivities.data.filter(
+        activity => activity.category === ActivityCategory.Monthly,
+      );
+      setMonthlyActivities(_monthlyActivities);
+    };
+    getDailyActivities();
+  }, [isFocused]);
 
   return (
     <ScrollView style={globalStyles.container}>

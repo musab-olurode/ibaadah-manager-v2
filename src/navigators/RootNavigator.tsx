@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {StyleSheet} from 'react-native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import RNBootSplash from 'react-native-bootsplash';
@@ -14,6 +14,12 @@ import ProfileNavigator from './ProfileNavigator';
 import Reminders from '../screens/Reminders';
 import RemindersList from '../screens/RemindersList';
 import RemindersSettings from '../screens/RemindersSettings';
+import {getOnboardingState} from '../utils/onboarding';
+import {getUser} from '../utils/storage';
+import {setUserDetails} from '../redux/user/userSlice';
+import {useAppDispatch} from '../redux/hooks';
+import {synchronizeActivities} from '../utils/activities';
+import {connectDB} from '../database/config';
 
 export type RootNavigatorParamList = {
   Onboarding: undefined;
@@ -32,7 +38,24 @@ export type RootNavigatorParamList = {
 const Stack = createNativeStackNavigator<RootNavigatorParamList>();
 
 const RootNavigator = () => {
-  const handleAppStart = () => {
+  const [showOnboarding, setShowOnboarding] = useState<boolean>(true);
+  const dispatch = useAppDispatch();
+
+  const populateUserInState = async () => {
+    const user = await getUser();
+    dispatch(setUserDetails(user));
+  };
+
+  const handleAppStart = async () => {
+    await connectDB();
+    const hasOnboarded = await getOnboardingState();
+
+    if (hasOnboarded === 'true') {
+      await populateUserInState();
+      setShowOnboarding(false);
+      await synchronizeActivities();
+    }
+
     RNBootSplash.hide({fade: true});
   };
 
@@ -42,11 +65,13 @@ const RootNavigator = () => {
 
   return (
     <Stack.Navigator>
-      <Stack.Screen
-        name="Onboarding"
-        component={Onboarding}
-        options={{headerShown: false}}
-      />
+      {showOnboarding && (
+        <Stack.Screen
+          name="Onboarding"
+          component={Onboarding}
+          options={{headerShown: false}}
+        />
+      )}
       <Stack.Screen
         name="Home"
         component={Home}

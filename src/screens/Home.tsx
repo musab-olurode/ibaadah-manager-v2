@@ -20,10 +20,13 @@ import WeeklyActivitiesIconImg from '../assets/icons/weekly-activities.png';
 import MonthlyActivitiesIconImg from '../assets/icons/monthly-activities.png';
 import {RootNavigatorParamList} from '../navigators/RootNavigator';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {useAppSelector} from '../redux/hooks';
 
 const Home = ({navigation}: NativeStackScreenProps<RootNavigatorParamList>) => {
   const [isSearchInputFocused, setIsSearchInputFocused] = useState(false);
   const searchInputRef = useRef<TextInput | null>(null);
+
+  const user = useAppSelector(state => state.user);
 
   const ACTIVITIES = [
     {
@@ -67,7 +70,13 @@ const Home = ({navigation}: NativeStackScreenProps<RootNavigatorParamList>) => {
     <View style={globalStyles.container}>
       <View style={styles.header}>
         <Pressable onPress={handleOnPressProfileAvatar}>
-          <Image source={AvatarSmImg} style={styles.headerIcon} />
+          <Image
+            resizeMode="contain"
+            source={
+              user.avatarPath ? {uri: `file://${user.avatarPath}`} : AvatarSmImg
+            }
+            style={styles.headerIcon}
+          />
         </Pressable>
         <View style={styles.searchInputContainer}>
           {!isSearchInputFocused && (
@@ -92,7 +101,7 @@ const Home = ({navigation}: NativeStackScreenProps<RootNavigatorParamList>) => {
       <ScrollView style={[globalStyles.container, styles.scrollView]}>
         <View style={styles.greetingContainer}>
           <Text style={styles.salam}>Salamun Alykum</Text>
-          <Text style={styles.name}>Qoreebullah,</Text>
+          <Text style={styles.name}>{user.name},</Text>
         </View>
 
         <View>
@@ -129,6 +138,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerIcon: {
+    borderRadius: 100,
     height: 40,
     width: 40,
   },

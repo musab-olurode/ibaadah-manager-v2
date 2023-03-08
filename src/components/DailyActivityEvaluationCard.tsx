@@ -6,12 +6,14 @@ import {GlobalColors, globalStyles, normalizeFont} from '../styles/global';
 
 export interface DailyActivityEvaluationCardProps {
   activity: string;
+  progress: number;
   style?: StyleProp<ViewStyle>;
   actions: {name: string; completed: boolean}[];
 }
 
 const DailyActivityEvaluationCard = ({
   activity,
+  progress,
   actions,
   style,
 }: DailyActivityEvaluationCardProps) => {
@@ -19,9 +21,9 @@ const DailyActivityEvaluationCard = ({
     <View style={[styles.card, style]}>
       <Progress.Circle
         size={70}
-        progress={0.2}
+        progress={progress}
         showsText
-        formatText={() => '5%'}
+        formatText={prog => `${Math.round(prog * 1000) / 10}%`}
         style={styles.progress}
         textStyle={styles.progressText}
         color={GlobalColors.primary}

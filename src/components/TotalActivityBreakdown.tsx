@@ -5,20 +5,22 @@ import {GlobalColors, globalStyles, normalizeFont} from '../styles/global';
 
 export interface TotalActivityBreakdownProps {
   style?: StyleProp<ViewStyle>;
+  progress: number;
   activities: {name: string; completed: number; total: number}[];
 }
 
 const TotalActivityBreakdown = ({
   style,
+  progress,
   activities,
 }: TotalActivityBreakdownProps) => {
   return (
     <View style={[styles.card, style]}>
       <Progress.Circle
         size={70}
-        progress={0.2}
+        progress={progress}
         showsText
-        formatText={() => '5%'}
+        formatText={prog => `${Math.round(prog * 1000) / 10}%`}
         style={styles.progress}
         textStyle={styles.progressText}
         color={GlobalColors.primary}

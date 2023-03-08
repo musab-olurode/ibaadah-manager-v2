@@ -1,5 +1,5 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React, {useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -19,25 +19,45 @@ import ChevronRightIcon from '../assets/icons/chevron-right.svg';
 import CollapsedCalender from '../components/CollapsedCalender';
 import WeeklyActivitiesIconImg from '../assets/icons/weekly-activities.png';
 import MonthlyActivitiesIconImg from '../assets/icons/monthly-activities.png';
-import {FilterType, SubFilterType} from '../types/global';
+import {
+  ActivityStorage,
+  FilterType,
+  GroupedActivityEvaluation,
+  SubFilterType,
+} from '../types/global';
 import {Select} from 'native-base';
 import FilterIconImg from '../assets/icons/filter.svg';
 import Chip from '../components/Chip';
-import {SOLAH} from '../utils/activities';
+import {
+  getActivitiesForCurrentWeek,
+  getActivitiesForLastWeek,
+  groupActivities,
+} from '../utils/activities';
 import ActivityItem from '../components/ActivityItem';
 import TotalActivityBreakdown from '../components/TotalActivityBreakdown';
 import {Moment} from 'moment';
+import {useIsFocused} from '@react-navigation/native';
 
 const PeriodicEvaluation = ({
   route,
 }: NativeStackScreenProps<ProfileNavigatorParamList>) => {
-  const {filter} =
+  const {filter, activity: activityTitle} =
     route.params as ProfileNavigatorParamList['PeriodicEvaluation'];
   const [calenderDisplay, setCalendarDisplay] = useState<'weekly' | 'monthly'>(
     'weekly',
   );
   const [subFilter, setSubFilter] = useState(SubFilterType.INDIVIDUAL);
-  const [selectedChip, setSelectedChip] = useState('Fajr');
+  const [selectedChip, setSelectedChip] = useState('');
+  const [selectedActivityGroup, setSelectedActivityGroup] =
+    useState<GroupedActivityEvaluation>();
+  const [activitiesForTheWeek, setActivitiesForTheWeek] = useState<
+    ActivityStorage[]
+  >([]);
+  const [weeklyActivitiesEvaluation, setWeeklyActivitiesEvaluation] = useState<
+    GroupedActivityEvaluation[]
+  >([]);
+
+  const isFocused = useIsFocused();
 
   const handleOnSelectSubFilter = (value: string) => {
     setSubFilter(value as SubFilterType);
@@ -89,22 +109,131 @@ const PeriodicEvaluation = ({
     }
   };
 
+  const handleCalenderDateChange = (date: Date) => {
+    const activitiesForTheDay = activitiesForTheWeek.find(
+      activity =>
+        new Date(activity.date).toLocaleDateString() ===
+        new Date(date).toLocaleDateString(),
+    );
+    const groupedActivities = groupActivities(activitiesForTheDay?.data || []);
+    setSelectedChip(groupedActivities[0]?.title || '');
+    setSelectedActivityGroup(groupedActivities[0]);
+    setWeeklyActivitiesEvaluation(groupedActivities);
+  };
+
+  const handleActivityGroupSelection = (activityGroup: string) => {
+    const selectedGroup = weeklyActivitiesEvaluation.find(
+      activity => activity.title === activityGroup,
+    );
+    setSelectedActivityGroup(selectedGroup);
+    setSelectedChip(activityGroup);
+  };
+
+  const totalActivitiesBreakdown = useMemo(() => {
+    let progress = 0;
+    let totalBreakdown: {name: string; completed: number; total: number}[] = [];
+    if (selectedActivityGroup) {
+      const totalActivitiesForGroup = activitiesForTheWeek.map(activity => {
+        const filteredActivities = activity.data.filter(
+          act => act.title === selectedActivityGroup.title,
+        );
+        return {...activity, data: filteredActivities};
+      });
+
+      totalBreakdown = totalActivitiesForGroup.reduce((acc, activity) => {
+        activity.data.map(act => {
+          const found = acc.find(item => item.name === act.activity);
+          if (found) {
+            found.completed = act.completed
+              ? found.completed + 1
+              : found.completed;
+          } else {
+            acc.push({
+              name: act.activity,
+              completed: 0,
+              total: filter === FilterType.MONTHLY ? 30 : 7,
+            });
+          }
+        });
+        return acc;
+      }, [] as {name: string; completed: number; total: number}[]);
+
+      const total = filter === FilterType.MONTHLY ? 30 : 7;
+      const totalCompleted = totalBreakdown.reduce((acc, item) => {
+        acc = acc + item.completed;
+        return acc;
+      }, 0);
+      progress = totalCompleted / (total * totalBreakdown.length);
+    }
+
+    return {progress, totalBreakdown};
+  }, [selectedActivityGroup, activitiesForTheWeek]);
+
+  useEffect(() => {
+    const getEvaluation = async () => {
+      if (filter === FilterType.THIS_WEEK) {
+        const activitiesForCurrentWeek = await getActivitiesForCurrentWeek(
+          activityTitle,
+        );
+        console.log('act------', activitiesForCurrentWeek);
+        setActivitiesForTheWeek(activitiesForCurrentWeek);
+        const activitiesForTheDay = activitiesForCurrentWeek.find(
+          activity =>
+            new Date(activity.date).toLocaleDateString() ===
+            new Date().toLocaleDateString(),
+        );
+        const groupedActivities = groupActivities(activitiesForTheDay!.data);
+        setSelectedChip(groupedActivities[0].title);
+        setSelectedActivityGroup(groupedActivities[0]);
+        setWeeklyActivitiesEvaluation(groupedActivities);
+      } else if (filter === FilterType.LAST_WEEK) {
+        const activitiesForCurrentWeek = await getActivitiesForLastWeek(
+          activityTitle,
+        );
+        setActivitiesForTheWeek(activitiesForCurrentWeek);
+        const sortedActivities = activitiesForCurrentWeek.sort(
+          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+        );
+        if (activitiesForCurrentWeek.length > 0) {
+          const activitiesForTheFirstDayInTheWeek = sortedActivities.find(
+            activity =>
+              new Date(activity.date).toLocaleDateString() ===
+              new Date(sortedActivities[0].date).toLocaleDateString(),
+          );
+          const groupedActivities = groupActivities(
+            activitiesForTheFirstDayInTheWeek!.data,
+          );
+          setSelectedChip(groupedActivities[0].title);
+          setSelectedActivityGroup(groupedActivities[0]);
+          setWeeklyActivitiesEvaluation(groupedActivities);
+        }
+      }
+    };
+    getEvaluation();
+  }, [isFocused]);
+
   return (
     <ScrollView style={globalStyles.container}>
-      {filter === FilterType.MONTHLY ||
-        (filter === FilterType.LAST_WEEK && (
-          <View style={styles.toggleCalendarDisplay}>
-            <Pressable onPress={toggleCalenderDisplay}>
-              {calenderDisplay === 'weekly' ? (
-                <Image source={MonthlyActivitiesIconImg} />
-              ) : (
-                <Image source={WeeklyActivitiesIconImg} />
-              )}
-            </Pressable>
-          </View>
-        ))}
+      {filter === FilterType.MONTHLY && (
+        <View style={styles.toggleCalendarDisplay}>
+          <Pressable onPress={toggleCalenderDisplay}>
+            {calenderDisplay === 'weekly' ? (
+              <Image source={MonthlyActivitiesIconImg} />
+            ) : (
+              <Image source={WeeklyActivitiesIconImg} />
+            )}
+          </Pressable>
+        </View>
+      )}
       {calenderDisplay === 'weekly' ? (
-        <CollapsedCalender />
+        <CollapsedCalender
+          type={
+            filter === FilterType.LAST_WEEK
+              ? FilterType.LAST_WEEK
+              : FilterType.THIS_WEEK
+          }
+          onDateChange={handleCalenderDateChange}
+        />
       ) : (
         <View style={styles.calenderContainer}>
           <CalendarPicker
@@ -126,7 +255,7 @@ const PeriodicEvaluation = ({
         </View>
       )}
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionHeaderTitle}>5 daily solah</Text>
+        <Text style={styles.sectionHeaderTitle}></Text>
         <View style={styles.selectContainer}>
           <Select
             variant="unstyled"
@@ -146,13 +275,13 @@ const PeriodicEvaluation = ({
         horizontal
         showsHorizontalScrollIndicator={false}
         style={styles.chips}>
-        {SOLAH.map((solah, index) => (
+        {weeklyActivitiesEvaluation.map((activity, index) => (
           <Chip
             key={index}
-            title={solah.title}
+            title={activity.title}
             style={styles.chip}
-            active={selectedChip === solah.title}
-            onPress={() => setSelectedChip(solah.title)}
+            active={selectedChip === activity.title}
+            onPress={() => handleActivityGroupSelection(activity.title)}
           />
         ))}
       </ScrollView>
@@ -160,19 +289,17 @@ const PeriodicEvaluation = ({
       <View style={styles.breakdown}>
         {subFilter === SubFilterType.TOTAL ? (
           <TotalActivityBreakdown
+            progress={totalActivitiesBreakdown.progress}
             style={styles.breakdownItem}
-            activities={SOLAH[0].content.map(content => ({
-              name: content.activity,
-              completed: 0,
-              total: 30,
-            }))}
+            activities={totalActivitiesBreakdown.totalBreakdown}
           />
         ) : (
           <View>
-            {SOLAH[0].content.map((content, index) => (
+            {selectedActivityGroup?.content.map((content, index) => (
               <ActivityItem
                 key={`breakdown-${index}`}
                 activity={content.activity}
+                defaultCheckboxState={content.completed}
                 hideStartIcon={true}
                 showEndIcon={true}
                 endIcon="checkbox"

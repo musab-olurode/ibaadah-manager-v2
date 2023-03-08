@@ -2,14 +2,23 @@ import moment from 'moment';
 import React, {useEffect, useState} from 'react';
 import {Pressable, StyleSheet, Text, View} from 'react-native';
 import {GlobalColors, globalStyles, normalizeFont} from '../styles/global';
+import {FilterType} from '../types/global';
+import {
+  getEndOfLastWeek,
+  getEndOfThisWeek,
+  getStartOfLastWeek,
+  getStartOfThisWeek,
+} from '../utils/global';
 
 export interface CollapsedCalenderProps {
   defaultDate?: Date;
   onDateChange?: (date: Date) => void;
+  type: FilterType.THIS_WEEK | FilterType.LAST_WEEK;
 }
 
 const CollapsedCalender = ({
   onDateChange,
+  type,
   defaultDate,
 }: CollapsedCalenderProps) => {
   const [daysInTheWeek, setDaysInTheWeek] = useState(
@@ -26,23 +35,25 @@ const CollapsedCalender = ({
   };
 
   useEffect(() => {
-    moment.updateLocale('en', {
-      week: {
-        dow: 1,
-      },
-    });
-    var startOfWeek = moment().startOf('isoWeek');
-    var endOfWeek = moment().endOf('isoWeek');
+    var startOfWeek =
+      type === FilterType.THIS_WEEK
+        ? getStartOfThisWeek()
+        : getStartOfLastWeek();
+    var endOfWeek =
+      type === FilterType.THIS_WEEK ? getEndOfThisWeek() : getEndOfLastWeek();
     var days = [];
     var day = startOfWeek;
     while (day <= endOfWeek) {
-      days.push(day.toDate());
-      day = day.clone().add(1, 'd');
+      days.push(day);
+      day = moment(day).clone().add(1, 'd').toDate();
     }
     const firstDay = days[0];
     days.pop();
     days.unshift(moment(firstDay).clone().subtract(1, 'd').toDate());
     setDaysInTheWeek(days);
+    if (type === FilterType.LAST_WEEK && !defaultDate) {
+      setSelectedDate(days[0]);
+    }
   }, []);
 
   return (
