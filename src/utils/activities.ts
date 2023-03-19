@@ -1,8 +1,3 @@
-// Global Activities
-import DailyActivitiesIconImg from '../assets/icons/daily-activities.png';
-import WeeklyActivitiesIconImg from '../assets/icons/weekly-activities.png';
-import MonthlyActivitiesIconImg from '../assets/icons/monthly-activities.png';
-
 // Solah
 import FajrIconImg from '../assets/icons/fajr.png';
 import ZhurIconImg from '../assets/icons/dhur.png';
@@ -29,7 +24,7 @@ import HifdhIconImg from '../assets/icons/hifdh.png';
 import MurajaahIconImg from '../assets/icons/murajaah.png';
 import TadaburIconImg from '../assets/icons/tadabur.png';
 import HealthHabitsIconImg from '../assets/icons/health-habits.png';
-import ExcerciseIconImg from '../assets/icons/excercise.png';
+import ExerciseIconImg from '../assets/icons/exercise.png';
 import BathIconImg from '../assets/icons/bath.png';
 import ToothBrushIconImg from '../assets/icons/tooth-brush.png';
 import HealthyFoodIconImg from '../assets/icons/food.png';
@@ -42,7 +37,6 @@ import FastingIconImg from '../assets/icons/fasting.png';
 import FridaySunnahIconImg from '../assets/icons/friday-sunnah.png';
 import SadaqahIconImg from '../assets/icons/sadaqah.png';
 import FamilySittingIconImg from '../assets/icons/family-sitting.png';
-import SelfEvaluationIconImg from '../assets/icons/self-evaluation.png';
 import MondayIconImg from '../assets/icons/monday.png';
 import ThursdayIconImg from '../assets/icons/thursday.png';
 import ShoweringIconImg from '../assets/icons/showering.png';
@@ -52,7 +46,6 @@ import SuratulKhafIconImg from '../assets/icons/suratul-khaf.png';
 import DuaBetweenAsrAndMaghribIconImg from '../assets/icons/dua-between-asr-and-maghrib.png';
 import DonationIconImg from '../assets/icons/donation.png';
 import FamilyDiscussionIconImg from '../assets/icons/family-discussion.png';
-import ChartUpIconImg from '../assets/icons/chart-up.png';
 
 // Monthly Activities
 import ThirteenthIconImg from '../assets/icons/13th.png';
@@ -66,19 +59,7 @@ import SoliheenIconImg from '../assets/icons/soliheen.png';
 import BrotherlyVisitIconImg from '../assets/icons/brotherly-visit.png';
 import SickVisitationIconImg from '../assets/icons/sick-visitation.png';
 import CemetaryIconImg from '../assets/icons/cemetary-visit.png';
-import {
-  Activity,
-  ActivityStorage,
-  GroupedActivityEvaluation,
-} from '../types/global';
-import {getActivities, setActivities} from './storage';
-import {
-  getDaysDifference,
-  getEndOfLastWeek,
-  getEndOfThisWeek,
-  getStartOfLastWeek,
-  getStartOfThisWeek,
-} from './global';
+import {Activity, RawActivity} from '../types/global';
 
 export enum ActivityCategory {
   Solah = 'Solah',
@@ -87,382 +68,218 @@ export enum ActivityCategory {
   Monthly = 'Monthly',
 }
 
-export const SOLAH = [
+export const SOLAH: RawActivity[] = [
   {
     icon: FajrIconImg,
-    title: 'Fajr',
-    content: [
-      {icon: JamaahIconImg, activity: 'Jama’ah'},
-      {icon: AloneIconImg, activity: 'Alone'},
-      {icon: AdhkarAfterIconImg, activity: 'Adhkar After'},
-      {icon: RawatibIconImg, activity: 'Rawatib'},
+    group: 'Fajr',
+    activities: [
+      {icon: JamaahIconImg, order: 1, title: 'Jama’ah'},
+      {icon: AloneIconImg, order: 2, title: 'Alone'},
+      {icon: AdhkarAfterIconImg, order: 3, title: 'Adhkar After'},
+      {icon: RawatibIconImg, order: 4, title: 'Rawatib'},
     ],
   },
   {
     icon: ZhurIconImg,
-    title: 'Dhur',
-    content: [
-      {icon: JamaahIconImg, activity: 'Jama’ah'},
-      {icon: AloneIconImg, activity: 'Alone'},
-      {icon: AdhkarAfterIconImg, activity: 'Adhkar After'},
-      {icon: RawatibIconImg, activity: 'Rawatib'},
+    group: 'Dhur',
+    activities: [
+      {icon: JamaahIconImg, order: 5, title: 'Jama’ah'},
+      {icon: AloneIconImg, order: 6, title: 'Alone'},
+      {icon: AdhkarAfterIconImg, order: 7, title: 'Adhkar After'},
+      {icon: RawatibIconImg, order: 8, title: 'Rawatib'},
     ],
   },
   {
     icon: AsrIconImg,
-    title: 'Asr',
-    content: [
-      {icon: JamaahIconImg, activity: 'Jama’ah'},
-      {icon: AloneIconImg, activity: 'Alone'},
-      {icon: AdhkarAfterIconImg, activity: 'Adhkar After'},
-      {icon: RawatibIconImg, activity: 'Rawatib'},
+    group: 'Asr',
+    activities: [
+      {icon: JamaahIconImg, order: 9, title: 'Jama’ah'},
+      {icon: AloneIconImg, order: 10, title: 'Alone'},
+      {icon: AdhkarAfterIconImg, order: 11, title: 'Adhkar After'},
+      {icon: RawatibIconImg, order: 12, title: 'Rawatib'},
     ],
   },
   {
     icon: MaghribIconImg,
-    title: 'Maghrib',
-    content: [
-      {icon: JamaahIconImg, activity: 'Jama’ah'},
-      {icon: AloneIconImg, activity: 'Alone'},
-      {icon: AdhkarAfterIconImg, activity: 'Adhkar After'},
-      {icon: RawatibIconImg, activity: 'Rawatib'},
+    group: 'Maghrib',
+    activities: [
+      {icon: JamaahIconImg, order: 13, title: 'Jama’ah'},
+      {icon: AloneIconImg, order: 14, title: 'Alone'},
+      {icon: AdhkarAfterIconImg, order: 15, title: 'Adhkar After'},
+      {icon: RawatibIconImg, order: 16, title: 'Rawatib'},
     ],
   },
   {
     icon: IshaiIconImg,
-    title: "Isha'i",
-    content: [
-      {icon: JamaahIconImg, activity: 'Jama’ah'},
-      {icon: AloneIconImg, activity: 'Alone'},
-      {icon: AdhkarAfterIconImg, activity: 'Adhkar After'},
-      {icon: RawatibIconImg, activity: 'Rawatib'},
+    group: "Isha'i",
+    activities: [
+      {icon: JamaahIconImg, order: 17, title: 'Jama’ah'},
+      {icon: AloneIconImg, order: 18, title: 'Alone'},
+      {icon: AdhkarAfterIconImg, order: 19, title: 'Adhkar After'},
+      {icon: RawatibIconImg, order: 20, title: 'Rawatib'},
     ],
   },
 ];
 
-export const DAILY_ACTIVITIES = [
+export const DAILY_ACTIVITIES: RawActivity[] = [
   {
     icon: NawafilIconImg,
-    title: 'Nawafil',
-    content: [
-      {icon: TahajjudIconImg, activity: 'Tahajjud'},
-      {icon: DhuaIconImg, activity: 'Dhua'},
-      {icon: TaobahIconImg, activity: 'Taobah'},
-      {icon: ShafiAndWitrIconImg, activity: 'Shafi & Witr'},
+    group: 'Nawafil',
+    activities: [
+      {icon: TahajjudIconImg, order: 21, title: 'Tahajjud'},
+      {icon: DhuaIconImg, order: 22, title: 'Dhua'},
+      {icon: TaobahIconImg, order: 23, title: 'Taobah'},
+      {icon: ShafiAndWitrIconImg, order: 24, title: 'Shafi & Witr'},
     ],
   },
   {
     icon: AdhkarIconImg,
-    title: 'Adhkar',
-    content: [
-      {icon: MorningIconImg, activity: 'Morning'},
-      {icon: EveningIconImg, activity: 'Evening'},
+    group: 'Adhkar',
+    activities: [
+      {icon: MorningIconImg, order: 25, title: 'Morning'},
+      {icon: EveningIconImg, order: 26, title: 'Evening'},
     ],
   },
   {
     icon: QuranIconImg,
-    title: 'Qur’an',
-    content: [
-      {icon: TilawahIconImg, activity: 'Tilawah'},
-      {icon: HifdhIconImg, activity: 'Hifdh'},
-      {icon: MurajaahIconImg, activity: 'Muraja’ah'},
-      {icon: TadaburIconImg, activity: 'Tadabur'},
+    group: 'Qur’an',
+    activities: [
+      {icon: TilawahIconImg, order: 27, title: 'Tilawah'},
+      {icon: HifdhIconImg, order: 28, title: 'Hifdh'},
+      {icon: MurajaahIconImg, order: 29, title: 'Muraja’ah'},
+      {icon: TadaburIconImg, order: 30, title: 'Tadabur'},
     ],
   },
   {
     icon: HealthHabitsIconImg,
-    title: 'Health Habits',
-    content: [
-      {icon: ExcerciseIconImg, activity: 'Daily Exercise'},
-      {icon: BathIconImg, activity: 'Bath'},
-      {icon: ToothBrushIconImg, activity: 'Tooth Brushing'},
-      {icon: HealthyFoodIconImg, activity: 'Healthy Food'},
+    group: 'Health Habits',
+    activities: [
+      {icon: ExerciseIconImg, order: 31, title: 'Daily Exercise'},
+      {icon: BathIconImg, order: 32, title: 'Bath'},
+      {icon: ToothBrushIconImg, order: 33, title: 'Tooth Brushing'},
+      {icon: HealthyFoodIconImg, order: 34, title: 'Healthy Food'},
     ],
   },
   {
     icon: BooksIconImg,
-    title: 'Book Reading',
-    content: [
-      {icon: IslamicBookIconImg, activity: 'Islamic Book'},
-      {icon: SelfDevelopmentIconImg, activity: 'Self Development'},
+    group: 'Book Reading',
+    activities: [
+      {icon: IslamicBookIconImg, order: 35, title: 'Islamic Books'},
+      {icon: SelfDevelopmentIconImg, order: 36, title: 'Self Development'},
     ],
   },
 ];
 
-export const WEEKLY_ACTIVITIES = [
+export const WEEKLY_ACTIVITIES: RawActivity[] = [
   {
     icon: FastingIconImg,
-    title: 'Fasting',
-    content: [
-      {icon: MondayIconImg, activity: 'Monday'},
-      {icon: ThursdayIconImg, activity: 'Thursday'},
+    group: 'Fasting',
+    activities: [
+      {icon: MondayIconImg, order: 37, title: 'Monday'},
+      {icon: ThursdayIconImg, order: 38, title: 'Thursday'},
     ],
   },
   {
     icon: FridaySunnahIconImg,
-    title: 'Friday’s Sunnah',
-    content: [
-      {icon: ShoweringIconImg, activity: 'Showering'},
-      {icon: NailCuttingIconImg, activity: 'Cutting of nails'},
-      {icon: EarlyMosqueGoingIconImg, activity: 'Going to the Mosque early'},
-      {icon: SuratulKhafIconImg, activity: 'Read suratul Al Khaf'},
+    group: 'Friday’s Sunnah',
+    activities: [
+      {icon: ShoweringIconImg, order: 39, title: 'Showering'},
+      {icon: NailCuttingIconImg, order: 40, title: 'Cutting of nails'},
+      {
+        icon: EarlyMosqueGoingIconImg,
+        order: 41,
+        title: 'Going to the Mosque early',
+      },
+      {icon: SuratulKhafIconImg, order: 42, title: 'Read suratul Al Khaf'},
       {
         icon: DuaBetweenAsrAndMaghribIconImg,
-        activity: 'Dua between Asr & Maghrib',
+        order: 43,
+        title: 'Dua between Asr & Maghrib',
       },
     ],
   },
   {
     icon: SadaqahIconImg,
-    title: 'Sadaqah',
-    content: [{icon: DonationIconImg, activity: 'Donate to the needy'}],
-  },
-  {
-    icon: FamilySittingIconImg,
-    title: 'Family Sitting',
-    content: [
-      {icon: FamilyDiscussionIconImg, activity: 'Discussion with Family'},
+    group: 'Sadaqah',
+    activities: [
+      {icon: DonationIconImg, order: 44, title: 'Donate to the needy'},
     ],
   },
   {
-    icon: SelfEvaluationIconImg,
-    title: 'Self Evaluation',
-    content: [{icon: ChartUpIconImg, activity: 'Progress during the week'}],
+    icon: FamilySittingIconImg,
+    group: 'Family Sitting',
+    activities: [
+      {
+        icon: FamilyDiscussionIconImg,
+        order: 45,
+        title: 'Discussion with Family',
+      },
+    ],
   },
 ];
 
-export const MONTHLY_ACTIVITIES = [
+export const MONTHLY_ACTIVITIES: RawActivity[] = [
   {
     icon: FastingIconImg,
-    title: 'Fasting',
-    content: [
-      {icon: ThirteenthIconImg, activity: '13th of the month'},
-      {icon: FourteenthIconImg, activity: '14th of the month'},
-      {icon: FifteenthIconImg, activity: '15th of the month'},
+    group: 'Fasting',
+    activities: [
+      {icon: ThirteenthIconImg, order: 46, title: '13th of the month'},
+      {icon: FourteenthIconImg, order: 47, title: '14th of the month'},
+      {icon: FifteenthIconImg, order: 48, title: '15th of the month'},
     ],
   },
   {
     icon: SavingMoneyIconImg,
-    title: 'Saving Money',
-    content: [
-      {icon: CharityIconImg, activity: 'For charity'},
-      {icon: WalletIconImg, activity: 'For oneself'},
+    group: 'Saving Money',
+    activities: [
+      {icon: CharityIconImg, order: 49, title: 'For charity'},
+      {icon: WalletIconImg, order: 50, title: 'For yourself'},
     ],
   },
   {
     icon: ZiyaarahIconImg,
-    title: 'Ziyaarah',
-    content: [
-      {icon: SoliheenIconImg, activity: 'Soliheen'},
-      {icon: BrotherlyVisitIconImg, activity: 'Visit a Brother'},
-      {icon: FamilySittingIconImg, activity: 'Visit a Family'},
-      {icon: SickVisitationIconImg, activity: 'Visit the Sick'},
-      {icon: CemetaryIconImg, activity: 'Visit the Cementry'},
-    ],
-  },
-  {
-    icon: SelfEvaluationIconImg,
-    title: 'Self Evaluation',
-    content: [
-      {icon: DailyActivitiesIconImg, activity: 'Daily activities progress'},
-      {icon: WeeklyActivitiesIconImg, activity: 'Weekly activities progress'},
-      {icon: MonthlyActivitiesIconImg, activity: 'Monthly activities progress'},
+    group: 'Ziyaarah',
+    activities: [
+      {icon: SoliheenIconImg, order: 51, title: 'Soliheen'},
+      {icon: BrotherlyVisitIconImg, order: 52, title: 'Visit a Brother'},
+      {icon: FamilySittingIconImg, order: 53, title: 'Visit Family'},
+      {icon: SickVisitationIconImg, order: 54, title: 'Visit the Sick'},
+      {icon: CemetaryIconImg, order: 55, title: 'Visit the Cemetary'},
     ],
   },
 ];
 
 export const ALL_ACTIVITIES_FORMATTED: Activity[] = [
   ...SOLAH.map(solah => {
-    return solah.content.map(content => ({
-      ...content,
-      title: solah.title,
+    return solah.activities.map(activity => ({
+      ...activity,
+      group: solah.group,
       category: ActivityCategory.Solah,
       completed: false,
     }));
   }).flat(2),
   ...DAILY_ACTIVITIES.map(dailyActivities => {
-    return dailyActivities.content.map(content => ({
-      ...content,
-      title: dailyActivities.title,
+    return dailyActivities.activities.map(activity => ({
+      ...activity,
+      group: dailyActivities.group,
       category: ActivityCategory.Daily,
       completed: false,
     }));
   }).flat(2),
   ...WEEKLY_ACTIVITIES.map(weeklyActivities => {
-    return weeklyActivities.content.map(content => ({
-      ...content,
-      title: weeklyActivities.title,
+    return weeklyActivities.activities.map(activity => ({
+      ...activity,
+      group: weeklyActivities.group,
       category: ActivityCategory.Weekly,
       completed: false,
     }));
   }).flat(2),
   ...MONTHLY_ACTIVITIES.map(monthlyActivities => {
-    return monthlyActivities.content.map(content => ({
-      ...content,
-      title: monthlyActivities.title,
+    return monthlyActivities.activities.map(activity => ({
+      ...activity,
+      group: monthlyActivities.group,
       category: ActivityCategory.Monthly,
       completed: false,
     }));
   }).flat(2),
 ];
-
-export const getActivitiesForCurrentDay =
-  async (): Promise<ActivityStorage> => {
-    const allActivities = await getActivities();
-
-    let activitiesForTheDay = allActivities.find(
-      activity =>
-        new Date(activity.date).toLocaleDateString() ===
-        new Date().toLocaleDateString(),
-    );
-
-    if (!activitiesForTheDay) {
-      activitiesForTheDay = {
-        data: ALL_ACTIVITIES_FORMATTED,
-        date: new Date().toISOString(),
-      };
-      await setActivities([...allActivities, activitiesForTheDay]);
-    }
-
-    return activitiesForTheDay;
-  };
-
-export const updateActivitiesForCurrentDay = async (
-  updatedActivities: Activity[],
-  category: ActivityCategory,
-) => {
-  const allActivities = await getActivities();
-
-  let activitiesForTheDay = await getActivitiesForCurrentDay();
-
-  const activitiesForTheDayExcludingUpdated = activitiesForTheDay.data.filter(
-    activity => activity.category !== category,
-  );
-  activitiesForTheDay.data = [
-    ...activitiesForTheDayExcludingUpdated,
-    ...updatedActivities,
-  ];
-
-  const allActivitiesExcludingCurrentDay = allActivities.filter(
-    activity =>
-      new Date(activity.date).toLocaleDateString() !==
-      new Date().toLocaleDateString(),
-  );
-  await setActivities([
-    ...allActivitiesExcludingCurrentDay,
-    activitiesForTheDay,
-  ]);
-};
-
-export const synchronizeActivities = async () => {
-  let allActivities = await getActivities();
-
-  const activitiesSortedByDate = allActivities.sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
-  );
-
-  const activitiesForLastRecordedDay = activitiesSortedByDate.pop();
-
-  if (activitiesForLastRecordedDay) {
-    let lastRecordDate = new Date(activitiesForLastRecordedDay.date);
-
-    const daysSinceLastRecord = getDaysDifference(lastRecordDate, new Date());
-
-    for (let i = 0; i < daysSinceLastRecord; i++) {
-      lastRecordDate = new Date(activitiesForLastRecordedDay.date);
-      const dateForDay = lastRecordDate.setDate(
-        lastRecordDate.getDate() + (i + 1),
-      );
-      const activitiesForCurrentDay = {
-        data: ALL_ACTIVITIES_FORMATTED,
-        date: new Date(dateForDay).toISOString(),
-      };
-      await setActivities([...allActivities, activitiesForCurrentDay]);
-      allActivities = await getActivities();
-    }
-
-    allActivities = await getActivities();
-  }
-};
-
-export const getActivitiesForCurrentWeek = async (activityTitle?: string) => {
-  const allActivities = await getActivities();
-
-  let activitiesForCurrentWeek = allActivities.filter(activity => {
-    const activityDate = new Date(activity.date);
-    const startOfTheWeek = getStartOfThisWeek();
-    const endOfTheWeek = getEndOfThisWeek();
-    return (
-      activityDate.getTime() >= startOfTheWeek.getTime() &&
-      activityDate.getTime() <= endOfTheWeek.getTime()
-    );
-  });
-
-  if (activityTitle) {
-    activitiesForCurrentWeek = activitiesForCurrentWeek.map(activity => {
-      const data = activity.data.filter(
-        act => act.title === activityTitle || act.category === activityTitle,
-      );
-      return {
-        ...activity,
-        data,
-      };
-    });
-  }
-
-  return activitiesForCurrentWeek;
-};
-
-export const getActivitiesForLastWeek = async (activityTitle?: string) => {
-  const allActivities = await getActivities();
-
-  let activitiesForLastWeek = allActivities.filter(activity => {
-    const activityDate = new Date(activity.date);
-    const startOfLastWeek = getStartOfLastWeek();
-    const endOfLastWeek = getEndOfLastWeek();
-    return (
-      activityDate.getTime() <= startOfLastWeek.getTime() &&
-      activityDate.getTime() >= endOfLastWeek.getTime()
-    );
-  });
-
-  if (activityTitle) {
-    activitiesForLastWeek = activitiesForLastWeek.map(activity => {
-      const data = activity.data.filter(
-        act => act.title === activityTitle || act.category === activityTitle,
-      );
-      return {
-        ...activity,
-        data,
-      };
-    });
-  }
-
-  return activitiesForLastWeek;
-};
-
-export const groupActivities = (activities: Activity[]) => {
-  const groupedActivities = activities.reduce((acc, activity) => {
-    const {title} = activity;
-    const activityIndex = acc.findIndex(act => act.title === title);
-    if (activityIndex === -1) {
-      acc.push({
-        title,
-        completedCount: 0,
-        progress: 0,
-        content: [activity],
-      });
-    } else {
-      acc[activityIndex].content.push(activity);
-    }
-    return acc;
-  }, [] as GroupedActivityEvaluation[]);
-  groupedActivities.forEach(activity => {
-    const completedActions = activity.content.filter(
-      action => action.completed,
-    ).length;
-    activity.completedCount = completedActions;
-    activity.progress = completedActions / activity.content.length;
-  });
-  return groupedActivities;
-};

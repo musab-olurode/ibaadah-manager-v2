@@ -3,16 +3,13 @@ import {StyleSheet, ScrollView, View} from 'react-native';
 import {globalStyles} from '../styles/global';
 import ActivityItem from '../components/ActivityItem';
 import Accordion from 'react-native-collapsible/Accordion';
-import {
-  ActivityCategory,
-  getActivitiesForCurrentDay,
-  MONTHLY_ACTIVITIES,
-  updateActivitiesForCurrentDay,
-} from '../utils/activities';
+import {ActivityCategory, MONTHLY_ACTIVITIES} from '../utils/activities';
 import PlusIconImg from '../assets/icons/plus.svg';
 import {Fab} from 'native-base';
 import {useIsFocused} from '@react-navigation/native';
-import {Activity} from '../types/global';
+import {Activity} from '../database/entities/Activity';
+import {RawActivity} from '../types/global';
+import {ActivityService} from '../services/ActivityService';
 
 const MonthlyActivities = () => {
   const [activeSections, setActiveSections] = useState<number[]>([]);
@@ -37,36 +34,28 @@ const MonthlyActivities = () => {
 
   const onPressAddActivity = () => {};
 
-  const handleOnCheckboxChange = async (
-    isSelected: boolean,
-    title: string,
-    activity: string,
-  ) => {
+  const handleOnCheckboxChange = async (isSelected: boolean, id: string) => {
     const _monthlyActivities = [...monthlyActivities];
     const changedActivityIndex = _monthlyActivities.findIndex(
-      solahActivity =>
-        solahActivity.activity === activity && solahActivity.title === title,
+      solahActivity => solahActivity.id === id,
     );
     _monthlyActivities[changedActivityIndex] = {
       ..._monthlyActivities[changedActivityIndex],
       completed: isSelected,
     };
     setMonthlyActivities(_monthlyActivities);
-    await updateActivitiesForCurrentDay(
-      _monthlyActivities,
-      ActivityCategory.Monthly,
-    );
+    await ActivityService.update(id, _monthlyActivities[changedActivityIndex]);
   };
 
   const renderHeader = (
-    section: typeof MONTHLY_ACTIVITIES[0],
+    section: RawActivity,
     index: number,
     isActive: boolean,
   ) => {
     return (
       <ActivityItem
         icon={section.icon}
-        activity={section.title}
+        activity={section.group}
         style={[styles.accordionHeader, !isActive && styles.activityItem]}
         showEndIcon={true}
         endIcon={isActive ? 'chevron-up' : 'chevron-down'}
@@ -75,24 +64,24 @@ const MonthlyActivities = () => {
     );
   };
 
-  const renderContent = ({title}: {title: string}, _index: number) => {
+  const renderContent = ({group}: {group: string}, _index: number) => {
     return (
       <View style={styles.content}>
         {monthlyActivities
-          .filter(activity => activity.title === title)
+          .filter(activity => activity.group === group)
           .map((contentItem, contentIndex) => (
             <ActivityItem
               key={contentIndex}
               icon={contentItem.icon}
-              activity={contentItem.activity}
+              activity={contentItem.title}
               style={styles.contentItemActivity}
               showEndIcon={true}
               endIcon={'checkbox'}
               bindItemToCheckbox
               defaultCheckboxState={contentItem.completed}
-              checkboxValue={`${contentItem.title}-${contentItem.activity}`}
+              checkboxValue={`${contentItem.group}-${contentItem.title}`}
               onCheckboxChange={isSelected =>
-                handleOnCheckboxChange(isSelected, title, contentItem.activity)
+                handleOnCheckboxChange(isSelected, contentItem.id)
               }
             />
           ))}
@@ -102,10 +91,9 @@ const MonthlyActivities = () => {
 
   useEffect(() => {
     const getDailyActivities = async () => {
-      const allActivities = await getActivitiesForCurrentDay();
-      const _monthlyActivities = allActivities.data.filter(
-        activity => activity.category === ActivityCategory.Monthly,
-      );
+      const _monthlyActivities = await ActivityService.getOrCreateForToday({
+        category: ActivityCategory.Monthly,
+      });
       setMonthlyActivities(_monthlyActivities);
     };
     getDailyActivities();

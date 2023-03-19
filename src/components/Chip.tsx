@@ -1,6 +1,6 @@
 import React from 'react';
 import {StyleSheet, Text, Pressable, StyleProp, ViewStyle} from 'react-native';
-import {GlobalColors, normalizeFont} from '../styles/global';
+import {GlobalColors, globalFonts, normalizeFont} from '../styles/global';
 
 export interface ChipProps {
   title: string;
@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: normalizeFont(16),
     color: GlobalColors.gray,
-    fontWeight: '500',
+    ...globalFonts.aeonik.bold,
   },
   activeChip: {
     backgroundColor: GlobalColors.primary,

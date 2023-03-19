@@ -9,13 +9,10 @@ import PlusIconImg from '../assets/icons/plus.svg';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useIsFocused} from '@react-navigation/native';
 import {RootNavigatorParamList} from '../navigators/RootNavigator';
-import {
-  ActivityCategory,
-  DAILY_ACTIVITIES,
-  getActivitiesForCurrentDay,
-  updateActivitiesForCurrentDay,
-} from '../utils/activities';
-import {Activity} from '../types/global';
+import {ActivityCategory, DAILY_ACTIVITIES} from '../utils/activities';
+import {Activity} from '../database/entities/Activity';
+import {ActivityService} from '../services/ActivityService';
+import {RawActivity} from '../types/global';
 
 const DailyActivities = ({
   navigation,
@@ -48,36 +45,28 @@ const DailyActivities = ({
     navigation.push('ManageActivities', {category: 'Daily'});
   };
 
-  const handleOnCheckboxChange = async (
-    isSelected: boolean,
-    title: string,
-    activity: string,
-  ) => {
+  const handleOnCheckboxChange = async (isSelected: boolean, id: string) => {
     const _dailyActivities = [...dailyActivities];
     const changedActivityIndex = _dailyActivities.findIndex(
-      solahActivity =>
-        solahActivity.activity === activity && solahActivity.title === title,
+      solahActivity => solahActivity.id === id,
     );
     _dailyActivities[changedActivityIndex] = {
       ..._dailyActivities[changedActivityIndex],
       completed: isSelected,
     };
     setDailyActivities(_dailyActivities);
-    await updateActivitiesForCurrentDay(
-      _dailyActivities,
-      ActivityCategory.Daily,
-    );
+    await ActivityService.update(id, _dailyActivities[changedActivityIndex]);
   };
 
   const renderHeader = (
-    section: typeof DAILY_ACTIVITIES[0],
+    section: RawActivity,
     index: number,
     isActive: boolean,
   ) => {
     return (
       <ActivityItem
         icon={section.icon}
-        activity={section.title}
+        activity={section.group}
         style={[styles.accordionHeader, !isActive && styles.activityItem]}
         showEndIcon={true}
         endIcon={isActive ? 'chevron-up' : 'chevron-down'}
@@ -86,24 +75,24 @@ const DailyActivities = ({
     );
   };
 
-  const renderContent = ({title}: {title: string}, _index: number) => {
+  const renderContent = ({group}: {group: string}, _index: number) => {
     return (
       <View style={styles.content}>
         {dailyActivities
-          .filter(activity => activity.title === title)
+          .filter(activity => activity.group === group)
           .map((contentItem, contentIndex) => (
             <ActivityItem
               key={contentIndex}
               icon={contentItem.icon}
-              activity={contentItem.activity}
+              activity={contentItem.title}
               style={styles.contentItemActivity}
               showEndIcon={true}
               endIcon={'checkbox'}
               bindItemToCheckbox
               defaultCheckboxState={contentItem.completed}
-              checkboxValue={`${contentItem.title}-${contentItem.activity}`}
+              checkboxValue={`${contentItem.group}-${contentItem.title}`}
               onCheckboxChange={isSelected =>
-                handleOnCheckboxChange(isSelected, title, contentItem.activity)
+                handleOnCheckboxChange(isSelected, contentItem.id)
               }
             />
           ))}
@@ -113,10 +102,9 @@ const DailyActivities = ({
 
   useEffect(() => {
     const getDailyActivities = async () => {
-      const allActivities = await getActivitiesForCurrentDay();
-      const _dailyActivities = allActivities.data.filter(
-        activity => activity.category === ActivityCategory.Daily,
-      );
+      const _dailyActivities = await ActivityService.getOrCreateForToday({
+        category: ActivityCategory.Daily,
+      });
       setDailyActivities(_dailyActivities);
     };
     getDailyActivities();

@@ -48,7 +48,7 @@ const RemindersSettings = ({
           <ActivityItem
             key={index}
             hideStartIcon
-            activity={action.title}
+            activity={action.group}
             style={styles.activityItem}
             showEndIcon
             customEndIcon={

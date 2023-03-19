@@ -1,40 +1,34 @@
-import moment from 'moment';
-
-moment.updateLocale('en', {
-  week: {
-    dow: 1,
-  },
-});
+import {
+  differenceInCalendarDays,
+  endOfWeek,
+  startOfWeek,
+  subWeeks,
+} from 'date-fns';
 
 export const capitalizeFirstLetter = (s: string) =>
   s.charAt(0).toUpperCase() + s.substring(1).toLowerCase();
 
 export const getDaysDifference = (startDate: Date, endDate: Date) => {
-  const startDateMomentInstance = moment(startDate);
-  const endDateMomentInstance = moment(endDate);
-  const daysDifference = endDateMomentInstance.diff(
-    startDateMomentInstance,
-    'days',
-  );
+  const daysDifference = differenceInCalendarDays(endDate, startDate);
   return daysDifference;
 };
 
 export const getStartOfThisWeek = () => {
-  const startOfThisWeek = moment().startOf('isoWeek');
-  return startOfThisWeek.toDate();
+  const startOfThisWeek = startOfWeek(new Date());
+  return startOfThisWeek;
 };
 
 export const getStartOfLastWeek = () => {
-  const startOfLastWeek = moment().subtract(1, 'week').startOf('isoWeek');
-  return startOfLastWeek.toDate();
+  const startOfLastWeek = startOfWeek(subWeeks(new Date(), 1));
+  return startOfLastWeek;
 };
 
 export const getEndOfThisWeek = () => {
-  const endOfThisWeek = moment().endOf('isoWeek');
-  return endOfThisWeek.toDate();
+  const endOfThisWeek = endOfWeek(new Date());
+  return endOfThisWeek;
 };
 
 export const getEndOfLastWeek = () => {
-  const endOfLastWeek = moment().subtract(1, 'week').endOf('isoWeek');
-  return endOfLastWeek.toDate();
+  const endOfLastWeek = endOfWeek(subWeeks(new Date(), 1));
+  return endOfLastWeek;
 };

@@ -1,12 +1,18 @@
 import React from 'react';
 import {StyleSheet, Text, View, StyleProp, ViewStyle} from 'react-native';
 import * as Progress from 'react-native-progress';
-import {GlobalColors, globalStyles, normalizeFont} from '../styles/global';
+import {
+  GlobalColors,
+  globalFonts,
+  globalStyles,
+  normalizeFont,
+} from '../styles/global';
+import {TotalEvaluationGroup} from '../types/global';
 
 export interface TotalActivityBreakdownProps {
   style?: StyleProp<ViewStyle>;
   progress: number;
-  activities: {name: string; completed: number; total: number}[];
+  activities: TotalEvaluationGroup[];
 }
 
 const TotalActivityBreakdown = ({
@@ -14,13 +20,21 @@ const TotalActivityBreakdown = ({
   progress,
   activities,
 }: TotalActivityBreakdownProps) => {
+  const formatCount = (count: number) => {
+    return count < 10 ? `0${count}` : count;
+  };
   return (
     <View style={[styles.card, style]}>
       <Progress.Circle
         size={70}
         progress={progress}
         showsText
-        formatText={prog => `${Math.round(prog * 1000) / 10}%`}
+        formatText={() => {
+          const percentage = (progress / 1) * 100;
+          return percentage % 1 === 0
+            ? `${percentage}%`
+            : `${percentage.toFixed(2)}%`;
+        }}
         style={styles.progress}
         textStyle={styles.progressText}
         color={GlobalColors.primary}
@@ -29,12 +43,14 @@ const TotalActivityBreakdown = ({
       />
       <View style={styles.details}>
         {activities.map((activity, index) => (
-          <View key={`breakdown-activity-${index}`}>
+          <View
+            key={`breakdown-activity-${index}`}
+            style={[index === activities.length - 1 && styles.breakdownItem]}>
             <View style={styles.activityRow}>
-              <Text style={styles.text}>{activity.name}</Text>
+              <Text style={styles.text}>{activity.title}</Text>
               <View style={styles.dots} />
-              <Text style={styles.text}>
-                {activity.completed}/{activity.total}
+              <Text style={[styles.text, styles.countText]}>
+                {formatCount(activity.completedCount)}/{activity.totalCount}
               </Text>
             </View>
           </View>
@@ -64,17 +80,21 @@ const styles = StyleSheet.create({
   },
   progressText: {
     color: '#505050',
-    fontWeight: '500',
-    fontSize: normalizeFont(20),
+    fontSize: normalizeFont(18),
+    ...globalFonts.spaceGrotesk.bold,
   },
   details: {
     flexGrow: 1,
+  },
+  breakdownItem: {
+    marginBottom: 10,
   },
   activityRow: {
     flexDirection: 'row',
   },
   text: {
     ...globalStyles.text,
+    ...globalFonts.aeonik.regular,
     color: GlobalColors.gray,
     fontSize: normalizeFont(14),
   },
@@ -84,6 +104,10 @@ const styles = StyleSheet.create({
     borderStyle: 'dotted',
     borderBottomColor: GlobalColors.gray,
     flexGrow: 1,
+  },
+  countText: {
+    ...globalFonts.aeonik.regular,
+    fontVariant: ['tabular-nums'],
   },
 });
 

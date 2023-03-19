@@ -4,14 +4,14 @@ import React, {useEffect, useState} from 'react';
 import {ScrollView, StyleSheet, Text} from 'react-native';
 import DailyActivityEvaluationCard from '../components/DailyActivityEvaluationCard';
 import {ProfileNavigatorParamList} from '../navigators/ProfileNavigator';
-import {globalStyles} from '../styles/global';
+import {ActivityService} from '../services/ActivityService';
+import {globalFonts, globalStyles} from '../styles/global';
 import {GroupedActivityEvaluation} from '../types/global';
-import {getActivitiesForCurrentDay, groupActivities} from '../utils/activities';
 
 const DailyEvaluation = ({
   route,
 }: NativeStackScreenProps<ProfileNavigatorParamList>) => {
-  const {activity: activityTitle} =
+  const {activityGroup} =
     route.params as ProfileNavigatorParamList['DailyEvaluation'];
   const [dailyActivitiesEvaluation, setDailyActivitiesEvaluation] = useState<
     GroupedActivityEvaluation[]
@@ -19,37 +19,30 @@ const DailyEvaluation = ({
 
   const isFocused = useIsFocused();
 
-  const formatDate = () => {
+  const getCurrentDate = () => {
     return new Date().toDateString();
   };
 
   useEffect(() => {
     const getDailyActivities = async () => {
-      const allActivities = await getActivitiesForCurrentDay();
-      const _dailyActivities = allActivities.data.filter(
-        activity =>
-          activity.title === activityTitle ||
-          activity.category === activityTitle,
-      );
-      const groupedActivities = groupActivities(_dailyActivities);
-      setDailyActivitiesEvaluation(groupedActivities);
+      const _dailyActivitiesEvaluation =
+        await ActivityService.groupDailyEvaluation(activityGroup);
+      setDailyActivitiesEvaluation(_dailyActivitiesEvaluation);
     };
     getDailyActivities();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFocused]);
 
   return (
     <ScrollView style={globalStyles.container}>
-      <Text style={[globalStyles.text, styles.date]}>{formatDate()}</Text>
+      <Text style={[globalStyles.text, styles.date]}>{getCurrentDate()}</Text>
       {dailyActivitiesEvaluation.map((activity, index) => (
         <DailyActivityEvaluationCard
           key={`activity-${index}`}
           style={styles.card}
-          activity={activity.title}
+          group={activity.group}
           progress={activity.progress}
-          actions={activity.content.map(action => ({
-            name: action.activity,
-            completed: action.completed,
-          }))}
+          activities={activity.activities}
         />
       ))}
     </ScrollView>
@@ -58,7 +51,7 @@ const DailyEvaluation = ({
 
 const styles = StyleSheet.create({
   date: {
-    fontWeight: '500',
+    ...globalFonts.aeonik.bold,
     marginBottom: 24,
   },
   card: {

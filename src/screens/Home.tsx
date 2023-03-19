@@ -8,7 +8,12 @@ import {
   Image,
   TextInput,
 } from 'react-native';
-import {GlobalColors, globalStyles, normalizeFont} from '../styles/global';
+import {
+  GlobalColors,
+  globalFonts,
+  globalStyles,
+  normalizeFont,
+} from '../styles/global';
 import AvatarSmImg from '../assets/avatar-sm.png';
 import Input from '../components/Input';
 import NotificationIconImg from '../assets/icons/notification.svg';
@@ -21,6 +26,9 @@ import MonthlyActivitiesIconImg from '../assets/icons/monthly-activities.png';
 import {RootNavigatorParamList} from '../navigators/RootNavigator';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useAppSelector} from '../redux/hooks';
+import {ActivityService} from '../services/ActivityService';
+import Button from '../components/Button';
+import {FilterType} from '../types/global';
 
 const Home = ({navigation}: NativeStackScreenProps<RootNavigatorParamList>) => {
   const [isSearchInputFocused, setIsSearchInputFocused] = useState(false);
@@ -66,6 +74,25 @@ const Home = ({navigation}: NativeStackScreenProps<RootNavigatorParamList>) => {
     navigation.navigate('Reminders');
   };
 
+  const handleOnTestPress = async () => {
+    console.log(
+      'test clicked +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++',
+    );
+
+    // delete all activities
+    // await ActivityService.deleteAll();
+
+    await ActivityService.groupPeriodicEvaluation(
+      FilterType.MONTHLY,
+      'Fajr',
+      new Date(),
+    );
+
+    console.log(
+      'test operation ended --------------------------------------------------------------------------------------------------',
+    );
+  };
+
   return (
     <View style={globalStyles.container}>
       <View style={styles.header}>
@@ -100,8 +127,9 @@ const Home = ({navigation}: NativeStackScreenProps<RootNavigatorParamList>) => {
       </View>
       <ScrollView style={[globalStyles.container, styles.scrollView]}>
         <View style={styles.greetingContainer}>
-          <Text style={styles.salam}>Salamun Alykum</Text>
+          <Text style={styles.salam}>As salaamu alaekum</Text>
           <Text style={styles.name}>{user.name},</Text>
+          {/* <Button text={'Test'} variant="solid" onPress={handleOnTestPress} /> */}
         </View>
 
         <View>
@@ -167,14 +195,15 @@ const styles = StyleSheet.create({
     marginTop: 14,
   },
   salam: {
-    fontSize: normalizeFont(28),
+    fontSize: normalizeFont(21),
     color: GlobalColors.primary,
-    fontWeight: '700',
+    ...globalFonts.spaceGrotesk.bold,
   },
   name: {
     ...globalStyles.text,
     fontSize: normalizeFont(20),
     color: GlobalColors.gray,
+    ...globalFonts.aeonik.regular,
   },
   banner: {
     marginTop: 32,
@@ -187,7 +216,7 @@ const styles = StyleSheet.create({
   activitiesTitle: {
     ...globalStyles.text,
     fontSize: normalizeFont(24),
-    fontWeight: '500',
+    ...globalFonts.spaceGrotesk.medium,
   },
   activityList: {
     marginTop: 24,

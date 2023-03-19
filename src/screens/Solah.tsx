@@ -3,14 +3,11 @@ import {StyleSheet, ScrollView, View} from 'react-native';
 import {globalStyles} from '../styles/global';
 import ActivityItem from '../components/ActivityItem';
 import Accordion from 'react-native-collapsible/Accordion';
-import {
-  ActivityCategory,
-  getActivitiesForCurrentDay,
-  SOLAH,
-  updateActivitiesForCurrentDay,
-} from '../utils/activities';
-import {Activity} from '../types/global';
+import {ActivityCategory, SOLAH} from '../utils/activities';
 import {useIsFocused} from '@react-navigation/native';
+import {ActivityService} from '../services/ActivityService';
+import {Activity} from '../database/entities/Activity';
+import {RawActivity} from '../types/global';
 
 const Solah = () => {
   const [activeSections, setActiveSections] = useState<number[]>([]);
@@ -33,36 +30,28 @@ const Solah = () => {
     }
   };
 
-  const handleOnCheckboxChange = async (
-    isSelected: boolean,
-    title: string,
-    activity: string,
-  ) => {
+  const handleOnCheckboxChange = async (isSelected: boolean, id: string) => {
     const _solahActivities = [...solahActivities];
     const changedActivityIndex = _solahActivities.findIndex(
-      solahActivity =>
-        solahActivity.activity === activity && solahActivity.title === title,
+      solahActivity => solahActivity.id === id,
     );
     _solahActivities[changedActivityIndex] = {
       ..._solahActivities[changedActivityIndex],
       completed: isSelected,
     };
     setSolahActivities(_solahActivities);
-    await updateActivitiesForCurrentDay(
-      _solahActivities,
-      ActivityCategory.Solah,
-    );
+    await ActivityService.update(id, _solahActivities[changedActivityIndex]);
   };
 
   const renderHeader = (
-    section: typeof SOLAH[0],
+    section: RawActivity,
     index: number,
     isActive: boolean,
   ) => {
     return (
       <ActivityItem
         icon={section.icon}
-        activity={section.title}
+        activity={section.group}
         style={[styles.accordionHeader, !isActive && styles.activityItem]}
         showEndIcon={true}
         endIcon={isActive ? 'chevron-up' : 'chevron-down'}
@@ -71,24 +60,24 @@ const Solah = () => {
     );
   };
 
-  const renderContent = ({title}: {title: string}, _index: number) => {
+  const renderContent = ({group}: {group: string}, _index: number) => {
     return (
       <View style={styles.content}>
         {solahActivities
-          .filter(activity => activity.title === title)
+          .filter(activity => activity.group === group)
           .map((contentItem, contentIndex) => (
             <ActivityItem
               key={contentIndex}
               icon={contentItem.icon}
-              activity={contentItem.activity}
+              activity={contentItem.title}
               style={styles.contentItemActivity}
               showEndIcon={true}
               endIcon={'checkbox'}
               bindItemToCheckbox
               defaultCheckboxState={contentItem.completed}
-              checkboxValue={`${contentItem.title}-${contentItem.activity}`}
+              checkboxValue={`${contentItem.group}-${contentItem.title}`}
               onCheckboxChange={isSelected =>
-                handleOnCheckboxChange(isSelected, title, contentItem.activity)
+                handleOnCheckboxChange(isSelected, contentItem.id)
               }
             />
           ))}
@@ -98,10 +87,9 @@ const Solah = () => {
 
   useEffect(() => {
     const getSolahActivities = async () => {
-      const allActivities = await getActivitiesForCurrentDay();
-      const _solahActivities = allActivities.data.filter(
-        activity => activity.category === ActivityCategory.Solah,
-      );
+      const _solahActivities = await ActivityService.getOrCreateForToday({
+        category: ActivityCategory.Solah,
+      });
       setSolahActivities(_solahActivities);
     };
     getSolahActivities();

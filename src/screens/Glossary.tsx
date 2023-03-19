@@ -19,6 +19,8 @@ const Glossary = () => {
   const [isSearchInputFocused, setIsSearchInputFocused] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedWord, setSelectedWord] = useState<GlossaryItem>();
+  const [glossaryItems, setGlossaryItems] =
+    useState<GlossaryItem[]>(ORDERED_GLOSSARY);
   const searchInputRef = useRef<TextInput | null>(null);
 
   const handleOnPressSearchInputIcon = () => {
@@ -39,9 +41,20 @@ const Glossary = () => {
       onPress={() => handleOnPressGlossaryItem(item)}
       style={styles.item}>
       <Text style={styles.word}>{'\u2022'}</Text>
-      <Text style={[styles.itemText, styles.word]}>{item.word}</Text>
+      <Text style={[styles.itemText, styles.word]}>{item.name}</Text>
     </Pressable>
   );
+
+  const handleOnTypeSearchInput = (text: string) => {
+    if (text) {
+      const filteredGlossary = ORDERED_GLOSSARY.filter(glossaryItem =>
+        glossaryItem.slug.toLowerCase().includes(text.toLowerCase()),
+      );
+      setGlossaryItems(filteredGlossary);
+    } else {
+      setGlossaryItems(ORDERED_GLOSSARY);
+    }
+  };
 
   const handleOnPressOkay = () => {
     setSelectedWord(undefined);
@@ -62,6 +75,7 @@ const Glossary = () => {
           innerRef={searchInputRef}
           placeholder="Search here"
           style={styles.searchInput}
+          onChangeText={handleOnTypeSearchInput}
           onFocus={() => handleOnSearchInputFocus(true)}
           onEndEditing={() => handleOnSearchInputFocus(false)}
         />
@@ -69,10 +83,10 @@ const Glossary = () => {
       <Modal isOpen={modalVisible} avoidKeyboard>
         <Modal.Content>
           <View style={styles.modalBody}>
-            <Text style={globalStyles.text}>{selectedWord?.word}</Text>
+            <Text style={globalStyles.text}>{selectedWord?.name}</Text>
             <View style={styles.definitionContainer}>
               <Text style={styles.definitionText}>
-                {selectedWord?.definition}
+                {selectedWord?.explanation}
               </Text>
             </View>
             <Button
@@ -86,7 +100,7 @@ const Glossary = () => {
       </Modal>
       <FlatList
         style={styles.list}
-        data={ORDERED_GLOSSARY}
+        data={glossaryItems}
         renderItem={renderItem}
       />
     </View>
