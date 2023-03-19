@@ -88,9 +88,14 @@ const Profile = ({
         `avatar${new Date().getTime()}.$2`,
       );
 
-      const fileExists = await RNFS.exists(user.avatarPath as string).then(
-        exists => exists,
-      );
+      let fileExists = false;
+
+      if (user.avatarPath) {
+        fileExists = await RNFS.exists(user.avatarPath as string).then(
+          exists => exists,
+        );
+      }
+
       if (fileExists) {
         await RNFS.unlink(user.avatarPath!);
       }

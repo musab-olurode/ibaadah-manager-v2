@@ -38,11 +38,11 @@ const RemindersList = ({
               <ActivityItem
                 key={index}
                 hideStartIcon
-                activity={activity.title}
+                activity={activity.group}
                 style={styles.activityItem}
                 showEndIcon
                 customEndIcon={<Image source={ReminderIconImg} />}
-                onPress={() => handleOnPressItem(activity.title)}
+                onPress={() => handleOnPressItem(activity.group)}
               />
             ))}
           </View>
@@ -53,11 +53,11 @@ const RemindersList = ({
               <ActivityItem
                 key={index}
                 hideStartIcon
-                activity={activity.title}
+                activity={activity.group}
                 style={styles.activityItem}
                 showEndIcon
                 customEndIcon={<Image source={ReminderIconImg} />}
-                onPress={() => handleOnPressItem(activity.title)}
+                onPress={() => handleOnPressItem(activity.group)}
               />
             ))}
           </View>
@@ -68,11 +68,11 @@ const RemindersList = ({
               <ActivityItem
                 key={index}
                 hideStartIcon
-                activity={activity.title}
+                activity={activity.group}
                 style={styles.activityItem}
                 showEndIcon
                 customEndIcon={<Image source={ReminderIconImg} />}
-                onPress={() => handleOnPressItem(activity.title)}
+                onPress={() => handleOnPressItem(activity.group)}
               />
             ))}
           </View>

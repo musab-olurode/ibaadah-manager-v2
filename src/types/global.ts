@@ -13,8 +13,11 @@ export enum SubFilterType {
 }
 
 export interface GlossaryItem {
-  word: string;
+  sn: number;
+  name: string;
+  slug: string;
   definition: string;
+  explanation: string;
 }
 
 export enum StorageKeys {
@@ -23,22 +26,53 @@ export enum StorageKeys {
   ACTIVITIES = 'ACTIVITIES',
 }
 
+interface RawActivitySubActivity {
+  icon: number;
+  order: number;
+  title: string;
+}
+
+export interface RawActivity {
+  icon: number;
+  group: string;
+  activities: RawActivitySubActivity[];
+}
+
 export interface Activity {
   icon: number;
-  title: string;
+  order: number;
+  group: string;
   category: ActivityCategory;
-  activity: string;
+  title: string;
   completed: boolean;
 }
 
-export interface ActivityStorage {
-  data: Activity[];
-  date: string;
+export interface EvaluationGroup {
+  title: string;
+  group: string;
+  category: ActivityCategory;
+  completed: boolean;
+}
+
+export interface TotalEvaluationGroup {
+  title: string;
+  group: string;
+  category: ActivityCategory;
+  completedCount: number;
+  totalCount: number;
 }
 
 export interface GroupedActivityEvaluation {
   title: string;
+  group: string;
   progress: number;
   completedCount: number;
-  content: Activity[];
+  totalCount: number;
+  activities: EvaluationGroup[];
+}
+
+export interface TotalGroupedActivityEvaluation {
+  group: string;
+  progress: number;
+  activities: TotalEvaluationGroup[];
 }

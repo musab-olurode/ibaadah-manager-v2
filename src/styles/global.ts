@@ -52,6 +52,37 @@ export const globalStyles = StyleSheet.create({
   },
 });
 
+export const globalFonts = {
+  aeonik: {
+    regular: {
+      fontFamily: 'Aeonik-Regular',
+    },
+    medium: {
+      fontFamily: 'Aeonik-Medium',
+    },
+    light: {
+      fontFamily: 'Aeonik-Light',
+    },
+    bold: {
+      fontFamily: 'Aeonik-Bold',
+    },
+  },
+  spaceGrotesk: {
+    regular: {
+      fontFamily: 'SpaceGrotesk-Regular',
+    },
+    medium: {
+      fontFamily: 'SpaceGrotesk-Medium',
+    },
+    light: {
+      fontFamily: 'SpaceGrotesk-Light',
+    },
+    bold: {
+      fontFamily: 'SpaceGrotesk-Bold',
+    },
+  },
+};
+
 // const isDarkMode = useColorScheme() === 'dark';
 
 // const backgroundStyle = {

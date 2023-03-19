@@ -2,19 +2,24 @@ import {Checkbox} from 'native-base';
 import React from 'react';
 import {StyleProp, StyleSheet, Text, View, ViewStyle} from 'react-native';
 import * as Progress from 'react-native-progress';
-import {GlobalColors, globalStyles, normalizeFont} from '../styles/global';
+import {
+  GlobalColors,
+  globalFonts,
+  globalStyles,
+  normalizeFont,
+} from '../styles/global';
 
 export interface DailyActivityEvaluationCardProps {
-  activity: string;
+  group: string;
   progress: number;
   style?: StyleProp<ViewStyle>;
-  actions: {name: string; completed: boolean}[];
+  activities: {title: string; completed: boolean}[];
 }
 
 const DailyActivityEvaluationCard = ({
-  activity,
+  group,
   progress,
-  actions,
+  activities,
   style,
 }: DailyActivityEvaluationCardProps) => {
   return (
@@ -23,7 +28,12 @@ const DailyActivityEvaluationCard = ({
         size={70}
         progress={progress}
         showsText
-        formatText={prog => `${Math.round(prog * 1000) / 10}%`}
+        formatText={() => {
+          const percentage = (progress / 1) * 100;
+          return percentage % 1 === 0
+            ? `${percentage}%`
+            : `${percentage.toFixed(2)}%`;
+        }}
         style={styles.progress}
         textStyle={styles.progressText}
         color={GlobalColors.primary}
@@ -31,17 +41,17 @@ const DailyActivityEvaluationCard = ({
         borderColor="#DEEDE7"
       />
       <View style={styles.details}>
-        <Text style={[globalStyles.text, styles.activity]}>{activity}</Text>
+        <Text style={[globalStyles.text, styles.group]}>{group}</Text>
         <View style={styles.actions}>
-          {actions.map((action, index) => (
+          {activities.map((activity, index) => (
             <View key={`action-${index}`} style={styles.actionRow}>
-              <Text style={styles.actionTitle}>{action.name}</Text>
+              <Text style={styles.actionTitle}>{activity.title}</Text>
               <Checkbox
-                value={action.name}
-                accessibilityLabel={`${action.name} check`}
+                value={activity.title}
+                accessibilityLabel={`${activity.title} check`}
                 size="sm"
                 isDisabled
-                defaultIsChecked={action.completed}
+                defaultIsChecked={activity.completed}
               />
             </View>
           ))}
@@ -71,14 +81,14 @@ const styles = StyleSheet.create({
   },
   progressText: {
     color: '#505050',
-    fontWeight: '500',
-    fontSize: normalizeFont(20),
+    fontSize: normalizeFont(18),
+    ...globalFonts.spaceGrotesk.bold,
   },
   details: {
     flexGrow: 1,
   },
-  activity: {
-    fontWeight: '600',
+  group: {
+    ...globalFonts.spaceGrotesk.bold,
   },
   actions: {
     marginTop: 18,
@@ -89,9 +99,9 @@ const styles = StyleSheet.create({
   },
   actionTitle: {
     flexGrow: 1,
-    fontWeight: '400',
     fontSize: normalizeFont(14),
     color: GlobalColors['gray.2'],
+    ...globalFonts.aeonik.regular,
   },
 });
 
