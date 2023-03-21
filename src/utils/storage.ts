@@ -1,4 +1,4 @@
-import {ActivityStorage, StorageKeys, ReminderStorage} from '../types/global';
+import {StorageKeys, ReminderStorage} from '../types/global';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export interface User {
@@ -19,21 +19,6 @@ export const getUser = async (): Promise<User> => {
 
 export const setUser = async (state: User) => {
   await AsyncStorage.setItem(StorageKeys.USER, JSON.stringify(state));
-};
-
-export const getActivities = async (): Promise<ActivityStorage[]> => {
-  const stringifiedState = await AsyncStorage.getItem(StorageKeys.ACTIVITIES);
-
-  if (!stringifiedState) {
-    return [];
-  }
-  const state = JSON.parse(stringifiedState);
-
-  return state as ActivityStorage[];
-};
-
-export const setActivities = async (state: ActivityStorage[]) => {
-  await AsyncStorage.setItem(StorageKeys.ACTIVITIES, JSON.stringify(state));
 };
 
 export const setReminder = async (state: ReminderStorage[], db: string) => {

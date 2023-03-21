@@ -5,7 +5,7 @@ import RNBootSplash from 'react-native-bootsplash';
 import Home from '../screens/Home';
 import Onboarding from '../screens/Onboarding';
 import DailyActivities from '../screens/DailyActivities';
-import {GlobalColors} from '../styles/global';
+import {GlobalColors, globalFonts} from '../styles/global';
 import Solah from '../screens/Solah';
 import WeeklyActivities from '../screens/WeeklyActivities';
 import MonthlyActivities from '../screens/MonthlyActivities';
@@ -18,8 +18,9 @@ import {getOnboardingState} from '../utils/onboarding';
 import {getUser} from '../utils/storage';
 import {setUserDetails} from '../redux/user/userSlice';
 import {useAppDispatch} from '../redux/hooks';
-import {synchronizeActivities} from '../utils/activities';
 import {connectDB} from '../database/config';
+import {ActivityService} from '../services/ActivityService';
+import {setGlobalActivityDetails} from '../redux/activity/activitySlice';
 
 export type RootNavigatorParamList = {
   Onboarding: undefined;
@@ -56,7 +57,9 @@ const RootNavigator = () => {
     if (hasOnboarded === 'true') {
       await populateUserInState();
       setShowOnboarding(false);
-      await synchronizeActivities();
+      await ActivityService.synchronizeActivities();
+      const firstDayDate = await ActivityService.getFirstDay();
+      dispatch(setGlobalActivityDetails({firstDay: firstDayDate}));
     }
 
     RNBootSplash.hide({fade: true});
@@ -64,6 +67,7 @@ const RootNavigator = () => {
 
   useEffect(() => {
     handleAppStart();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -86,6 +90,7 @@ const RootNavigator = () => {
         options={{
           headerTitle: 'Daily Activities',
           headerStyle: styles.flatHeader,
+          headerTitleStyle: styles.flatHeaderText,
           headerShadowVisible: false,
         }}
       />
@@ -95,6 +100,7 @@ const RootNavigator = () => {
         options={{
           headerTitle: 'Solah',
           headerStyle: styles.flatHeader,
+          headerTitleStyle: styles.flatHeaderText,
           headerShadowVisible: false,
         }}
       />
@@ -104,6 +110,7 @@ const RootNavigator = () => {
         options={{
           headerTitle: 'Weekly Activities',
           headerStyle: styles.flatHeader,
+          headerTitleStyle: styles.flatHeaderText,
           headerShadowVisible: false,
         }}
       />
@@ -113,6 +120,7 @@ const RootNavigator = () => {
         options={{
           headerTitle: 'Monthly Activities',
           headerStyle: styles.flatHeader,
+          headerTitleStyle: styles.flatHeaderText,
           headerShadowVisible: false,
         }}
       />
@@ -122,6 +130,7 @@ const RootNavigator = () => {
         options={{
           headerTitle: 'Add/Remove Activities',
           headerStyle: styles.flatHeader,
+          headerTitleStyle: styles.flatHeaderText,
           headerShadowVisible: false,
         }}
       />
@@ -131,6 +140,7 @@ const RootNavigator = () => {
         options={{
           headerTitle: 'Reminders',
           headerStyle: styles.flatHeader,
+          headerTitleStyle: styles.flatHeaderText,
           headerShadowVisible: false,
         }}
       />
@@ -140,6 +150,7 @@ const RootNavigator = () => {
         options={({route}) => ({
           headerTitle: `${route.params.category} Activities`,
           headerStyle: styles.flatHeader,
+          headerTitleStyle: styles.flatHeaderText,
           headerShadowVisible: false,
         })}
       />
@@ -148,6 +159,7 @@ const RootNavigator = () => {
         component={RemindersSettings}
         options={({route}) => ({
           headerTitle: `${route.params.activity}`,
+          headerTitleStyle: styles.flatHeaderText,
           headerStyle: styles.flatHeader,
           headerShadowVisible: false,
         })}
@@ -164,6 +176,9 @@ const RootNavigator = () => {
 const styles = StyleSheet.create({
   flatHeader: {
     backgroundColor: GlobalColors.background,
+  },
+  flatHeaderText: {
+    ...globalFonts.spaceGrotesk.medium,
   },
 });
 

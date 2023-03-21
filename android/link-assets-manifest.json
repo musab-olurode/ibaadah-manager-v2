@@ -1,0 +1,37 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "src/assets/fonts/Aeonik-Bold.otf",
+      "sha1": "4f2ce3d81d3cfb85ac46d73b024b0f626765a06c"
+    },
+    {
+      "path": "src/assets/fonts/Aeonik-Light.otf",
+      "sha1": "71c14766339bed3fddc7bbec1e042e4f3c81b980"
+    },
+    {
+      "path": "src/assets/fonts/Aeonik-Medium.otf",
+      "sha1": "2f08ac4aedccab83ff7aa5d74a0cbbbdf8789862"
+    },
+    {
+      "path": "src/assets/fonts/Aeonik-Regular.otf",
+      "sha1": "23c5509c167f7fb3985302a148e5d97d74f573df"
+    },
+    {
+      "path": "src/assets/fonts/SpaceGrotesk-Bold.otf",
+      "sha1": "9f8e19422a08e9a505c6dd901bf859c7ec2cb806"
+    },
+    {
+      "path": "src/assets/fonts/SpaceGrotesk-Light.otf",
+      "sha1": "5857e2a6cc01d03a1f879bfafb27dc208b5ef6dc"
+    },
+    {
+      "path": "src/assets/fonts/SpaceGrotesk-Medium.otf",
+      "sha1": "cb5b12a21508fa7b836454153524b3395de9fe2a"
+    },
+    {
+      "path": "src/assets/fonts/SpaceGrotesk-Regular.otf",
+      "sha1": "4a61d1a3391409b87da1c46c2ecbbce10c6f4952"
+    }
+  ]
+}

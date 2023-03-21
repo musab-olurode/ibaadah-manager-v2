@@ -1,5 +1,5 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -12,7 +12,12 @@ import {
   StyleProp,
 } from 'react-native';
 import {ProfileNavigatorParamList} from '../navigators/ProfileNavigator';
-import {GlobalColors, globalStyles, normalizeFont} from '../styles/global';
+import {
+  GlobalColors,
+  globalFonts,
+  globalStyles,
+  normalizeFont,
+} from '../styles/global';
 import CalendarPicker from 'react-native-calendar-picker';
 import ChevronLeftIcon from '../assets/icons/chevron-left.svg';
 import ChevronRightIcon from '../assets/icons/chevron-right.svg';
@@ -20,51 +25,83 @@ import CollapsedCalender from '../components/CollapsedCalender';
 import WeeklyActivitiesIconImg from '../assets/icons/weekly-activities.png';
 import MonthlyActivitiesIconImg from '../assets/icons/monthly-activities.png';
 import {
-  ActivityStorage,
   FilterType,
   GroupedActivityEvaluation,
+  TotalGroupedActivityEvaluation,
   SubFilterType,
 } from '../types/global';
 import {Select} from 'native-base';
 import FilterIconImg from '../assets/icons/filter.svg';
 import Chip from '../components/Chip';
-import {
-  getActivitiesForCurrentWeek,
-  getActivitiesForLastWeek,
-  groupActivities,
-} from '../utils/activities';
 import ActivityItem from '../components/ActivityItem';
 import TotalActivityBreakdown from '../components/TotalActivityBreakdown';
 import {Moment} from 'moment';
 import {useIsFocused} from '@react-navigation/native';
+import {ActivityService} from '../services/ActivityService';
+import {useAppSelector} from '../redux/hooks';
+import {getStartOfLastWeek} from '../utils/global';
 
 const PeriodicEvaluation = ({
   route,
 }: NativeStackScreenProps<ProfileNavigatorParamList>) => {
-  const {filter, activity: activityTitle} =
+  const {filter, activityGroup} =
     route.params as ProfileNavigatorParamList['PeriodicEvaluation'];
   const [calenderDisplay, setCalendarDisplay] = useState<'weekly' | 'monthly'>(
     'weekly',
   );
   const [subFilter, setSubFilter] = useState(SubFilterType.INDIVIDUAL);
-  const [selectedChip, setSelectedChip] = useState('');
+  const [selectedGroup, setSelectedGroup] = useState('');
   const [selectedActivityGroup, setSelectedActivityGroup] =
     useState<GroupedActivityEvaluation>();
-  const [activitiesForTheWeek, setActivitiesForTheWeek] = useState<
-    ActivityStorage[]
-  >([]);
-  const [weeklyActivitiesEvaluation, setWeeklyActivitiesEvaluation] = useState<
+  const [periodicEvaluation, setPeriodicEvaluation] = useState<
     GroupedActivityEvaluation[]
   >([]);
+  const [totalPeriodicEvaluation, setTotalPeriodicEvaluation] = useState<
+    TotalGroupedActivityEvaluation[]
+  >([]);
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [customPeriodEndDate, setCustomPeriodEndDate] = useState<Date>();
 
   const isFocused = useIsFocused();
+  const globalActivity = useAppSelector(state => state.activity);
+  const startOfLastWeek = getStartOfLastWeek();
 
-  const handleOnSelectSubFilter = (value: string) => {
+  const handleOnSelectSubFilter = async (value: string) => {
     setSubFilter(value as SubFilterType);
+    if (value === SubFilterType.TOTAL) {
+      const groupedActivities = await ActivityService.groupPeriodicEvaluation(
+        filter as Exclude<FilterType, FilterType.TODAY>,
+        selectedGroup,
+        currentDate,
+        customPeriodEndDate,
+      );
+      // eslint-disable-next-line curly
+      if (groupedActivities.length === 0) return;
+      setSelectedGroup(groupedActivities[0].group);
+      setTotalPeriodicEvaluation(groupedActivities);
+    }
   };
 
-  const onDateChange = (date: Moment, type: 'START_DATE' | 'END_DATE') => {
-    console.log(date, type);
+  const onDateChange = async (
+    date: Moment,
+    type: 'START_DATE' | 'END_DATE',
+  ) => {
+    if (type === 'START_DATE') {
+      setCurrentDate(date.toDate());
+      setCustomPeriodEndDate(undefined);
+    } else {
+      setCustomPeriodEndDate(date.toDate());
+      const groupedActivities = await ActivityService.groupPeriodicEvaluation(
+        filter as Exclude<FilterType, FilterType.TODAY>,
+        selectedGroup,
+        currentDate,
+        date.toDate(),
+      );
+      // eslint-disable-next-line curly
+      if (groupedActivities.length === 0) return;
+      setSelectedGroup(groupedActivities[0].group);
+      setTotalPeriodicEvaluation(groupedActivities);
+    }
   };
 
   const customDayHeaderStylesCallback = (): {
@@ -78,7 +115,7 @@ const PeriodicEvaluation = ({
       textStyle: {
         color: GlobalColors['primary.900'],
         fontSize: normalizeFont(14),
-        fontWeight: '400',
+        ...globalFonts.spaceGrotesk.regular,
       },
     };
   };
@@ -94,7 +131,7 @@ const PeriodicEvaluation = ({
       textStyle: {
         color: GlobalColors['primary.900'],
         fontSize: normalizeFont(16),
-        fontWeight: '500',
+        ...globalFonts.aeonik.bold,
       },
       containerStyle: {},
       allowDisabled: false,
@@ -109,122 +146,92 @@ const PeriodicEvaluation = ({
     }
   };
 
-  const handleCalenderDateChange = (date: Date) => {
-    const activitiesForTheDay = activitiesForTheWeek.find(
-      activity =>
-        new Date(activity.date).toLocaleDateString() ===
-        new Date(date).toLocaleDateString(),
+  const handleCalenderDateChange = async (date: Date) => {
+    setCurrentDate(date);
+    const groupedActivities = await ActivityService.groupDailyEvaluation(
+      activityGroup,
+      date,
     );
-    const groupedActivities = groupActivities(activitiesForTheDay?.data || []);
-    setSelectedChip(groupedActivities[0]?.title || '');
+    // eslint-disable-next-line curly
+    if (groupedActivities.length === 0) return;
+    setSelectedGroup(groupedActivities[0].title);
     setSelectedActivityGroup(groupedActivities[0]);
-    setWeeklyActivitiesEvaluation(groupedActivities);
+    setPeriodicEvaluation(groupedActivities);
   };
 
-  const handleActivityGroupSelection = (activityGroup: string) => {
-    const selectedGroup = weeklyActivitiesEvaluation.find(
-      activity => activity.title === activityGroup,
-    );
-    setSelectedActivityGroup(selectedGroup);
-    setSelectedChip(activityGroup);
-  };
-
-  const totalActivitiesBreakdown = useMemo(() => {
-    let progress = 0;
-    let totalBreakdown: {name: string; completed: number; total: number}[] = [];
-    if (selectedActivityGroup) {
-      const totalActivitiesForGroup = activitiesForTheWeek.map(activity => {
-        const filteredActivities = activity.data.filter(
-          act => act.title === selectedActivityGroup.title,
-        );
-        return {...activity, data: filteredActivities};
-      });
-
-      totalBreakdown = totalActivitiesForGroup.reduce((acc, activity) => {
-        activity.data.map(act => {
-          const found = acc.find(item => item.name === act.activity);
-          if (found) {
-            found.completed = act.completed
-              ? found.completed + 1
-              : found.completed;
-          } else {
-            acc.push({
-              name: act.activity,
-              completed: 0,
-              total: filter === FilterType.MONTHLY ? 30 : 7,
-            });
-          }
-        });
-        return acc;
-      }, [] as {name: string; completed: number; total: number}[]);
-
-      const total = filter === FilterType.MONTHLY ? 30 : 7;
-      const totalCompleted = totalBreakdown.reduce((acc, item) => {
-        acc = acc + item.completed;
-        return acc;
-      }, 0);
-      progress = totalCompleted / (total * totalBreakdown.length);
+  const handleActivityGroupSelection = async (groupToSelect: string) => {
+    setSelectedGroup(groupToSelect);
+    if (subFilter === SubFilterType.INDIVIDUAL) {
+      const selectedEvaluationGroup = periodicEvaluation.find(
+        evaluationGroup => evaluationGroup.group === groupToSelect,
+      );
+      setSelectedActivityGroup(selectedEvaluationGroup);
+    } else {
+      const groupedActivities = await ActivityService.groupPeriodicEvaluation(
+        filter as Exclude<FilterType, FilterType.TODAY>,
+        groupToSelect,
+        currentDate,
+        customPeriodEndDate,
+      );
+      // eslint-disable-next-line curly
+      if (groupedActivities.length === 0) return;
+      setSelectedGroup(groupedActivities[0].group);
+      setTotalPeriodicEvaluation(groupedActivities);
     }
+  };
 
-    return {progress, totalBreakdown};
-  }, [selectedActivityGroup, activitiesForTheWeek]);
+  const determineSelectedDateInLastWeek = (
+    _firstDay: Date,
+    _startOfLastWeek: Date,
+  ) => {
+    return _firstDay >= _startOfLastWeek ? _firstDay : _startOfLastWeek;
+  };
 
   useEffect(() => {
     const getEvaluation = async () => {
-      if (filter === FilterType.THIS_WEEK) {
-        const activitiesForCurrentWeek = await getActivitiesForCurrentWeek(
-          activityTitle,
-        );
-        console.log('act------', activitiesForCurrentWeek);
-        setActivitiesForTheWeek(activitiesForCurrentWeek);
-        const activitiesForTheDay = activitiesForCurrentWeek.find(
-          activity =>
-            new Date(activity.date).toLocaleDateString() ===
-            new Date().toLocaleDateString(),
-        );
-        const groupedActivities = groupActivities(activitiesForTheDay!.data);
-        setSelectedChip(groupedActivities[0].title);
-        setSelectedActivityGroup(groupedActivities[0]);
-        setWeeklyActivitiesEvaluation(groupedActivities);
-      } else if (filter === FilterType.LAST_WEEK) {
-        const activitiesForCurrentWeek = await getActivitiesForLastWeek(
-          activityTitle,
-        );
-        setActivitiesForTheWeek(activitiesForCurrentWeek);
-        const sortedActivities = activitiesForCurrentWeek.sort(
-          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
-        );
-        if (activitiesForCurrentWeek.length > 0) {
-          const activitiesForTheFirstDayInTheWeek = sortedActivities.find(
-            activity =>
-              new Date(activity.date).toLocaleDateString() ===
-              new Date(sortedActivities[0].date).toLocaleDateString(),
-          );
-          const groupedActivities = groupActivities(
-            activitiesForTheFirstDayInTheWeek!.data,
-          );
-          setSelectedChip(groupedActivities[0].title);
-          setSelectedActivityGroup(groupedActivities[0]);
-          setWeeklyActivitiesEvaluation(groupedActivities);
-        }
-      }
+      const dateToUse =
+        filter === FilterType.LAST_WEEK
+          ? determineSelectedDateInLastWeek(
+              new Date(globalActivity.firstDay),
+              startOfLastWeek,
+            )
+          : currentDate;
+      const groupedActivities = await ActivityService.groupDailyEvaluation(
+        activityGroup,
+        dateToUse,
+      );
+      // eslint-disable-next-line curly
+      if (groupedActivities.length === 0) return;
+      setSelectedGroup(groupedActivities[0].group);
+      setSelectedActivityGroup(groupedActivities[0]);
+      setPeriodicEvaluation(groupedActivities);
     };
     getEvaluation();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFocused]);
 
   return (
     <ScrollView style={globalStyles.container}>
-      {filter === FilterType.MONTHLY && (
-        <View style={styles.toggleCalendarDisplay}>
+      <View style={styles.calendarTitleRow}>
+        <Text style={[globalStyles.text, styles.date]}>
+          {currentDate.toDateString()}
+        </Text>
+        {filter === FilterType.MONTHLY && (
           <Pressable onPress={toggleCalenderDisplay}>
             {calenderDisplay === 'weekly' ? (
-              <Image source={MonthlyActivitiesIconImg} />
+              <Image
+                style={styles.calenderDisplayIcon}
+                source={MonthlyActivitiesIconImg}
+              />
             ) : (
-              <Image source={WeeklyActivitiesIconImg} />
+              <Image
+                style={styles.calenderDisplayIcon}
+                source={WeeklyActivitiesIconImg}
+              />
             )}
           </Pressable>
-        </View>
-      )}
+        )}
+      </View>
       {calenderDisplay === 'weekly' ? (
         <CollapsedCalender
           type={
@@ -233,6 +240,8 @@ const PeriodicEvaluation = ({
               : FilterType.THIS_WEEK
           }
           onDateChange={handleCalenderDateChange}
+          firstDate={new Date(globalActivity.firstDay)}
+          isDisabled={subFilter === SubFilterType.TOTAL}
         />
       ) : (
         <View style={styles.calenderContainer}>
@@ -251,11 +260,14 @@ const PeriodicEvaluation = ({
             allowRangeSelection
             selectedDayTextStyle={styles.yearMonthTitle}
             onDateChange={onDateChange}
+            minDate={new Date(globalActivity.firstDay)}
+            maxDate={new Date()}
+            enableDateChange={subFilter === SubFilterType.INDIVIDUAL}
           />
         </View>
       )}
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionHeaderTitle}></Text>
+        <Text style={styles.sectionHeaderTitle}>{activityGroup}</Text>
         <View style={styles.selectContainer}>
           <Select
             variant="unstyled"
@@ -275,30 +287,35 @@ const PeriodicEvaluation = ({
         horizontal
         showsHorizontalScrollIndicator={false}
         style={styles.chips}>
-        {weeklyActivitiesEvaluation.map((activity, index) => (
+        {periodicEvaluation.map((activity, index) => (
           <Chip
             key={index}
-            title={activity.title}
+            title={activity.group}
             style={styles.chip}
-            active={selectedChip === activity.title}
-            onPress={() => handleActivityGroupSelection(activity.title)}
+            active={selectedGroup === activity.group}
+            onPress={() => handleActivityGroupSelection(activity.group)}
           />
         ))}
       </ScrollView>
 
       <View style={styles.breakdown}>
         {subFilter === SubFilterType.TOTAL ? (
-          <TotalActivityBreakdown
-            progress={totalActivitiesBreakdown.progress}
-            style={styles.breakdownItem}
-            activities={totalActivitiesBreakdown.totalBreakdown}
-          />
+          <View>
+            {totalPeriodicEvaluation?.map((content, index) => (
+              <TotalActivityBreakdown
+                key={`total-breakdown-${index}`}
+                progress={content.progress}
+                style={styles.breakdownItem}
+                activities={content.activities}
+              />
+            ))}
+          </View>
         ) : (
           <View>
-            {selectedActivityGroup?.content.map((content, index) => (
+            {selectedActivityGroup?.activities.map((content, index) => (
               <ActivityItem
                 key={`breakdown-${index}`}
-                activity={content.activity}
+                activity={content.title}
                 defaultCheckboxState={content.completed}
                 hideStartIcon={true}
                 showEndIcon={true}
@@ -315,10 +332,18 @@ const PeriodicEvaluation = ({
 };
 
 const styles = StyleSheet.create({
-  toggleCalendarDisplay: {
+  date: {
+    ...globalFonts.aeonik.bold,
+  },
+  calendarTitleRow: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: 20,
+  },
+  calenderDisplayIcon: {
+    width: 36,
+    height: 36,
   },
   calenderContainer: {
     borderRadius: 8,
@@ -339,6 +364,7 @@ const styles = StyleSheet.create({
   },
   yearMonthTitle: {
     color: 'white',
+    ...globalFonts.spaceGrotesk.bold,
   },
   sectionHeader: {
     marginTop: 40,
@@ -348,7 +374,7 @@ const styles = StyleSheet.create({
   },
   sectionHeaderTitle: {
     ...globalStyles.text,
-    fontWeight: '500',
+    ...globalFonts.spaceGrotesk.bold,
     fontSize: normalizeFont(22),
   },
   selectContainer: {
@@ -363,6 +389,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     width: '100%',
     borderRadius: 4,
+    ...globalFonts.aeonik.regular,
   },
   filterIcon: {
     marginRight: 16,

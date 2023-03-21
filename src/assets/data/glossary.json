@@ -1,0 +1,338 @@
+[
+  {
+    "sn": 1,
+    "slug": "Dhur",
+    "name": "Dhur",
+    "definition": "Dhur Prayer",
+    "explanation": "4 Raka'ah prayed at its time "
+  },
+  {
+    "sn": 2,
+    "slug": "Asr",
+    "name": "Asr",
+    "definition": "Asr Prayer",
+    "explanation": "4 Raka'ah prayed at its time"
+  },
+  {
+    "sn": 3,
+    "slug": "Maghrib",
+    "name": "Maghrib",
+    "definition": "Maghrib",
+    "explanation": "3 Raka'ah prayed at its time"
+  },
+  {
+    "sn": 4,
+    "slug": "Ishai",
+    "name": "Ishai",
+    "definition": "Ishai Prayer",
+    "explanation": "4 Raka'ah prayed at its time"
+  },
+  {
+    "sn": 5,
+    "slug": "Fajr",
+    "name": "Fajr",
+    "definition": "Fajr Prayer",
+    "explanation": "2 Raka'ah prayed at its time"
+  },
+  {
+    "sn": 6,
+    "slug": "Jamaah",
+    "name": "Jamaah (Solah)",
+    "definition": "Solah observed in jamaah",
+    "explanation": "Observing Solat in congregation and in the mosque"
+  },
+  {
+    "sn": 7,
+    "slug": "Alone",
+    "name": "Alone (Solah)",
+    "definition": "Solah observed alone",
+    "explanation": "When any of the Solat is observed alone and at home"
+  },
+  {
+    "sn": 8,
+    "slug": "AdhkarAfter",
+    "name": "Adhkar After (Solah)",
+    "definition": "Adhkar after solah",
+    "explanation": "It is the supplication enjoyed by the prophet to be done after every compulsory solat"
+  },
+  {
+    "sn": 9,
+    "slug": "Rawatib",
+    "name": "Rawatib",
+    "definition": "Rawatib",
+    "explanation": "The 12 Nawafil (super-rogatory prayer) before and after each compulsory solat which include;\ni. 2 or 4 raka'ah before Zuhr and 2 raka'ah after zuhr\nii. 2 Rak'ah before Asr\niii. 2 Rak'ah before magrib and 2 rak'ah after magrib\niv. 2 Rak'ah before Ishai and 2 rak'ah after Ishai\nv. 2 Rak'ah before Subhi and 2 rak'ah after Subhi"
+  },
+  {
+    "sn": 10,
+    "slug": "Nawafil",
+    "name": "Nawafil",
+    "definition": "The different types of nawafil (Tahajjud, Duha, etc)",
+    "explanation": "The different types of nawafil (Tahajjud, Duha, etc)"
+  },
+  {
+    "sn": 11,
+    "slug": "Tahajjud",
+    "name": "Tahajjud",
+    "definition": "Tahajjud prayer",
+    "explanation": "At least 2 rak'ah especially at the third part of the night"
+  },
+  {
+    "sn": 12,
+    "slug": "Dhua",
+    "name": "Dhua",
+    "definition": "Dhua prayer",
+    "explanation": "At least 2 raka'ah at sunrise (reward of one that performs umrah)"
+  },
+  {
+    "sn": 13,
+    "slug": "Taobah",
+    "name": "Taobah",
+    "definition": "Taobah prayer",
+    "explanation": "2 rak'ah before sleeping (reading suuratul kaafirun and ikhlas in the 2 rak'ah)"
+  },
+  {
+    "sn": 14,
+    "slug": "ShafiAndWitr",
+    "name": "Shafi And Witr",
+    "definition": "Shafi And Witr prayers",
+    "explanation": "2 rak'ah of rawaatib after ishai, and 1 witr after it and can be delayed till after Tahajjud"
+  },
+  {
+    "sn": 15,
+    "slug": "Adhkar",
+    "name": "Adhkar",
+    "definition": "Adhkar (Al-Mathuraat)",
+    "explanation": "Done in the morning and evening or night (after subh or anytime in the morning and before magrib or before sleeping)"
+  },
+  {
+    "sn": 16,
+    "slug": "Morning",
+    "name": "Morning (Adhkar)",
+    "definition": "Morning Adhkar",
+    "explanation": "Subhi adhkar after Solat"
+  },
+  {
+    "sn": 17,
+    "slug": "Evening",
+    "name": "Evening (Adhkar)",
+    "definition": "Evening Adhkar",
+    "explanation": "Asr adhkar after solat"
+  },
+  {
+    "sn": 18,
+    "slug": "Quran",
+    "name": "Quran",
+    "definition": "Quran (Tilaawah, hifdh, etc)",
+    "explanation": "Must be done everyday at least a Juz'u from suuratul Baqarah"
+  },
+  {
+    "sn": 19,
+    "slug": "Hifdh",
+    "name": "Hifdh",
+    "definition": "Hifdh (Memorization)",
+    "explanation": "Memorising at least a new verse everyday(pick a chapter)"
+  },
+  {
+    "sn": 20,
+    "slug": "Murajaah",
+    "name": "Murajaah",
+    "definition": "Murajaah (Revision)",
+    "explanation": "Revision of the memorised verses everyday"
+  },
+  {
+    "sn": 21,
+    "slug": "Tadabur",
+    "name": "Tadabur",
+    "definition": "Tadabur (Reflection)",
+    "explanation": "Reflect on the verses of the Qur'an or Hadith of the Prophet"
+  },
+  {
+    "sn": 22,
+    "slug": "HealthHabits",
+    "name": "Health Habits",
+    "definition": "Health Habits (General)",
+    "explanation": "Like daily chores such as laying bed, sweeping, washing clothes and the likes"
+  },
+  {
+    "sn": 23,
+    "slug": "Exercise",
+    "name": "Exercise",
+    "definition": "Exercise (Daily)",
+    "explanation": "Keeping fit ('a strong believer is better than the weak believer') everyday"
+  },
+  {
+    "sn": 24,
+    "slug": "TeethBrush",
+    "name": "Teeth brushing",
+    "definition": "Teeth brushing",
+    "explanation": "Teeth brushing - using miswak at least twice daily on waking up and before sleeping"
+  },
+  {
+    "sn": 25,
+    "slug": "HealthyFood",
+    "name": "Healthy Food",
+    "definition": "Eating Healthy Food",
+    "explanation": "At all items "
+  },
+  {
+    "sn": 26,
+    "slug": "Books",
+    "name": "Books",
+    "definition": "Books (Book reading)",
+    "explanation": "Picking a book to broaden your knowledge, and must be  done daily"
+  },
+  {
+    "sn": 27,
+    "slug": "IslamicBook",
+    "name": "Islamic Books",
+    "definition": "Reading Islamic Books",
+    "explanation": "Picking an islamic book to broaden your knowledge, and must be  done daily"
+  },
+  {
+    "sn": 28,
+    "slug": "SelfDevelopment",
+    "name": "Self Development (Books)",
+    "definition": "Books on self development",
+    "explanation": "Read books that will increase your self awareness and civilisation"
+  },
+  {
+    "sn": 29,
+    "slug": "Fasting",
+    "name": "Fasting",
+    "definition": "Fasting (Monday/Thursday)",
+    "explanation": "Fasting every Mondays and Thursday"
+  },
+  {
+    "sn": 30,
+    "slug": "FridaySunnah",
+    "name": "Friday Sunnah",
+    "definition": "Friday Sunnah (Nail cutting, etc)",
+    "explanation": "Bath ghusl, nail cutting, shaving, reading suratul kahf and going early to the mosque"
+  },
+  {
+    "sn": 31,
+    "slug": "Sadaqah",
+    "name": "Sadaqah",
+    "definition": "Sadaqah (Charity)",
+    "explanation": "Giving charity, even something as simple as a smile to your brother"
+  },
+  {
+    "sn": 32,
+    "slug": "FamilySitting",
+    "name": "Family Sitting",
+    "definition": "Family Sitting",
+    "explanation": "Picking a day out of the week to sit wht members o fhte family to treat the book \" family sitting-bayatul\""
+  },
+  {
+    "sn": 33,
+    "slug": "Monday",
+    "name": "Monday (Fasting)",
+    "definition": "Monday Fast",
+    "explanation": "Fasting every Monday to follow the tradition of the prophet"
+  },
+  {
+    "sn": 34,
+    "slug": "Thursday",
+    "name": "Thursday (Fasting)",
+    "definition": "Thursday Fast",
+    "explanation": "Fasting every Thursday to follow the tradition of the prophet"
+  },
+  {
+    "sn": 35,
+    "slug": "NailCutting",
+    "name": "Nail Cutting",
+    "definition": "Nail cutting on friday",
+    "explanation": "Cutting and cleaning of nails as a sunnah of the prophet on Friday"
+  },
+  {
+    "sn": 36,
+    "slug": "EarlyMosqueGoing",
+    "name": "Early Mosque Going",
+    "definition": "Going to the mosque early",
+    "explanation": "Going to the mosque very early and calmly"
+  },
+  {
+    "sn": 37,
+    "slug": "SuratulKhaf",
+    "name": "Suratul Khaf",
+    "definition": "Reading suratul Khaf on friday",
+    "explanation": "Reciting suratul kahf every Friday especially after Asr"
+  },
+  {
+    "sn": 38,
+    "slug": "DuaBetweenAsrAndMaghrib",
+    "name": "Dua Between Asr And Maghrib",
+    "definition": "Dua Between Asr And Maghrib",
+    "explanation": "Dua Between Asr And Maghrib"
+  },
+  {
+    "sn": 39,
+    "slug": "Donation",
+    "name": "Donation",
+    "definition": "Donation (Sadaqah)",
+    "explanation": "Giving charity, even something as simple as a smile to your brother"
+  },
+  {
+    "sn": 40,
+    "slug": "FamilyDiscussion",
+    "name": "Family Discussion",
+    "definition": "Family Discussion (Sitting)",
+    "explanation": "Discussing important and beneficial islamic topics with the family"
+  },
+  {
+    "sn": 41,
+    "slug": "Thirteenth",
+    "name": "Thirteenth",
+    "definition": "Fasting on the Thirteenth",
+    "explanation": "Fasting on the thirteenth of every hijrah month"
+  },
+  {
+    "sn": 42,
+    "slug": "Fourteenth",
+    "name": "Fourteenth",
+    "definition": "Fasting on the Fourteenth",
+    "explanation": "Fasting on the fourteenth of every hijrah month"
+  },
+  {
+    "sn": 43,
+    "slug": "Charity",
+    "name": "Charity",
+    "definition": "Charity",
+    "explanation": "Giving charity, even something as simple as a smile to your brother"
+  },
+  {
+    "sn": 44,
+    "slug": "Ziyaarah",
+    "name": "Ziyaarah",
+    "definition": "Ziyaarah (Visitation, eg cemetary, brotherly,  etc)",
+    "explanation": "Visiting  the graveyard to pray for the dead muslims and as a remembrance of the death and the day of judgement"
+  },
+  {
+    "sn": 45,
+    "slug": "Soliheen",
+    "name": "Soliheen",
+    "definition": "Soliheen (Ziyaartus - soliheen)",
+    "explanation": "Picking a time to visit the righteous and pious one amongst brothers or sisters"
+  },
+  {
+    "sn": 46,
+    "slug": "BrotherlyVisit",
+    "name": "Brotherly Visit",
+    "definition": "Brotherly Visitation",
+    "explanation": "Picking  a time to visit our brothers to strenghten the bond of brotherhood and assist one another"
+  },
+  {
+    "sn": 47,
+    "slug": "SickVisitation",
+    "name": "SickVisitation",
+    "definition": "Sick Visitation",
+    "explanation": "Going to hospitals and homes to visit and pray for the sick ones and as an opportunity to give thanks to Allah for His favours upon us"
+  },
+  {
+    "sn": 48,
+    "slug": "Cemetary",
+    "name": "Cemetary (Visitation)",
+    "definition": "Cemetary Visitation",
+    "explanation": "To pray for our our dead ones, a means of remembering death is inevitable"
+  }
+]

@@ -7,7 +7,7 @@ import {
   Dimensions,
   Animated,
 } from 'react-native';
-import {globalStyles, normalizeFont} from '../styles/global';
+import {globalFonts, globalStyles, normalizeFont} from '../styles/global';
 import PagerView, {
   PagerViewOnPageScrollEventData,
   PagerViewOnPageSelectedEvent,
@@ -161,7 +161,9 @@ const Onboarding = () => {
     <View style={globalStyles.container}>
       <View style={styles.skipContainer}>
         {currentPageIndex !== ONBOARDING_DATA.length - 1 && (
-          <Text style={globalStyles.text} onPress={handleOnPressStartOrSkip}>
+          <Text
+            style={[globalStyles.text, styles.skipText]}
+            onPress={handleOnPressStartOrSkip}>
             Skip
           </Text>
         )}
@@ -173,9 +175,13 @@ const Onboarding = () => {
         onPageScroll={onPageScroll}
         onPageSelected={handleOnPageSelected}>
         {ONBOARDING_DATA.map((data, index) => (
-          <View style={styles.page} key={`page-${index}`}>
-            <View>
-              <Image source={data.icon} />
+          <View key={`page-${index}`}>
+            <View style={styles.pageContent}>
+              <Image
+                resizeMode="contain"
+                style={[styles.pageIcon]}
+                source={data.icon}
+              />
               <View>{data.text}</View>
             </View>
           </View>
@@ -226,18 +232,29 @@ const styles = StyleSheet.create({
   skipContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
+    height: 25,
+    overflow: 'visible',
+  },
+  skipText: {
+    ...globalFonts.aeonik.regular,
   },
   pagerView: {
     flex: 1,
   },
-  page: {
+  pageContent: {
+    width: '100%',
+    height: '100%',
+    display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-evenly',
+  },
+  pageIcon: {
+    width: '100%',
+    height: 349,
   },
   pageText: {
     fontSize: normalizeFont(32),
-    fontWeight: '700',
+    ...globalFonts.spaceGrotesk.bold,
     alignItems: 'flex-end',
     alignContent: 'flex-end',
     textAlignVertical: 'bottom',

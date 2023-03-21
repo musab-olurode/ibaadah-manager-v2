@@ -14,6 +14,14 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		7699B88040F8A987B510C191 /* libPods-IbaadahManager-IbaadahManagerTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-IbaadahManager-IbaadahManagerTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		8C4B819C5B5B4E0A9ED9302E /* SpaceGrotesk-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 811559637FBF472597F671C3 /* SpaceGrotesk-Regular.otf */; };
+		6FA33A08FA464416B4285DA1 /* Aeonik-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = E651E35A32D64E4CABBE0154 /* Aeonik-Bold.otf */; };
+		8D8A077D5BB846FA9B3AD33C /* Aeonik-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = DAB0A7DC10114F1AA58B1EB3 /* Aeonik-Light.otf */; };
+		271F1F94F4FB4E27899425CC /* Aeonik-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 044161168FF64F27BC341015 /* Aeonik-Medium.otf */; };
+		A33AFDED3C9B4DFB86006793 /* Aeonik-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = B05241ECFF8B432EA528CFC6 /* Aeonik-Regular.otf */; };
+		D840123F1AEE4112B6F64C1E /* SpaceGrotesk-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 24F96DEC4E3A426C95829A92 /* SpaceGrotesk-Bold.otf */; };
+		20F79174651B4D9B99586FB3 /* SpaceGrotesk-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = FDA49330135C4EF9B37D032C /* SpaceGrotesk-Light.otf */; };
+		20ADF2677F5F43999A133680 /* SpaceGrotesk-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = D982583541DF470DB854B05B /* SpaceGrotesk-Medium.otf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +52,15 @@
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = IbaadahManager/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-IbaadahManager-IbaadahManagerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-IbaadahManager-IbaadahManagerTests.release.xcconfig"; path = "Target Support Files/Pods-IbaadahManager-IbaadahManagerTests/Pods-IbaadahManager-IbaadahManagerTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		949AA43835194F7D90DEF29A /* SpaceGrotesk-Regular.ttf */ = {isa = PBXFileReference; name = "SpaceGrotesk-Regular.ttf"; path = "../src/assets/fonts/SpaceGrotesk-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		811559637FBF472597F671C3 /* SpaceGrotesk-Regular.otf */ = {isa = PBXFileReference; name = "SpaceGrotesk-Regular.otf"; path = "../src/assets/fonts/SpaceGrotesk-Regular.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		E651E35A32D64E4CABBE0154 /* Aeonik-Bold.otf */ = {isa = PBXFileReference; name = "Aeonik-Bold.otf"; path = "../src/assets/fonts/Aeonik-Bold.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		DAB0A7DC10114F1AA58B1EB3 /* Aeonik-Light.otf */ = {isa = PBXFileReference; name = "Aeonik-Light.otf"; path = "../src/assets/fonts/Aeonik-Light.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		044161168FF64F27BC341015 /* Aeonik-Medium.otf */ = {isa = PBXFileReference; name = "Aeonik-Medium.otf"; path = "../src/assets/fonts/Aeonik-Medium.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		B05241ECFF8B432EA528CFC6 /* Aeonik-Regular.otf */ = {isa = PBXFileReference; name = "Aeonik-Regular.otf"; path = "../src/assets/fonts/Aeonik-Regular.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		24F96DEC4E3A426C95829A92 /* SpaceGrotesk-Bold.otf */ = {isa = PBXFileReference; name = "SpaceGrotesk-Bold.otf"; path = "../src/assets/fonts/SpaceGrotesk-Bold.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		FDA49330135C4EF9B37D032C /* SpaceGrotesk-Light.otf */ = {isa = PBXFileReference; name = "SpaceGrotesk-Light.otf"; path = "../src/assets/fonts/SpaceGrotesk-Light.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		D982583541DF470DB854B05B /* SpaceGrotesk-Medium.otf */ = {isa = PBXFileReference; name = "SpaceGrotesk-Medium.otf"; path = "../src/assets/fonts/SpaceGrotesk-Medium.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -122,6 +139,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				7597864270BF41888425C2CF /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -147,6 +165,23 @@
 			);
 			path = Pods;
 			sourceTree = "<group>";
+		};
+		7597864270BF41888425C2CF /* Resources */ = {
+			isa = "PBXGroup";
+			children = (
+				949AA43835194F7D90DEF29A /* SpaceGrotesk-Regular.ttf */,
+				811559637FBF472597F671C3 /* SpaceGrotesk-Regular.otf */,
+				E651E35A32D64E4CABBE0154 /* Aeonik-Bold.otf */,
+				DAB0A7DC10114F1AA58B1EB3 /* Aeonik-Light.otf */,
+				044161168FF64F27BC341015 /* Aeonik-Medium.otf */,
+				B05241ECFF8B432EA528CFC6 /* Aeonik-Regular.otf */,
+				24F96DEC4E3A426C95829A92 /* SpaceGrotesk-Bold.otf */,
+				FDA49330135C4EF9B37D032C /* SpaceGrotesk-Light.otf */,
+				D982583541DF470DB854B05B /* SpaceGrotesk-Medium.otf */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+			path = "";
 		};
 /* End PBXGroup section */
 
@@ -244,6 +279,15 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				A17B32BFA4A84D2BA6F702B1 /* SpaceGrotesk-Regular.ttf in Resources */,
+				8C4B819C5B5B4E0A9ED9302E /* SpaceGrotesk-Regular.otf in Resources */,
+				6FA33A08FA464416B4285DA1 /* Aeonik-Bold.otf in Resources */,
+				8D8A077D5BB846FA9B3AD33C /* Aeonik-Light.otf in Resources */,
+				271F1F94F4FB4E27899425CC /* Aeonik-Medium.otf in Resources */,
+				A33AFDED3C9B4DFB86006793 /* Aeonik-Regular.otf in Resources */,
+				D840123F1AEE4112B6F64C1E /* SpaceGrotesk-Bold.otf in Resources */,
+				20F79174651B4D9B99586FB3 /* SpaceGrotesk-Light.otf in Resources */,
+				20ADF2677F5F43999A133680 /* SpaceGrotesk-Medium.otf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

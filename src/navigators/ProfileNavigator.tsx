@@ -13,8 +13,8 @@ import Glossary from '../screens/Glossary';
 export type ProfileNavigatorParamList = {
   Profile: undefined;
   EvaluationList: {category: 'Daily' | 'Weekly' | 'Monthly'};
-  DailyEvaluation: {activity: string};
-  PeriodicEvaluation: {activity: string; filter: FilterType};
+  DailyEvaluation: {activityGroup: string};
+  PeriodicEvaluation: {activityGroup: string; filter: FilterType};
   Glossary: undefined;
 };
 
@@ -53,7 +53,7 @@ const ProfileNavigator = () => {
         name="DailyEvaluation"
         component={DailyEvaluation}
         options={({route}) => ({
-          headerTitle: `${route.params.activity} (Today)`,
+          headerTitle: `${route.params.activityGroup} (Today)`,
           headerStyle: styles.flatHeader,
           headerShadowVisible: false,
         })}
@@ -62,7 +62,7 @@ const ProfileNavigator = () => {
         name="PeriodicEvaluation"
         component={PeriodicEvaluation}
         options={({route}) => ({
-          headerTitle: `${route.params.activity} (${formatFilter(
+          headerTitle: `${route.params.activityGroup} (${formatFilter(
             route.params.filter,
           )})`,
           headerStyle: styles.flatHeader,

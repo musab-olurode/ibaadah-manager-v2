@@ -8,7 +8,7 @@ import {
   StyleProp,
   ViewStyle,
 } from 'react-native';
-import {globalStyles} from '../styles/global';
+import {globalFonts, globalStyles} from '../styles/global';
 import ChevronUpIconImg from '../assets/icons/chevron-up.svg';
 import ChevronDownIconImg from '../assets/icons/chevron-down.svg';
 import {Checkbox} from 'native-base';
@@ -60,7 +60,9 @@ const ActivityItem = ({
     <Pressable
       style={[styles.activityItem, disabled && styles.disabled, style]}
       onPress={handleOnPressItem}>
-      {!hideStartIcon && <Image source={icon || ZhurIconImg} />}
+      {!hideStartIcon && (
+        <Image style={styles.startIcon} source={icon || ZhurIconImg} />
+      )}
       <Text style={[styles.activity, hideStartIcon && styles.noStartIcon]}>
         {activity}
       </Text>
@@ -92,12 +94,17 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 16,
   },
+  startIcon: {
+    width: 48,
+    height: 48,
+  },
   noStartIcon: {
     marginLeft: 8,
   },
   activity: {
     marginLeft: 24,
     ...globalStyles.text,
+    ...globalFonts.aeonik.regular,
     shadowColor: 'rgba(0, 0, 0, 0.03)',
     shadowOffset: {
       width: 0,

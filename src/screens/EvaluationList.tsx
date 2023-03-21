@@ -13,6 +13,8 @@ import {
   MONTHLY_ACTIVITIES,
   WEEKLY_ACTIVITIES,
 } from '../utils/activities';
+import {getEndOfLastWeek} from '../utils/global';
+import {useAppSelector} from '../redux/hooks';
 
 const EvaluationList = ({
   route,
@@ -22,6 +24,9 @@ const EvaluationList = ({
     route.params as ProfileNavigatorParamList['EvaluationList'];
   const [filter, setFilter] = useState(FilterType.TODAY);
 
+  const globalActivity = useAppSelector(state => state.activity);
+  const endOfLastWeek = getEndOfLastWeek();
+
   const handleOnSelectFilter = (value: string) => {
     setFilter(value as FilterType);
   };
@@ -29,10 +34,13 @@ const EvaluationList = ({
   const handleOnPressItem = (activity: string) => {
     switch (filter) {
       case FilterType.TODAY:
-        navigation.push('DailyEvaluation', {activity});
+        navigation.push('DailyEvaluation', {activityGroup: activity});
         break;
       default:
-        navigation.push('PeriodicEvaluation', {activity, filter});
+        navigation.push('PeriodicEvaluation', {
+          activityGroup: activity,
+          filter,
+        });
         break;
     }
   };
@@ -50,7 +58,11 @@ const EvaluationList = ({
           onValueChange={handleOnSelectFilter}>
           <Select.Item label="Today" value={FilterType.TODAY} />
           <Select.Item label="This Week" value={FilterType.THIS_WEEK} />
-          <Select.Item label="Last Week" value={FilterType.LAST_WEEK} />
+          <Select.Item
+            label="Last Week"
+            value={FilterType.LAST_WEEK}
+            disabled={new Date(globalActivity.firstDay) > endOfLastWeek}
+          />
           <Select.Item label="Monthly" value={FilterType.MONTHLY} />
         </Select>
       </View>
@@ -68,9 +80,9 @@ const EvaluationList = ({
               <ActivityItem
                 key={index}
                 icon={activity.icon}
-                activity={activity.title}
+                activity={activity.group}
                 style={styles.activityItem}
-                onPress={() => handleOnPressItem(activity.title)}
+                onPress={() => handleOnPressItem(activity.group)}
               />
             ))}
           </View>
@@ -81,9 +93,9 @@ const EvaluationList = ({
               <ActivityItem
                 key={index}
                 icon={activity.icon}
-                activity={activity.title}
+                activity={activity.group}
                 style={styles.activityItem}
-                onPress={() => handleOnPressItem(activity.title)}
+                onPress={() => handleOnPressItem(activity.group)}
               />
             ))}
           </View>
@@ -94,9 +106,9 @@ const EvaluationList = ({
               <ActivityItem
                 key={index}
                 icon={activity.icon}
-                activity={activity.title}
+                activity={activity.group}
                 style={styles.activityItem}
-                onPress={() => handleOnPressItem(activity.title)}
+                onPress={() => handleOnPressItem(activity.group)}
               />
             ))}
           </View>

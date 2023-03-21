@@ -3,16 +3,13 @@ import {StyleSheet, ScrollView, View} from 'react-native';
 import {globalStyles} from '../styles/global';
 import ActivityItem from '../components/ActivityItem';
 import Accordion from 'react-native-collapsible/Accordion';
-import {
-  ActivityCategory,
-  getActivitiesForCurrentDay,
-  updateActivitiesForCurrentDay,
-  WEEKLY_ACTIVITIES,
-} from '../utils/activities';
+import {ActivityCategory, WEEKLY_ACTIVITIES} from '../utils/activities';
 import PlusIconImg from '../assets/icons/plus.svg';
 import {Fab} from 'native-base';
 import {useIsFocused} from '@react-navigation/native';
-import {Activity} from '../types/global';
+import {Activity} from '../database/entities/Activity';
+import {ActivityService} from '../services/ActivityService';
+import {RawActivity} from '../types/global';
 
 const WeeklyActivities = () => {
   const [activeSections, setActiveSections] = useState<number[]>([]);
@@ -37,36 +34,28 @@ const WeeklyActivities = () => {
 
   const onPressAddActivity = () => {};
 
-  const handleOnCheckboxChange = async (
-    isSelected: boolean,
-    title: string,
-    activity: string,
-  ) => {
+  const handleOnCheckboxChange = async (isSelected: boolean, id: string) => {
     const _weeklyActivities = [...weeklyActivities];
     const changedActivityIndex = _weeklyActivities.findIndex(
-      solahActivity =>
-        solahActivity.activity === activity && solahActivity.title === title,
+      solahActivity => solahActivity.id === id,
     );
     _weeklyActivities[changedActivityIndex] = {
       ..._weeklyActivities[changedActivityIndex],
       completed: isSelected,
     };
     setWeeklyActivities(_weeklyActivities);
-    await updateActivitiesForCurrentDay(
-      _weeklyActivities,
-      ActivityCategory.Weekly,
-    );
+    await ActivityService.update(id, _weeklyActivities[changedActivityIndex]);
   };
 
   const renderHeader = (
-    section: typeof WEEKLY_ACTIVITIES[0],
+    section: RawActivity,
     index: number,
     isActive: boolean,
   ) => {
     return (
       <ActivityItem
         icon={section.icon}
-        activity={section.title}
+        activity={section.group}
         style={[styles.accordionHeader, !isActive && styles.activityItem]}
         showEndIcon={true}
         endIcon={isActive ? 'chevron-up' : 'chevron-down'}
@@ -75,24 +64,24 @@ const WeeklyActivities = () => {
     );
   };
 
-  const renderContent = ({title}: {title: string}, _index: number) => {
+  const renderContent = ({group}: {group: string}, _index: number) => {
     return (
       <View style={styles.content}>
         {weeklyActivities
-          .filter(activity => activity.title === title)
+          .filter(activity => activity.group === group)
           .map((contentItem, contentIndex) => (
             <ActivityItem
               key={contentIndex}
               icon={contentItem.icon}
-              activity={contentItem.activity}
+              activity={contentItem.title}
               style={styles.contentItemActivity}
               showEndIcon={true}
               endIcon={'checkbox'}
               bindItemToCheckbox
               defaultCheckboxState={contentItem.completed}
-              checkboxValue={`${contentItem.title}-${contentItem.activity}`}
+              checkboxValue={`${contentItem.group}-${contentItem.title}`}
               onCheckboxChange={isSelected =>
-                handleOnCheckboxChange(isSelected, title, contentItem.activity)
+                handleOnCheckboxChange(isSelected, contentItem.id)
               }
             />
           ))}
@@ -102,10 +91,9 @@ const WeeklyActivities = () => {
 
   useEffect(() => {
     const getWeeklyActivities = async () => {
-      const allActivities = await getActivitiesForCurrentDay();
-      const _weeklyActivities = allActivities.data.filter(
-        activity => activity.category === ActivityCategory.Weekly,
-      );
+      const _weeklyActivities = await ActivityService.getOrCreateForToday({
+        category: ActivityCategory.Weekly,
+      });
       setWeeklyActivities(_weeklyActivities);
     };
     getWeeklyActivities();

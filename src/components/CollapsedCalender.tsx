@@ -1,25 +1,29 @@
-import moment from 'moment';
+import {addDays} from 'date-fns';
 import React, {useEffect, useState} from 'react';
 import {Pressable, StyleSheet, Text, View} from 'react-native';
-import {GlobalColors, globalStyles, normalizeFont} from '../styles/global';
-import {FilterType} from '../types/global';
 import {
-  getEndOfLastWeek,
-  getEndOfThisWeek,
-  getStartOfLastWeek,
-  getStartOfThisWeek,
-} from '../utils/global';
+  GlobalColors,
+  globalFonts,
+  globalStyles,
+  normalizeFont,
+} from '../styles/global';
+import {FilterType} from '../types/global';
+import {getStartOfLastWeek, getStartOfThisWeek} from '../utils/global';
 
 export interface CollapsedCalenderProps {
   defaultDate?: Date;
   onDateChange?: (date: Date) => void;
   type: FilterType.THIS_WEEK | FilterType.LAST_WEEK;
+  firstDate: Date;
+  isDisabled?: boolean;
 }
 
 const CollapsedCalender = ({
   onDateChange,
   type,
   defaultDate,
+  firstDate,
+  isDisabled,
 }: CollapsedCalenderProps) => {
   const [daysInTheWeek, setDaysInTheWeek] = useState(
     new Array(7).fill(new Date()),
@@ -28,9 +32,11 @@ const CollapsedCalender = ({
   const daysOfTheWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   const handleOnSelectDate = (date: Date) => {
-    setSelectedDate(date);
-    if (onDateChange) {
-      onDateChange(date);
+    if (!isDisabled && date >= firstDate && date <= new Date()) {
+      setSelectedDate(date);
+      if (onDateChange) {
+        onDateChange(date);
+      }
     }
   };
 
@@ -39,28 +45,32 @@ const CollapsedCalender = ({
       type === FilterType.THIS_WEEK
         ? getStartOfThisWeek()
         : getStartOfLastWeek();
-    var endOfWeek =
-      type === FilterType.THIS_WEEK ? getEndOfThisWeek() : getEndOfLastWeek();
-    var days = [];
-    var day = startOfWeek;
-    while (day <= endOfWeek) {
-      days.push(day);
-      day = moment(day).clone().add(1, 'd').toDate();
+    var daysInWeek = [];
+    for (let i = 0; i < 7; i++) {
+      const day = addDays(startOfWeek, i);
+      daysInWeek.push(day);
     }
-    const firstDay = days[0];
-    days.pop();
-    days.unshift(moment(firstDay).clone().subtract(1, 'd').toDate());
-    setDaysInTheWeek(days);
+    setDaysInTheWeek(daysInWeek);
     if (type === FilterType.LAST_WEEK && !defaultDate) {
-      setSelectedDate(days[0]);
+      setSelectedDate(daysInWeek[0]);
+      if (onDateChange) {
+        onDateChange(daysInWeek[0]);
+      }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <View style={styles.calender}>
       <View style={styles.weekHeader}>
         {daysOfTheWeek.map((day, index) => (
-          <Text key={`day-${index}`} style={[styles.date, styles.weekDay]}>
+          <Text
+            key={`day-${index}`}
+            style={[
+              styles.date,
+              styles.weekDay,
+              globalFonts.spaceGrotesk.bold,
+            ]}>
             {day}
           </Text>
         ))}
@@ -77,8 +87,10 @@ const CollapsedCalender = ({
             <Text
               style={[
                 styles.weekDay,
+                (date < firstDate || date > new Date()) && styles.disabledDate,
                 date.getDate() === selectedDate.getDate() &&
                   styles.selectedDateText,
+                globalFonts.aeonik.bold,
               ]}>
               {date.getDate()}
             </Text>
@@ -118,6 +130,9 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: normalizeFont(14),
     textAlign: 'center',
+  },
+  disabledDate: {
+    color: GlobalColors.gray,
   },
   selectedDate: {
     backgroundColor: 'white',
