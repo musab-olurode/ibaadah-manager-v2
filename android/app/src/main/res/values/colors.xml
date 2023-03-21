@@ -3,4 +3,5 @@
     <color name="primary_dark">#000000</color>
     <color name="bootsplash_status_bar_color">#FFFFFF</color>
     <color name="bootsplash_background">#FFFFFF</color>
+    <color name="white">#FFF</color>
 </resources>

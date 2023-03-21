@@ -21,6 +21,9 @@ export enum StorageKeys {
   USER = 'USER',
   ONBOARDING = 'ONBOARDING',
   ACTIVITIES = 'ACTIVITIES',
+  DAILY_REMINDER = 'DAILY_REMINDER',
+  WEEKLY_REMINDER = 'WEEKLY_REMINDER',
+  MONTHLY_REMINDER = 'MONTHLY_REMINDER',
 }
 
 export interface Activity {
@@ -41,4 +44,12 @@ export interface GroupedActivityEvaluation {
   progress: number;
   completedCount: number;
   content: Activity[];
+}
+export interface ReminderStorage {
+  title: string;
+  message: string;
+  bigText?: string;
+  particularActivity: string;
+  hour: number;
+  minute: number;
 }

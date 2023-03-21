@@ -18,7 +18,7 @@ const RemindersList = ({
   const {category} = route.params as RootNavigatorParamList['RemindersList'];
 
   const handleOnPressItem = (activity: string) => {
-    navigation.push('RemindersSettings', {activity});
+    navigation.push('RemindersSettings', {activity, category});
   };
 
   return (

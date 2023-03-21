@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {StyleSheet, Text, ScrollView, View} from 'react-native';
 import ActivityItem from '../components/ActivityItem';
 import {globalStyles, normalizeFont} from '../styles/global';
@@ -7,6 +7,7 @@ import WeeklyActivitiesIconImg from '../assets/icons/weekly-activities.png';
 import MonthlyActivitiesIconImg from '../assets/icons/monthly-activities.png';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootNavigatorParamList} from '../navigators/RootNavigator';
+import {createChannel} from '../utils/notificationService';
 
 const Reminders = ({
   navigation,
@@ -28,6 +29,9 @@ const Reminders = ({
       onPress: () => handleOnActivityGroup('Monthly'),
     },
   ];
+  useEffect(() => {
+    createChannel();
+  }, []);
 
   function handleOnActivityGroup(
     category: RootNavigatorParamList['RemindersList']['category'],

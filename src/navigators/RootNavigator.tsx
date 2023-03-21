@@ -32,7 +32,10 @@ export type RootNavigatorParamList = {
   ProfileNavigator: undefined;
   Reminders: undefined;
   RemindersList: {category: 'Daily' | 'Weekly' | 'Monthly'};
-  RemindersSettings: {activity: string};
+  RemindersSettings: {
+    activity: string;
+    category: 'Daily' | 'Weekly' | 'Monthly' | 'Solah';
+  };
 };
 
 const Stack = createNativeStackNavigator<RootNavigatorParamList>();
