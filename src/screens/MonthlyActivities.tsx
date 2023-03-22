@@ -3,15 +3,20 @@ import {StyleSheet, ScrollView, View} from 'react-native';
 import {globalStyles} from '../styles/global';
 import ActivityItem from '../components/ActivityItem';
 import Accordion from 'react-native-collapsible/Accordion';
-import {ActivityCategory, MONTHLY_ACTIVITIES} from '../utils/activities';
+import {ActivityCategory} from '../types/global';
+import {MONTHLY_ACTIVITIES} from '../utils/activities';
 import PlusIconImg from '../assets/icons/plus.svg';
 import {Fab} from 'native-base';
 import {useIsFocused} from '@react-navigation/native';
 import {Activity} from '../database/entities/Activity';
 import {RawActivity} from '../types/global';
 import {ActivityService} from '../services/ActivityService';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {RootNavigatorParamList} from '../navigators/RootNavigator';
 
-const MonthlyActivities = () => {
+const MonthlyActivities = ({
+  navigation,
+}: NativeStackScreenProps<RootNavigatorParamList>) => {
   const [activeSections, setActiveSections] = useState<number[]>([]);
   const [monthlyActivities, setMonthlyActivities] = useState<Activity[]>([]);
 
@@ -32,7 +37,9 @@ const MonthlyActivities = () => {
     }
   };
 
-  const onPressAddActivity = () => {};
+  const onPressAddActivity = () => {
+    navigation.push('ManageActivities', {category: ActivityCategory.Monthly});
+  };
 
   const handleOnCheckboxChange = async (isSelected: boolean, id: string) => {
     const _monthlyActivities = [...monthlyActivities];
@@ -52,16 +59,24 @@ const MonthlyActivities = () => {
     index: number,
     isActive: boolean,
   ) => {
-    return (
-      <ActivityItem
-        icon={section.icon}
-        activity={section.group}
-        style={[styles.accordionHeader, !isActive && styles.activityItem]}
-        showEndIcon={true}
-        endIcon={isActive ? 'chevron-up' : 'chevron-down'}
-        onPress={() => onPressAccordionHeader(index)}
-      />
+    const CUSTOM_GROUP = 'Custom';
+    const customActivities = monthlyActivities.filter(
+      activity => activity.group === CUSTOM_GROUP,
     );
+    if (section.group === CUSTOM_GROUP && customActivities.length === 0) {
+      return <></>;
+    } else {
+      return (
+        <ActivityItem
+          icon={section.icon}
+          activity={section.group}
+          style={[styles.accordionHeader, !isActive && styles.activityItem]}
+          showEndIcon={true}
+          endIcon={isActive ? 'chevron-up' : 'chevron-down'}
+          onPress={() => onPressAccordionHeader(index)}
+        />
+      );
+    }
   };
 
   const renderContent = ({group}: {group: string}, _index: number) => {
@@ -91,7 +106,7 @@ const MonthlyActivities = () => {
 
   useEffect(() => {
     const getDailyActivities = async () => {
-      const _monthlyActivities = await ActivityService.getOrCreateForToday({
+      const _monthlyActivities = await ActivityService.getOrCreateForThisMonth({
         category: ActivityCategory.Monthly,
       });
       setMonthlyActivities(_monthlyActivities);

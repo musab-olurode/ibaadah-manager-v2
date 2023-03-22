@@ -9,10 +9,12 @@ import PlusIconImg from '../assets/icons/plus.svg';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useIsFocused} from '@react-navigation/native';
 import {RootNavigatorParamList} from '../navigators/RootNavigator';
-import {ActivityCategory, DAILY_ACTIVITIES} from '../utils/activities';
+import {ActivityCategory} from '../types/global';
+import {DAILY_ACTIVITIES} from '../utils/activities';
 import {Activity} from '../database/entities/Activity';
 import {ActivityService} from '../services/ActivityService';
 import {RawActivity} from '../types/global';
+import {In} from 'typeorm';
 
 const DailyActivities = ({
   navigation,
@@ -42,7 +44,7 @@ const DailyActivities = ({
   };
 
   const onPressAddActivity = () => {
-    navigation.push('ManageActivities', {category: 'Daily'});
+    navigation.push('ManageActivities', {category: ActivityCategory.Daily});
   };
 
   const handleOnCheckboxChange = async (isSelected: boolean, id: string) => {
@@ -63,16 +65,24 @@ const DailyActivities = ({
     index: number,
     isActive: boolean,
   ) => {
-    return (
-      <ActivityItem
-        icon={section.icon}
-        activity={section.group}
-        style={[styles.accordionHeader, !isActive && styles.activityItem]}
-        showEndIcon={true}
-        endIcon={isActive ? 'chevron-up' : 'chevron-down'}
-        onPress={() => onPressAccordionHeader(index)}
-      />
+    const CUSTOM_GROUP = 'Custom';
+    const customActivities = dailyActivities.filter(
+      activity => activity.group === CUSTOM_GROUP,
     );
+    if (section.group === CUSTOM_GROUP && customActivities.length === 0) {
+      return <></>;
+    } else {
+      return (
+        <ActivityItem
+          icon={section.icon}
+          activity={section.group}
+          style={[styles.accordionHeader, !isActive && styles.activityItem]}
+          showEndIcon={true}
+          endIcon={isActive ? 'chevron-up' : 'chevron-down'}
+          onPress={() => onPressAccordionHeader(index)}
+        />
+      );
+    }
   };
 
   const renderContent = ({group}: {group: string}, _index: number) => {
@@ -103,7 +113,7 @@ const DailyActivities = ({
   useEffect(() => {
     const getDailyActivities = async () => {
       const _dailyActivities = await ActivityService.getOrCreateForToday({
-        category: ActivityCategory.Daily,
+        category: In([ActivityCategory.Daily, ActivityCategory.Solah]),
       });
       setDailyActivities(_dailyActivities);
     };

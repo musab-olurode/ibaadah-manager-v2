@@ -29,6 +29,7 @@ import {
   GroupedActivityEvaluation,
   TotalGroupedActivityEvaluation,
   SubFilterType,
+  ActivityCategory,
 } from '../types/global';
 import {Select} from 'native-base';
 import FilterIconImg from '../assets/icons/filter.svg';
@@ -39,18 +40,21 @@ import {Moment} from 'moment';
 import {useIsFocused} from '@react-navigation/native';
 import {ActivityService} from '../services/ActivityService';
 import {useAppSelector} from '../redux/hooks';
-import {getStartOfLastWeek} from '../utils/global';
 
 const PeriodicEvaluation = ({
   route,
 }: NativeStackScreenProps<ProfileNavigatorParamList>) => {
-  const {filter, activityGroup} =
+  const {filter, activityGroup, category} =
     route.params as ProfileNavigatorParamList['PeriodicEvaluation'];
   const [calenderDisplay, setCalendarDisplay] = useState<'weekly' | 'monthly'>(
     'weekly',
   );
-  const [subFilter, setSubFilter] = useState(SubFilterType.INDIVIDUAL);
-  const [selectedGroup, setSelectedGroup] = useState('');
+  const [subFilter, setSubFilter] = useState(
+    [ActivityCategory.Daily, ActivityCategory.Solah].includes(category)
+      ? SubFilterType.INDIVIDUAL
+      : SubFilterType.TOTAL,
+  );
+  const [selectedGroup, setSelectedGroup] = useState(activityGroup);
   const [selectedActivityGroup, setSelectedActivityGroup] =
     useState<GroupedActivityEvaluation>();
   const [periodicEvaluation, setPeriodicEvaluation] = useState<
@@ -60,11 +64,9 @@ const PeriodicEvaluation = ({
     TotalGroupedActivityEvaluation[]
   >([]);
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [customPeriodEndDate, setCustomPeriodEndDate] = useState<Date>();
 
   const isFocused = useIsFocused();
   const globalActivity = useAppSelector(state => state.activity);
-  const startOfLastWeek = getStartOfLastWeek();
 
   const handleOnSelectSubFilter = async (value: string) => {
     setSubFilter(value as SubFilterType);
@@ -72,8 +74,7 @@ const PeriodicEvaluation = ({
       const groupedActivities = await ActivityService.groupPeriodicEvaluation(
         filter as Exclude<FilterType, FilterType.TODAY>,
         selectedGroup,
-        currentDate,
-        customPeriodEndDate,
+        category,
       );
       // eslint-disable-next-line curly
       if (groupedActivities.length === 0) return;
@@ -84,18 +85,24 @@ const PeriodicEvaluation = ({
 
   const onDateChange = async (
     date: Moment,
-    type: 'START_DATE' | 'END_DATE',
+    _type: 'START_DATE' | 'END_DATE',
   ) => {
-    if (type === 'START_DATE') {
+    if (subFilter === SubFilterType.INDIVIDUAL) {
       setCurrentDate(date.toDate());
-      setCustomPeriodEndDate(undefined);
+      const groupedActivities = await ActivityService.groupDailyEvaluation(
+        activityGroup,
+        date.toDate(),
+      );
+      // eslint-disable-next-line curly
+      if (groupedActivities.length === 0) return;
+      setSelectedGroup(groupedActivities[0].group);
+      setSelectedActivityGroup(groupedActivities[0]);
+      setPeriodicEvaluation(groupedActivities);
     } else {
-      setCustomPeriodEndDate(date.toDate());
       const groupedActivities = await ActivityService.groupPeriodicEvaluation(
         filter as Exclude<FilterType, FilterType.TODAY>,
         selectedGroup,
-        currentDate,
-        date.toDate(),
+        category,
       );
       // eslint-disable-next-line curly
       if (groupedActivities.length === 0) return;
@@ -154,7 +161,7 @@ const PeriodicEvaluation = ({
     );
     // eslint-disable-next-line curly
     if (groupedActivities.length === 0) return;
-    setSelectedGroup(groupedActivities[0].title);
+    setSelectedGroup(groupedActivities[0].group);
     setSelectedActivityGroup(groupedActivities[0]);
     setPeriodicEvaluation(groupedActivities);
   };
@@ -170,8 +177,7 @@ const PeriodicEvaluation = ({
       const groupedActivities = await ActivityService.groupPeriodicEvaluation(
         filter as Exclude<FilterType, FilterType.TODAY>,
         groupToSelect,
-        currentDate,
-        customPeriodEndDate,
+        category,
       );
       // eslint-disable-next-line curly
       if (groupedActivities.length === 0) return;
@@ -180,31 +186,29 @@ const PeriodicEvaluation = ({
     }
   };
 
-  const determineSelectedDateInLastWeek = (
-    _firstDay: Date,
-    _startOfLastWeek: Date,
-  ) => {
-    return _firstDay >= _startOfLastWeek ? _firstDay : _startOfLastWeek;
-  };
-
   useEffect(() => {
     const getEvaluation = async () => {
-      const dateToUse =
-        filter === FilterType.LAST_WEEK
-          ? determineSelectedDateInLastWeek(
-              new Date(globalActivity.firstDay),
-              startOfLastWeek,
-            )
-          : currentDate;
-      const groupedActivities = await ActivityService.groupDailyEvaluation(
-        activityGroup,
-        dateToUse,
-      );
-      // eslint-disable-next-line curly
-      if (groupedActivities.length === 0) return;
-      setSelectedGroup(groupedActivities[0].group);
-      setSelectedActivityGroup(groupedActivities[0]);
-      setPeriodicEvaluation(groupedActivities);
+      if ([ActivityCategory.Daily, ActivityCategory.Solah].includes(category)) {
+        const groupedActivities = await ActivityService.groupDailyEvaluation(
+          activityGroup,
+          currentDate,
+        );
+        // eslint-disable-next-line curly
+        if (groupedActivities.length === 0) return;
+        setSelectedGroup(groupedActivities[0].group);
+        setSelectedActivityGroup(groupedActivities[0]);
+        setPeriodicEvaluation(groupedActivities);
+      } else {
+        const groupedActivities = await ActivityService.groupPeriodicEvaluation(
+          filter as Exclude<FilterType, FilterType.TODAY>,
+          selectedGroup,
+          category,
+        );
+        // eslint-disable-next-line curly
+        if (groupedActivities.length === 0) return;
+        setSelectedGroup(groupedActivities[0].group);
+        setTotalPeriodicEvaluation(groupedActivities);
+      }
     };
     getEvaluation();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -239,6 +243,7 @@ const PeriodicEvaluation = ({
               ? FilterType.LAST_WEEK
               : FilterType.THIS_WEEK
           }
+          defaultDate={currentDate}
           onDateChange={handleCalenderDateChange}
           firstDate={new Date(globalActivity.firstDay)}
           isDisabled={subFilter === SubFilterType.TOTAL}
@@ -253,13 +258,13 @@ const PeriodicEvaluation = ({
             customDayHeaderStyles={customDayHeaderStylesCallback}
             monthTitleStyle={styles.yearMonthTitle}
             yearTitleStyle={styles.yearMonthTitle}
-            todayBackgroundColor={GlobalColors.primary}
+            todayBackgroundColor={GlobalColors['primary.100']}
             selectedDayColor={GlobalColors.primary}
             todayTextStyle={styles.yearMonthTitle}
             customDatesStyles={customDatesStylesCallback}
-            allowRangeSelection
             selectedDayTextStyle={styles.yearMonthTitle}
             onDateChange={onDateChange}
+            selectedStartDate={currentDate}
             minDate={new Date(globalActivity.firstDay)}
             maxDate={new Date()}
             enableDateChange={subFilter === SubFilterType.INDIVIDUAL}
@@ -276,7 +281,12 @@ const PeriodicEvaluation = ({
             selectedValue={subFilter}
             accessibilityLabel="Choose Filter"
             placeholder="Choose Filter"
-            onValueChange={handleOnSelectSubFilter}>
+            onValueChange={handleOnSelectSubFilter}
+            isDisabled={
+              ![ActivityCategory.Daily, ActivityCategory.Solah].includes(
+                category,
+              )
+            }>
             <Select.Item label="Individual" value={SubFilterType.INDIVIDUAL} />
             <Select.Item label="Total" value={SubFilterType.TOTAL} />
           </Select>

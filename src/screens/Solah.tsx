@@ -3,7 +3,8 @@ import {StyleSheet, ScrollView, View} from 'react-native';
 import {globalStyles} from '../styles/global';
 import ActivityItem from '../components/ActivityItem';
 import Accordion from 'react-native-collapsible/Accordion';
-import {ActivityCategory, SOLAH} from '../utils/activities';
+import {ActivityCategory} from '../types/global';
+import {SOLAH} from '../utils/activities';
 import {useIsFocused} from '@react-navigation/native';
 import {ActivityService} from '../services/ActivityService';
 import {Activity} from '../database/entities/Activity';
@@ -41,6 +42,7 @@ const Solah = () => {
     };
     setSolahActivities(_solahActivities);
     await ActivityService.update(id, _solahActivities[changedActivityIndex]);
+    await getSolahActivities();
   };
 
   const renderHeader = (
@@ -85,13 +87,14 @@ const Solah = () => {
     );
   };
 
+  const getSolahActivities = async () => {
+    const _solahActivities = await ActivityService.getOrCreateForToday({
+      category: ActivityCategory.Solah,
+    });
+    setSolahActivities(_solahActivities);
+  };
+
   useEffect(() => {
-    const getSolahActivities = async () => {
-      const _solahActivities = await ActivityService.getOrCreateForToday({
-        category: ActivityCategory.Solah,
-      });
-      setSolahActivities(_solahActivities);
-    };
     getSolahActivities();
   }, [isFocused]);
 

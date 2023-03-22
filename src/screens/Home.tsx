@@ -28,7 +28,7 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useAppSelector} from '../redux/hooks';
 import {ActivityService} from '../services/ActivityService';
 import Button from '../components/Button';
-import {FilterType} from '../types/global';
+import {ActivityCategory, FilterType} from '../types/global';
 
 const Home = ({navigation}: NativeStackScreenProps<RootNavigatorParamList>) => {
   const [isSearchInputFocused, setIsSearchInputFocused] = useState(false);
@@ -81,12 +81,10 @@ const Home = ({navigation}: NativeStackScreenProps<RootNavigatorParamList>) => {
 
     // delete all activities
     // await ActivityService.deleteAll();
+    await ActivityService.test();
 
-    await ActivityService.groupPeriodicEvaluation(
-      FilterType.MONTHLY,
-      'Fajr',
-      new Date(),
-    );
+    // const activities = await ActivityService.find();
+    // console.log('activities', JSON.stringify(activities));
 
     console.log(
       'test operation ended --------------------------------------------------------------------------------------------------',
@@ -115,7 +113,7 @@ const Home = ({navigation}: NativeStackScreenProps<RootNavigatorParamList>) => {
           )}
           <Input
             innerRef={searchInputRef}
-            placeholder="Search here"
+            placeholder="Search activities here"
             style={styles.searchInput}
             onFocus={() => handleOnSearchInputFocus(true)}
             onEndEditing={() => handleOnSearchInputFocus(false)}
@@ -180,13 +178,13 @@ const styles = StyleSheet.create({
   },
   searchInputIcon: {
     position: 'absolute',
-    left: '30%',
+    left: 20,
     zIndex: 2,
   },
   searchInput: {
     flexBasis: '80%',
+    paddingLeft: 40,
     height: 40,
-    textAlign: 'center',
   },
   scrollView: {
     padding: 0,
@@ -195,7 +193,7 @@ const styles = StyleSheet.create({
     marginTop: 14,
   },
   salam: {
-    fontSize: normalizeFont(21),
+    fontSize: normalizeFont(28),
     color: GlobalColors.primary,
     ...globalFonts.spaceGrotesk.bold,
   },
