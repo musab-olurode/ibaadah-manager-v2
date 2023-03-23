@@ -3,15 +3,20 @@ import {StyleSheet, ScrollView, View} from 'react-native';
 import {globalStyles} from '../styles/global';
 import ActivityItem from '../components/ActivityItem';
 import Accordion from 'react-native-collapsible/Accordion';
-import {ActivityCategory, WEEKLY_ACTIVITIES} from '../utils/activities';
+import {ActivityCategory} from '../types/global';
+import {WEEKLY_ACTIVITIES} from '../utils/activities';
 import PlusIconImg from '../assets/icons/plus.svg';
 import {Fab} from 'native-base';
 import {useIsFocused} from '@react-navigation/native';
 import {Activity} from '../database/entities/Activity';
 import {ActivityService} from '../services/ActivityService';
 import {RawActivity} from '../types/global';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {RootNavigatorParamList} from '../navigators/RootNavigator';
 
-const WeeklyActivities = () => {
+const WeeklyActivities = ({
+  navigation,
+}: NativeStackScreenProps<RootNavigatorParamList>) => {
   const [activeSections, setActiveSections] = useState<number[]>([]);
   const [weeklyActivities, setWeeklyActivities] = useState<Activity[]>([]);
 
@@ -32,7 +37,9 @@ const WeeklyActivities = () => {
     }
   };
 
-  const onPressAddActivity = () => {};
+  const onPressAddActivity = () => {
+    navigation.push('ManageActivities', {category: ActivityCategory.Weekly});
+  };
 
   const handleOnCheckboxChange = async (isSelected: boolean, id: string) => {
     const _weeklyActivities = [...weeklyActivities];
@@ -52,16 +59,24 @@ const WeeklyActivities = () => {
     index: number,
     isActive: boolean,
   ) => {
-    return (
-      <ActivityItem
-        icon={section.icon}
-        activity={section.group}
-        style={[styles.accordionHeader, !isActive && styles.activityItem]}
-        showEndIcon={true}
-        endIcon={isActive ? 'chevron-up' : 'chevron-down'}
-        onPress={() => onPressAccordionHeader(index)}
-      />
+    const CUSTOM_GROUP = 'Custom';
+    const customActivities = weeklyActivities.filter(
+      activity => activity.group === CUSTOM_GROUP,
     );
+    if (section.group === CUSTOM_GROUP && customActivities.length === 0) {
+      return <></>;
+    } else {
+      return (
+        <ActivityItem
+          icon={section.icon}
+          activity={section.group}
+          style={[styles.accordionHeader, !isActive && styles.activityItem]}
+          showEndIcon={true}
+          endIcon={isActive ? 'chevron-up' : 'chevron-down'}
+          onPress={() => onPressAccordionHeader(index)}
+        />
+      );
+    }
   };
 
   const renderContent = ({group}: {group: string}, _index: number) => {
@@ -91,7 +106,7 @@ const WeeklyActivities = () => {
 
   useEffect(() => {
     const getWeeklyActivities = async () => {
-      const _weeklyActivities = await ActivityService.getOrCreateForToday({
+      const _weeklyActivities = await ActivityService.getOrCreateForThisWeek({
         category: ActivityCategory.Weekly,
       });
       setWeeklyActivities(_weeklyActivities);

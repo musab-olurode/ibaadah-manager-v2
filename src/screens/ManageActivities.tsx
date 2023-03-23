@@ -1,13 +1,20 @@
 import React, {useState, useEffect} from 'react';
-import {StyleSheet, ScrollView, View, Text, Pressable} from 'react-native';
-import {globalStyles} from '../styles/global';
+import {
+  StyleSheet,
+  ScrollView,
+  View,
+  Text,
+  Pressable,
+  Image,
+} from 'react-native';
+import {GlobalColors, globalStyles, normalizeFont} from '../styles/global';
 import ActivityItem from '../components/ActivityItem';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootNavigatorParamList} from '../navigators/RootNavigator';
 import CreateActivityIconImg from '../assets/icons/create-activity.png';
 import EditActivityIconImg from '../assets/icons/edit-activity.png';
 import DeleteActivityIconImg from '../assets/icons/delete-activity.png';
-import {Checkbox, Modal} from 'native-base';
+import {Actionsheet, Checkbox, Modal} from 'native-base';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import ModalCloseIcon from '../assets/icons/modal-close.svg';
@@ -16,14 +23,26 @@ import {
   DateTimePickerAndroid,
 } from '@react-native-community/datetimepicker';
 import {useIsFocused} from '@react-navigation/native';
+import {ActivityService} from '../services/ActivityService';
+import {ActivityType} from '../types/global';
+import {CUSTOM_ACTIVITY_ICONS} from '../utils/activities';
+import ChevronDownIconImg from '../assets/icons/chevron-down.svg';
 
 const ManageActivities = ({
+  navigation,
   route,
 }: NativeStackScreenProps<RootNavigatorParamList>) => {
   const {category} = route.params as RootNavigatorParamList['ManageActivities'];
   const [modalVisible, setModalVisible] = useState(false);
   const [enableNotification, setEnableNotification] = useState(false);
   const [notificationTime, setNotificationTime] = useState(new Date());
+  const [customActivityTitle, setCustomActivityTitle] = useState('');
+  const [lastActivityOrder, setLastActivityOrder] = useState(0);
+  const [customActivityCount, setCustomActivityCount] = useState(0);
+  const [selectedCustomIcon, setSelectedCustomIcon] = useState(
+    CUSTOM_ACTIVITY_ICONS[0],
+  );
+  const [openActionSheet, setOpenActionSheet] = useState(false);
 
   const isFocused = useIsFocused();
 
@@ -31,32 +50,54 @@ const ManageActivities = ({
     {
       icon: CreateActivityIconImg,
       name: `New Personal ${category} Activity`,
-      disabled: false,
-      onPress: handleOnPressCreateActivity,
-    },
-    {
-      icon: EditActivityIconImg,
-      name: `Remove Personal ${category} Activity`,
-      disabled: true,
-      onPress: () => {},
+      onPress: () => handleOnPressCreateActivity(),
     },
     {
       icon: DeleteActivityIconImg,
       name: `Edit Personal ${category} Activity`,
-      disabled: true,
-      onPress: () => {},
+      onPress: () => handleOnPressEditActivity(),
+    },
+    {
+      icon: EditActivityIconImg,
+      name: `Remove Personal ${category} Activity`,
+      onPress: () => handleOnPressRemoveActivity(),
     },
   ];
 
-  function handleOnPressCreateActivity() {
+  const handleOnPressCreateActivity = () => {
     setModalVisible(true);
-  }
+  };
+
+  const handleOnPressRemoveActivity = () => {
+    if (customActivityCount > 0) {
+      navigation.push('RemoveCustomActivities', {category});
+    }
+  };
+
+  const handleOnPressEditActivity = () => {
+    if (customActivityCount > 0) {
+      navigation.push('EditCustomActivities', {category});
+    }
+  };
 
   const formatSelectedTime = (date: Date) => {
     const timeString = date.toLocaleTimeString();
     const splitTime = timeString.split(' ');
     const timeWithoutMilliseconds = splitTime[0].split(':');
     return `${timeWithoutMilliseconds[0]}:${timeWithoutMilliseconds[1]} ${splitTime[1]}`;
+  };
+
+  const handleOnCloseCustomIconActionSheet = () => {
+    setOpenActionSheet(false);
+  };
+
+  const handleOnSelectCustomIcon = (value: {name: string; icon: number}) => {
+    setSelectedCustomIcon(value);
+    handleOnCloseCustomIconActionSheet();
+  };
+
+  const handleOnPressShowSelectIcon = () => {
+    setOpenActionSheet(true);
   };
 
   const handleOnChangeNotificationDate = (
@@ -82,85 +123,154 @@ const ManageActivities = ({
     });
   };
 
-  const handleOnSubmitName = () => {};
+  const handleOnSubmitCustomActivity = async () => {
+    const CUSTOM_ACTIVITY_GROUP = 'Custom';
+    const newCustomActivity = {
+      icon: selectedCustomIcon.icon,
+      title: customActivityTitle,
+      category,
+      type: ActivityType.CUSTOM,
+      order: lastActivityOrder + 1,
+      group: CUSTOM_ACTIVITY_GROUP,
+      completed: false,
+    };
+    await ActivityService.create(newCustomActivity);
+    setCustomActivityTitle('');
+    await getLastActivityOrder();
+    await checkCustomActivityCount();
+    setModalVisible(false);
+  };
 
-  useEffect(() => {
+  const handleOnChangeCustomActivityTitle = (text: string) => {
+    setCustomActivityTitle(text);
+  };
+
+  const getLastActivityOrder = async () => {
+    const lastOrder = await ActivityService.getLowestActivityOrder();
+    setLastActivityOrder(lastOrder);
+  };
+
+  const checkCustomActivityCount = async () => {
+    const numberOfCustomActivities =
+      await ActivityService.getCustomActivityCount(category);
+    setCustomActivityCount(numberOfCustomActivities);
+  };
+
+  const handleDefaultNotificationTime = () => {
     const now = new Date();
     now.setHours(19);
     now.setMinutes(0);
     now.setSeconds(0);
     now.setMilliseconds(0);
     setNotificationTime(now);
+  };
+
+  useEffect(() => {
+    handleDefaultNotificationTime();
+    getLastActivityOrder();
+    checkCustomActivityCount();
   }, [isFocused]);
 
   return (
-    <ScrollView style={globalStyles.container}>
-      {ACTIONS.map((action, index) => (
-        <ActivityItem
-          key={index}
-          icon={action.icon}
-          activity={action.name}
-          style={styles.activityItem}
-          disabled={action.disabled}
-          onPress={action.onPress}
-        />
-      ))}
-      <Modal
-        isOpen={modalVisible}
-        avoidKeyboard
-        onClose={() => setModalVisible(false)}
-        size="xl">
-        <Modal.Content>
-          <View style={styles.modalBody}>
-            <View style={styles.modalHeader}>
+    <>
+      <ScrollView style={globalStyles.container}>
+        {ACTIONS.map((action, index) => (
+          <ActivityItem
+            key={index}
+            icon={action.icon}
+            activity={action.name}
+            style={styles.activityItem}
+            disabled={index !== 0 && customActivityCount === 0}
+            onPress={action.onPress}
+          />
+        ))}
+        <Modal
+          isOpen={modalVisible}
+          avoidKeyboard
+          onClose={() => setModalVisible(false)}
+          size="xl">
+          <Modal.Content>
+            <View style={styles.modalBody}>
+              <View style={styles.modalHeader}>
+                <Pressable
+                  style={styles.closeBtn}
+                  onPress={() => setModalVisible(false)}>
+                  <ModalCloseIcon />
+                </Pressable>
+                <Text
+                  style={[
+                    globalStyles.text,
+                    styles.modalHeaderText,
+                  ]}>{`New ${category} Activity`}</Text>
+              </View>
+              <Input
+                placeholder="Activity Title"
+                onChangeText={handleOnChangeCustomActivityTitle}
+                style={[styles.input, styles.topInput]}
+              />
               <Pressable
-                style={styles.closeBtn}
-                onPress={() => setModalVisible(false)}>
-                <ModalCloseIcon />
-              </Pressable>
-              <Text
-                style={[
-                  globalStyles.text,
-                  styles.modalHeaderText,
-                ]}>{`New ${category} Activity`}</Text>
-            </View>
-            <Input
-              placeholder="Activity Title"
-              style={[styles.input, styles.topInput]}
-            />
-            <Input
-              placeholder="Activity Details"
-              style={[styles.input, styles.bottomInput]}
-            />
-            <View style={styles.notificationSettings}>
-              <Checkbox
-                value="enable-notifications"
-                onChange={isSelected => setEnableNotification(isSelected)}>
-                Enable Notifications
-              </Checkbox>
-
-              <Pressable
-                disabled={!enableNotification}
-                style={[
-                  styles.timeIndicator,
-                  !enableNotification && styles.disabledBtn,
-                ]}
-                onPress={handleOnPressShowTimePicker}>
-                <Text style={globalStyles.text}>
-                  {formatSelectedTime(notificationTime)}
+                style={styles.chooseCustomIconBtn}
+                onPress={handleOnPressShowSelectIcon}>
+                <Image
+                  style={styles.selectedCustomIconPreview}
+                  source={selectedCustomIcon.icon}
+                />
+                <Text style={styles.chooseCustomIconBtnText}>
+                  {selectedCustomIcon.name}
                 </Text>
+                <ChevronDownIconImg style={styles.chooseCustomIconChevron} />
               </Pressable>
+              <View style={styles.notificationSettings}>
+                <Checkbox
+                  value="enable-notifications"
+                  isDisabled
+                  onChange={isSelected => setEnableNotification(isSelected)}>
+                  Enable Notifications
+                </Checkbox>
+
+                <Pressable
+                  disabled={!enableNotification}
+                  style={[
+                    styles.timeIndicator,
+                    !enableNotification && styles.disabledBtn,
+                  ]}
+                  onPress={handleOnPressShowTimePicker}>
+                  <Text style={globalStyles.text}>
+                    {formatSelectedTime(notificationTime)}
+                  </Text>
+                </Pressable>
+              </View>
+              <Button
+                text="Add"
+                variant="outline"
+                disabled={customActivityTitle.length === 0}
+                style={styles.createActivityBtn}
+                onPress={handleOnSubmitCustomActivity}
+              />
             </View>
-            <Button
-              text="Add"
-              variant="outline"
-              style={styles.createActivityBtn}
-              onPress={handleOnSubmitName}
-            />
-          </View>
-        </Modal.Content>
-      </Modal>
-    </ScrollView>
+          </Modal.Content>
+        </Modal>
+      </ScrollView>
+      <Actionsheet
+        isOpen={openActionSheet}
+        onClose={handleOnCloseCustomIconActionSheet}>
+        <Actionsheet.Content>
+          {CUSTOM_ACTIVITY_ICONS.map(customActivityIcon => (
+            <Actionsheet.Item
+              key={customActivityIcon.name}
+              onPress={() => handleOnSelectCustomIcon(customActivityIcon)}>
+              <View style={styles.customActivityIconItem}>
+                <Image
+                  style={styles.customActivityIcon}
+                  source={customActivityIcon.icon}
+                />
+                <Text style={globalStyles.text}>{customActivityIcon.name}</Text>
+              </View>
+            </Actionsheet.Item>
+          ))}
+        </Actionsheet.Content>
+      </Actionsheet>
+    </>
   );
 };
 
@@ -180,10 +290,7 @@ const styles = StyleSheet.create({
   },
   topInput: {
     marginTop: 40,
-    marginBottom: 16,
-  },
-  bottomInput: {
-    marginBottom: 40,
+    marginBottom: 20,
   },
   createActivityBtn: {
     marginTop: 31,
@@ -215,6 +322,43 @@ const styles = StyleSheet.create({
   },
   disabledBtn: {
     opacity: 0.5,
+  },
+  customActivityIcon: {
+    width: 38,
+    height: 38,
+    marginRight: 16,
+  },
+  customActivityIconItem: {
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  chooseCustomIconBtn: {
+    backgroundColor: '#ffffff',
+    borderRadius: 100,
+    borderWidth: 1,
+    borderColor: 'rgba(128, 128, 128, 0.2)',
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 6,
+    paddingLeft: 10,
+    marginBottom: 20,
+  },
+  chooseCustomIconChevron: {
+    marginLeft: 'auto',
+  },
+  chooseCustomIconBtnText: {
+    ...globalStyles.text,
+    color: GlobalColors['gray.2'],
+    fontSize: normalizeFont(16),
+  },
+  selectedCustomIconPreview: {
+    width: 28,
+    height: 28,
+    marginRight: 10,
   },
 });
 

@@ -17,13 +17,16 @@ import {
   normalizeFont,
 } from '../styles/global';
 import {monthNames} from '../utils/notificationService';
+
 export const ClockButton = ({
+  actionId,
   action,
   activity,
   index,
   category,
   filteredReminder,
   repeatType,
+  uniqueId,
 }: any) => {
   const [username, setUsername] = useState<string>('');
   const [notset, setNotset] = useState<boolean>(true);
@@ -85,6 +88,7 @@ export const ClockButton = ({
     }:${date!.getMinutes() < 10 ? 0 : ''}${date?.getMinutes()} ${
       date!.getHours() < 12 ? 'AM' : 'PM'
     }, time for ${reminderParams} ${activity === 'Adhkar' ? activity : ''}`;
+    // console.log(uniqueId + index);
     switch (event.type) {
       case 'set':
         if (!isMonthly) {
@@ -109,7 +113,7 @@ export const ClockButton = ({
             soundName: 'narutojutsu.mp3',
             repeatType,
             repeatTime: 1,
-            id: index,
+            id: actionId + uniqueId + index,
             priority: 'high',
           });
           const getReminderAfterAdd = async () => {
@@ -138,7 +142,6 @@ export const ClockButton = ({
 
           setNotset(false);
         } else {
-          console.log(monthDate);
           if (monthDate === 'Not Set') {
             date?.setMinutes(new Date().getMinutes());
             date?.setHours(new Date().getHours());

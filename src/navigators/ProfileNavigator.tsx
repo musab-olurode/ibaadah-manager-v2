@@ -4,7 +4,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {GlobalColors} from '../styles/global';
 import Profile from '../screens/Profile';
 import EvaluationList from '../screens/EvaluationList';
-import {FilterType} from '../types/global';
+import {ActivityCategory, FilterType} from '../types/global';
 import DailyEvaluation from '../screens/DailyEvaluation';
 import {capitalizeFirstLetter} from '../utils/global';
 import PeriodicEvaluation from '../screens/PeriodicEvaluation';
@@ -12,9 +12,13 @@ import Glossary from '../screens/Glossary';
 
 export type ProfileNavigatorParamList = {
   Profile: undefined;
-  EvaluationList: {category: 'Daily' | 'Weekly' | 'Monthly'};
+  EvaluationList: {category: Exclude<ActivityCategory, ActivityCategory.Solah>};
   DailyEvaluation: {activityGroup: string};
-  PeriodicEvaluation: {activityGroup: string; filter: FilterType};
+  PeriodicEvaluation: {
+    activityGroup: string;
+    category: ActivityCategory;
+    filter: FilterType;
+  };
   Glossary: undefined;
 };
 

@@ -25,14 +25,18 @@ const CollapsedCalender = ({
   firstDate,
   isDisabled,
 }: CollapsedCalenderProps) => {
-  const [daysInTheWeek, setDaysInTheWeek] = useState(
+  const [daysInTheWeek, setDaysInTheWeek] = useState<Date[]>(
     new Array(7).fill(new Date()),
   );
   const [selectedDate, setSelectedDate] = useState(defaultDate || new Date());
   const daysOfTheWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   const handleOnSelectDate = (date: Date) => {
-    if (!isDisabled && date >= firstDate && date <= new Date()) {
+    if (
+      !isDisabled &&
+      date.getDate() >= firstDate.getDate() &&
+      date.getDate() <= new Date().getDate()
+    ) {
       setSelectedDate(date);
       if (onDateChange) {
         onDateChange(date);
@@ -51,6 +55,13 @@ const CollapsedCalender = ({
       daysInWeek.push(day);
     }
     setDaysInTheWeek(daysInWeek);
+    if (
+      defaultDate &&
+      (daysInWeek[0].getDate() > defaultDate.getDate() ||
+        daysInWeek[6].getDate() < defaultDate.getDate())
+    ) {
+      setSelectedDate(new Date());
+    }
     if (type === FilterType.LAST_WEEK && !defaultDate) {
       setSelectedDate(daysInWeek[0]);
       if (onDateChange) {
@@ -87,7 +98,9 @@ const CollapsedCalender = ({
             <Text
               style={[
                 styles.weekDay,
-                (date < firstDate || date > new Date()) && styles.disabledDate,
+                (date.getDate() < firstDate.getDate() ||
+                  date.getDate() > new Date().getDate()) &&
+                  styles.disabledDate,
                 date.getDate() === selectedDate.getDate() &&
                   styles.selectedDateText,
                 globalFonts.aeonik.bold,

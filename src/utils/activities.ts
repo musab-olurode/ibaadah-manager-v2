@@ -30,7 +30,7 @@ import ToothBrushIconImg from '../assets/icons/tooth-brush.png';
 import HealthyFoodIconImg from '../assets/icons/food.png';
 import BooksIconImg from '../assets/icons/books.png';
 import IslamicBookIconImg from '../assets/icons/islamic-book.png';
-import SelfDevelopmentIconImg from '../assets/icons/open-book.png';
+import SelfDevelopmentIconImg from '../assets/icons/self-development.png';
 
 // Weekly Activities
 import FastingIconImg from '../assets/icons/fasting.png';
@@ -59,14 +59,18 @@ import SoliheenIconImg from '../assets/icons/soliheen.png';
 import BrotherlyVisitIconImg from '../assets/icons/brotherly-visit.png';
 import SickVisitationIconImg from '../assets/icons/sick-visitation.png';
 import CemetaryIconImg from '../assets/icons/cemetary-visit.png';
-import {Activity, RawActivity} from '../types/global';
-
-export enum ActivityCategory {
-  Solah = 'Solah',
-  Daily = 'Daily',
-  Weekly = 'Weekly',
-  Monthly = 'Monthly',
-}
+import {Activity, ActivityCategory, RawActivity} from '../types/global';
+import CustomActivitiesIconImg from '../assets/icons/custom-activities.png';
+import CustomActivityIcon1Img from '../assets/icons/custom-icon-1.png';
+import CustomActivityIcon2Img from '../assets/icons/custom-icon-2.png';
+import CustomActivityIcon3Img from '../assets/icons/custom-icon-3.png';
+import CustomActivityIcon4Img from '../assets/icons/custom-icon-4.png';
+import CustomActivityIcon5Img from '../assets/icons/custom-icon-5.png';
+import CustomActivityIcon6Img from '../assets/icons/custom-icon-6.png';
+import CustomActivityIcon7Img from '../assets/icons/custom-icon-7.png';
+import CustomActivityIcon8Img from '../assets/icons/custom-icon-8.png';
+import CustomActivityIcon9Img from '../assets/icons/custom-icon-9.png';
+import CustomActivityIcon10Img from '../assets/icons/custom-icon-10.png';
 
 export const SOLAH: RawActivity[] = [
   {
@@ -168,6 +172,11 @@ export const DAILY_ACTIVITIES: RawActivity[] = [
       {icon: SelfDevelopmentIconImg, order: 36, title: 'Self Development'},
     ],
   },
+  {
+    icon: CustomActivitiesIconImg,
+    group: 'Custom',
+    activities: [],
+  },
 ];
 
 export const WEEKLY_ACTIVITIES: RawActivity[] = [
@@ -216,6 +225,11 @@ export const WEEKLY_ACTIVITIES: RawActivity[] = [
       },
     ],
   },
+  {
+    icon: CustomActivitiesIconImg,
+    group: 'Custom',
+    activities: [],
+  },
 ];
 
 export const MONTHLY_ACTIVITIES: RawActivity[] = [
@@ -246,6 +260,11 @@ export const MONTHLY_ACTIVITIES: RawActivity[] = [
       {icon: SickVisitationIconImg, order: 54, title: 'Visit the Sick'},
       {icon: CemetaryIconImg, order: 55, title: 'Visit the Cemetary'},
     ],
+  },
+  {
+    icon: CustomActivitiesIconImg,
+    group: 'Custom',
+    activities: [],
   },
 ];
 
@@ -282,4 +301,47 @@ export const ALL_ACTIVITIES_FORMATTED: Activity[] = [
       completed: false,
     }));
   }).flat(2),
+];
+
+export const CUSTOM_ACTIVITY_ICONS = [
+  {
+    name: 'Custom Icon 1',
+    icon: CustomActivityIcon1Img,
+  },
+  {
+    name: 'Custom Icon 2',
+    icon: CustomActivityIcon2Img,
+  },
+  {
+    name: 'Custom Icon 3',
+    icon: CustomActivityIcon3Img,
+  },
+  {
+    name: 'Custom Icon 4',
+    icon: CustomActivityIcon4Img,
+  },
+  {
+    name: 'Custom Icon 5',
+    icon: CustomActivityIcon5Img,
+  },
+  {
+    name: 'Custom Icon 6',
+    icon: CustomActivityIcon6Img,
+  },
+  {
+    name: 'Custom Icon 7',
+    icon: CustomActivityIcon7Img,
+  },
+  {
+    name: 'Custom Icon 8',
+    icon: CustomActivityIcon8Img,
+  },
+  {
+    name: 'Custom Icon 9',
+    icon: CustomActivityIcon9Img,
+  },
+  {
+    name: 'Custom Icon 10',
+    icon: CustomActivityIcon10Img,
+  },
 ];

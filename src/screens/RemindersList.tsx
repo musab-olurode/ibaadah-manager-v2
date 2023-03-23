@@ -31,7 +31,9 @@ const RemindersList = ({
               activity="Solah"
               style={styles.activityItem}
               showEndIcon
-              customEndIcon={<Image source={ReminderIconImg} />}
+              customEndIcon={
+                <Image style={styles.bellIcon} source={ReminderIconImg} />
+              }
               onPress={() => handleOnPressItem('Solah')}
             />
             {DAILY_ACTIVITIES.map((activity, index) => (
@@ -41,7 +43,9 @@ const RemindersList = ({
                 activity={activity.group}
                 style={styles.activityItem}
                 showEndIcon
-                customEndIcon={<Image source={ReminderIconImg} />}
+                customEndIcon={
+                  <Image style={styles.bellIcon} source={ReminderIconImg} />
+                }
                 onPress={() => handleOnPressItem(activity.group)}
               />
             ))}
@@ -56,7 +60,9 @@ const RemindersList = ({
                 activity={activity.group}
                 style={styles.activityItem}
                 showEndIcon
-                customEndIcon={<Image source={ReminderIconImg} />}
+                customEndIcon={
+                  <Image style={styles.bellIcon} source={ReminderIconImg} />
+                }
                 onPress={() => handleOnPressItem(activity.group)}
               />
             ))}
@@ -71,7 +77,9 @@ const RemindersList = ({
                 activity={activity.group}
                 style={styles.activityItem}
                 showEndIcon
-                customEndIcon={<Image source={ReminderIconImg} />}
+                customEndIcon={
+                  <Image style={styles.bellIcon} source={ReminderIconImg} />
+                }
                 onPress={() => handleOnPressItem(activity.group)}
               />
             ))}
@@ -85,6 +93,10 @@ const RemindersList = ({
 const styles = StyleSheet.create({
   activityItem: {
     marginBottom: 24,
+  },
+  bellIcon: {
+    width: 40,
+    height: 40,
   },
 });
 

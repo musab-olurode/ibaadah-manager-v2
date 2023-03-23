@@ -21,19 +21,23 @@ const RemindersSettings = ({
     route.params as RootNavigatorParamList['RemindersSettings'];
   let All_ACTIVITIES;
   let filteredReminder: string;
+  let uniqueId: number;
   let repeatType: 'day' | 'week' | 'time';
   if (category === 'Daily') {
     All_ACTIVITIES = DAILY_ACTIVITIES;
     filteredReminder = StorageKeys.DAILY_REMINDER;
     repeatType = 'day';
+    uniqueId = 11;
   } else if (category === 'Weekly') {
     All_ACTIVITIES = WEEKLY_ACTIVITIES;
     filteredReminder = StorageKeys.WEEKLY_REMINDER;
     repeatType = 'week';
+    uniqueId = 22;
   } else if (category === 'Monthly') {
     All_ACTIVITIES = MONTHLY_ACTIVITIES;
     filteredReminder = StorageKeys.MONTHLY_REMINDER;
     repeatType = 'time';
+    uniqueId = 33;
   } else {
     All_ACTIVITIES = MONTHLY_ACTIVITIES;
     repeatType = 'time';
@@ -59,6 +63,8 @@ const RemindersSettings = ({
                     category={category}
                     filteredReminder={filteredReminder}
                     repeatType={repeatType}
+                    uniqueId={uniqueId}
+                    actionId={action.icon}
                   />
                 }
               />
@@ -80,6 +86,8 @@ const RemindersSettings = ({
                       category={category}
                       filteredReminder={filteredReminder}
                       repeatType={repeatType}
+                      uniqueId={uniqueId}
+                      actionId={action.icon}
                     />
                   }
                 />

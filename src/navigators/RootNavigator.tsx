@@ -21,6 +21,9 @@ import {useAppDispatch} from '../redux/hooks';
 import {connectDB} from '../database/config';
 import {ActivityService} from '../services/ActivityService';
 import {setGlobalActivityDetails} from '../redux/activity/activitySlice';
+import {ActivityCategory} from '../types/global';
+import EditCustomActivities from '../screens/EditCustomActivities';
+import RemoveCustomActivities from '../screens/RemoveCustomActivities';
 
 export type RootNavigatorParamList = {
   Onboarding: undefined;
@@ -29,10 +32,18 @@ export type RootNavigatorParamList = {
   Solah: undefined;
   WeeklyActivities: undefined;
   MonthlyActivities: undefined;
-  ManageActivities: {category: 'Daily' | 'Weekly' | 'Monthly'};
+  ManageActivities: {
+    category: Exclude<ActivityCategory, ActivityCategory.Solah>;
+  };
+  EditCustomActivities: {
+    category: Exclude<ActivityCategory, ActivityCategory.Solah>;
+  };
+  RemoveCustomActivities: {
+    category: Exclude<ActivityCategory, ActivityCategory.Solah>;
+  };
   ProfileNavigator: undefined;
   Reminders: undefined;
-  RemindersList: {category: 'Daily' | 'Weekly' | 'Monthly'};
+  RemindersList: {category: Exclude<ActivityCategory, ActivityCategory.Solah>};
   RemindersSettings: {
     activity: string;
     category: 'Daily' | 'Weekly' | 'Monthly' | 'Solah';
@@ -57,10 +68,11 @@ const RootNavigator = () => {
     if (hasOnboarded === 'true') {
       await populateUserInState();
       setShowOnboarding(false);
-      await ActivityService.synchronizeActivities();
-      const firstDayDate = await ActivityService.getFirstDay();
-      dispatch(setGlobalActivityDetails({firstDay: firstDayDate}));
     }
+
+    await ActivityService.synchronizeActivities();
+    const firstDayDate = await ActivityService.getFirstRecordedDay();
+    dispatch(setGlobalActivityDetails({firstDay: firstDayDate}));
 
     RNBootSplash.hide({fade: true});
   };
@@ -127,12 +139,32 @@ const RootNavigator = () => {
       <Stack.Screen
         name="ManageActivities"
         component={ManageActivities}
-        options={{
-          headerTitle: 'Add/Remove Activities',
+        options={({route}) => ({
+          headerTitle: `Add/Remove ${route.params.category} Activities`,
           headerStyle: styles.flatHeader,
           headerTitleStyle: styles.flatHeaderText,
           headerShadowVisible: false,
-        }}
+        })}
+      />
+      <Stack.Screen
+        name="EditCustomActivities"
+        component={EditCustomActivities}
+        options={({route}) => ({
+          headerTitle: `Edit Custom ${route.params.category} Activities`,
+          headerStyle: styles.flatHeader,
+          headerTitleStyle: styles.flatHeaderText,
+          headerShadowVisible: false,
+        })}
+      />
+      <Stack.Screen
+        name="RemoveCustomActivities"
+        component={RemoveCustomActivities}
+        options={({route}) => ({
+          headerTitle: `Remove Custom ${route.params.category} Activities`,
+          headerStyle: styles.flatHeader,
+          headerTitleStyle: styles.flatHeaderText,
+          headerShadowVisible: false,
+        })}
       />
       <Stack.Screen
         name="Reminders"

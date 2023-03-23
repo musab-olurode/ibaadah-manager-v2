@@ -1,6 +1,6 @@
 import 'react-native-get-random-values';
 import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm';
-import {ActivityCategory} from '../../utils/activities';
+import {ActivityCategory, ActivityType} from '../../types/global';
 import {Timestamp} from './Timestamp';
 
 @Entity()
@@ -13,6 +13,9 @@ export class Activity extends Timestamp {
 
   @Column({type: 'int'})
   order!: number;
+
+  @Column({type: 'varchar', default: ActivityType.INBUILT})
+  type!: ActivityType;
 
   @Column()
   group!: string;

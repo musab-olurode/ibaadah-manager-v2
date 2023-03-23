@@ -1,4 +1,14 @@
-import {ActivityCategory} from '../utils/activities';
+export enum ActivityCategory {
+  Solah = 'Solah',
+  Daily = 'Daily',
+  Weekly = 'Weekly',
+  Monthly = 'Monthly',
+}
+
+export enum ActivityType {
+  INBUILT = 'INBUILT',
+  CUSTOM = 'CUSTOM',
+}
 
 export enum FilterType {
   TODAY = 'TODAY',
@@ -68,6 +78,7 @@ export interface TotalEvaluationGroup {
 export interface GroupedActivityEvaluation {
   title: string;
   group: string;
+  category: ActivityCategory;
   progress: number;
   completedCount: number;
   totalCount: number;
