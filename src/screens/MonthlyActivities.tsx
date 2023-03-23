@@ -4,7 +4,7 @@ import {globalStyles} from '../styles/global';
 import ActivityItem from '../components/ActivityItem';
 import Accordion from 'react-native-collapsible/Accordion';
 import {ActivityCategory} from '../types/global';
-import {MONTHLY_ACTIVITIES} from '../utils/activities';
+import {MONTHLY_ACTIVITIES, resolveActivityDetails} from '../utils/activities';
 import PlusIconImg from '../assets/icons/plus.svg';
 import {Fab} from 'native-base';
 import {useIsFocused} from '@react-navigation/native';
@@ -13,13 +13,14 @@ import {RawActivity} from '../types/global';
 import {ActivityService} from '../services/ActivityService';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootNavigatorParamList} from '../navigators/RootNavigator';
+import {useTranslation} from 'react-i18next';
 
 const MonthlyActivities = ({
   navigation,
 }: NativeStackScreenProps<RootNavigatorParamList>) => {
   const [activeSections, setActiveSections] = useState<number[]>([]);
   const [monthlyActivities, setMonthlyActivities] = useState<Activity[]>([]);
-
+  const {t} = useTranslation();
   const isFocused = useIsFocused();
 
   const updateSections = (sections: number[]) => {
@@ -69,7 +70,7 @@ const MonthlyActivities = ({
       return (
         <ActivityItem
           icon={section.icon}
-          activity={section.group}
+          activity={resolveActivityDetails(section.group, t)}
           style={[styles.accordionHeader, !isActive && styles.activityItem]}
           showEndIcon={true}
           endIcon={isActive ? 'chevron-up' : 'chevron-down'}
@@ -88,7 +89,7 @@ const MonthlyActivities = ({
             <ActivityItem
               key={contentIndex}
               icon={contentItem.icon}
-              activity={contentItem.title}
+              activity={resolveActivityDetails(contentItem.title, t)}
               style={styles.contentItemActivity}
               showEndIcon={true}
               endIcon={'checkbox'}

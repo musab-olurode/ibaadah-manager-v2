@@ -4,16 +4,17 @@ import {globalStyles} from '../styles/global';
 import ActivityItem from '../components/ActivityItem';
 import Accordion from 'react-native-collapsible/Accordion';
 import {ActivityCategory} from '../types/global';
-import {SOLAH} from '../utils/activities';
+import {resolveActivityDetails, SOLAH} from '../utils/activities';
 import {useIsFocused} from '@react-navigation/native';
 import {ActivityService} from '../services/ActivityService';
 import {Activity} from '../database/entities/Activity';
 import {RawActivity} from '../types/global';
+import {useTranslation} from 'react-i18next';
 
 const Solah = () => {
   const [activeSections, setActiveSections] = useState<number[]>([]);
   const [solahActivities, setSolahActivities] = useState<Activity[]>([]);
-
+  const {t} = useTranslation();
   const isFocused = useIsFocused();
 
   const updateSections = (sections: number[]) => {
@@ -53,7 +54,7 @@ const Solah = () => {
     return (
       <ActivityItem
         icon={section.icon}
-        activity={section.group}
+        activity={resolveActivityDetails(section.group, t)}
         style={[styles.accordionHeader, !isActive && styles.activityItem]}
         showEndIcon={true}
         endIcon={isActive ? 'chevron-up' : 'chevron-down'}
@@ -71,7 +72,7 @@ const Solah = () => {
             <ActivityItem
               key={contentIndex}
               icon={contentItem.icon}
-              activity={contentItem.title}
+              activity={resolveActivityDetails(contentItem.title, t)}
               style={styles.contentItemActivity}
               showEndIcon={true}
               endIcon={'checkbox'}

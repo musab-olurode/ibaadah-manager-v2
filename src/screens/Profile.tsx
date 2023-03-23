@@ -25,12 +25,14 @@ import {
   launchImageLibrary,
 } from 'react-native-image-picker';
 import {setUser} from '../utils/storage';
-import {Modal} from 'native-base';
+import {Modal, useToast} from 'native-base';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import {setUserDetails} from '../redux/user/userSlice';
 import RNFS from 'react-native-fs';
 import {avatarFolder} from '../utils/constants';
+import {useTranslation} from 'react-i18next';
+import {ActivityCategory} from '../types/global';
 
 const Profile = ({
   navigation,
@@ -41,24 +43,29 @@ const Profile = ({
   });
   const [modalVisible, setModalVisible] = useState(false);
   const [name, setName] = useState(user.name);
+  const {t} = useTranslation();
+  const toast = useToast();
 
   const dispatch = useAppDispatch();
 
   const ACTIONS = [
     {
       icon: DailyActivitiesIconImg,
-      name: 'Daily Activities Evaluation',
-      onPress: () => handleOnPressCreateActivity('EvaluationList', 'Daily'),
+      name: t('common:dailyActivitiesEvaluation'),
+      onPress: () =>
+        handleOnPressCreateActivity('EvaluationList', ActivityCategory.Daily),
     },
     {
       icon: WeeklyActivitiesIconImg,
-      name: 'Weekly Activities Evaluation',
-      onPress: () => handleOnPressCreateActivity('EvaluationList', 'Weekly'),
+      name: t('common:weeklyActivitiesEvaluation'),
+      onPress: () =>
+        handleOnPressCreateActivity('EvaluationList', ActivityCategory.Weekly),
     },
     {
       icon: MonthlyActivitiesIconImg,
-      name: 'Monthly Activities Evaluation',
-      onPress: () => handleOnPressCreateActivity('EvaluationList', 'Monthly'),
+      name: t('common:monthlyActivitiesEvaluation'),
+      onPress: () =>
+        handleOnPressCreateActivity('EvaluationList', ActivityCategory.Monthly),
     },
   ];
 
@@ -133,22 +140,25 @@ const Profile = ({
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
         {
-          title: 'Ibaadah Manager Photos Permission',
-          message:
-            'Ibaadah Manager needs photos permission to select an avatar image.',
-          buttonNeutral: 'Ask Me Later',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
+          title: t('common:photoPermissionTitle'),
+          message: t('common:photoPermissionMessage'),
+          buttonNeutral: t('common:askMeLater') as string,
+          buttonNegative: t('common:cancel') as string,
+          buttonPositive: t('common:ok'),
         },
       );
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         return true;
       } else {
-        console.log('Camera permission denied');
+        toast.show({
+          title: t('common:photoPermissionDenied'),
+        });
         return false;
       }
-    } catch (err) {
-      console.warn(err);
+    } catch (err: any) {
+      toast.show({
+        title: err.message,
+      });
       return false;
     }
   };
@@ -174,7 +184,7 @@ const Profile = ({
         <Text style={styles.name}>{user.name}</Text>
       </View>
 
-      <Text style={styles.sectionTitle}>Self Evaluation</Text>
+      <Text style={styles.sectionTitle}>{t('common:selfEvaluation')}</Text>
 
       <View>
         {ACTIONS.map((action, index) => (
@@ -188,11 +198,11 @@ const Profile = ({
         ))}
       </View>
 
-      <Text style={styles.sectionTitle}>Glossary</Text>
+      <Text style={styles.sectionTitle}>{t('common:glossary')}</Text>
 
       <ActivityItem
         icon={GlossaryIconImg}
-        activity={'Meaning of some words'}
+        activity={t('common:meaningOfWords') as string}
         style={[styles.activityItem, styles.glossaryItem]}
         onPress={handleOnPressGotoGlossary}
       />
@@ -201,13 +211,13 @@ const Profile = ({
           <View style={styles.modalBody}>
             <Text style={globalStyles.text}>What should we call you</Text>
             <Input
-              placeholder="Enter your name"
+              placeholder={t('common:enterName') as string}
               defaultValue={name}
               style={styles.nameInput}
               onChangeText={text => setName(text)}
             />
             <Button
-              text="Save"
+              text={t('common:save') as string}
               variant="solid"
               style={styles.saveBtn}
               onPress={handleOnSubmitName}

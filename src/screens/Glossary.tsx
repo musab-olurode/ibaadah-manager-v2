@@ -14,6 +14,7 @@ import {GlossaryItem} from '../types/global';
 import {ORDERED_GLOSSARY} from '../utils/glossary';
 import {Modal} from 'native-base';
 import Button from '../components/Button';
+import {useTranslation} from 'react-i18next';
 
 const Glossary = () => {
   const [isSearchInputFocused, setIsSearchInputFocused] = useState(false);
@@ -22,6 +23,7 @@ const Glossary = () => {
   const [glossaryItems, setGlossaryItems] =
     useState<GlossaryItem[]>(ORDERED_GLOSSARY);
   const searchInputRef = useRef<TextInput | null>(null);
+  const {t} = useTranslation();
 
   const handleOnPressSearchInputIcon = () => {
     searchInputRef.current?.focus();
@@ -73,7 +75,7 @@ const Glossary = () => {
         )}
         <Input
           innerRef={searchInputRef}
-          placeholder="Search here"
+          placeholder={t('common:searchHere') as string}
           style={styles.searchInput}
           onChangeText={handleOnTypeSearchInput}
           onFocus={() => handleOnSearchInputFocus(true)}
@@ -90,7 +92,7 @@ const Glossary = () => {
               </Text>
             </View>
             <Button
-              text="Okay"
+              text={t('common:okay') as string}
               variant="solid"
               style={styles.okayBtn}
               onPress={handleOnPressOkay}

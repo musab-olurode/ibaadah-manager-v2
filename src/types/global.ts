@@ -34,6 +34,7 @@ export enum StorageKeys {
   USER = 'USER',
   ONBOARDING = 'ONBOARDING',
   ACTIVITIES = 'ACTIVITIES',
+  USER_LANGUAGE = 'USER_LANGUAGE',
 }
 
 interface RawActivitySubActivity {
