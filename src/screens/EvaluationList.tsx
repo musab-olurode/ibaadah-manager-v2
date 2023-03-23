@@ -11,11 +11,13 @@ import SolahIconImg from '../assets/icons/solah.png';
 import {
   DAILY_ACTIVITIES,
   MONTHLY_ACTIVITIES,
+  resolveActivityDetails,
   WEEKLY_ACTIVITIES,
 } from '../utils/activities';
 import {getEndOfLastWeek} from '../utils/global';
 import {useAppSelector} from '../redux/hooks';
 import {ActivityService} from '../services/ActivityService';
+import {useTranslation} from 'react-i18next';
 
 const EvaluationList = ({
   route,
@@ -29,6 +31,7 @@ const EvaluationList = ({
     weekly: WEEKLY_ACTIVITIES,
     monthly: MONTHLY_ACTIVITIES,
   });
+  const {t} = useTranslation();
 
   const globalActivity = useAppSelector(state => state.activity);
   const endOfLastWeek = getEndOfLastWeek();
@@ -141,25 +144,25 @@ const EvaluationList = ({
           style={styles.filter as StyleProp<ViewStyle>}
           dropdownIcon={<FilterIconImg style={styles.filterIcon} />}
           selectedValue={filter}
-          accessibilityLabel="Choose Filter"
-          placeholder="Choose Filter"
+          accessibilityLabel={t('common:chooseFilter') as string}
+          placeholder={t('common:chooseFilter') as string}
           onValueChange={handleOnSelectFilter}>
           <Select.Item
-            label="Today"
+            label={t('common:today')}
             value={FilterType.TODAY}
             disabled={shouldDisableTodayFilter()}
           />
           <Select.Item
-            label="This Week"
+            label={t('common:thisWeek')}
             value={FilterType.THIS_WEEK}
             disabled={shouldDisableThisWeekFilter()}
           />
           <Select.Item
-            label="Last Week"
+            label={t('common:lastWeek')}
             value={FilterType.LAST_WEEK}
             disabled={shouldDisableLastWeekFilter()}
           />
-          <Select.Item label="Monthly" value={FilterType.MONTHLY} />
+          <Select.Item label={t('common:monthly')} value={FilterType.MONTHLY} />
         </Select>
       </View>
 
@@ -171,7 +174,7 @@ const EvaluationList = ({
             <View>
               <ActivityItem
                 icon={SolahIconImg}
-                activity="Solah"
+                activity={t('common:solah')}
                 style={styles.activityItem}
                 onPress={() => handleOnPressItem('Solah')}
               />
@@ -179,7 +182,7 @@ const EvaluationList = ({
                 <ActivityItem
                   key={index}
                   icon={activity.icon}
-                  activity={activity.group}
+                  activity={resolveActivityDetails(activity.group, t)}
                   style={styles.activityItem}
                   onPress={() => handleOnPressItem(activity.group)}
                 />
@@ -192,7 +195,7 @@ const EvaluationList = ({
                 <ActivityItem
                   key={index}
                   icon={activity.icon}
-                  activity={activity.group}
+                  activity={resolveActivityDetails(activity.group, t)}
                   style={styles.activityItem}
                   onPress={() => handleOnPressItem(activity.group)}
                 />
@@ -205,7 +208,7 @@ const EvaluationList = ({
                 <ActivityItem
                   key={index}
                   icon={activity.icon}
-                  activity={activity.group}
+                  activity={resolveActivityDetails(activity.group, t)}
                   style={styles.activityItem}
                   onPress={() => handleOnPressItem(activity.group)}
                 />

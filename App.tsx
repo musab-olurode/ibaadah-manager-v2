@@ -7,6 +7,7 @@ import {reduxStore} from './src/redux/store';
 import {GlobalColors} from './src/styles/global';
 import {nativeBaseInset, nativeBaseTheme} from './src/styles/nativeBase';
 import {Provider as ReduxProvider} from 'react-redux';
+import './src/utils/IMLocalize';
 
 const App = () => {
   return (

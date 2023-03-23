@@ -29,27 +29,28 @@ import {useAppSelector} from '../redux/hooks';
 import {ActivityService} from '../services/ActivityService';
 import Button from '../components/Button';
 import {ActivityCategory, FilterType} from '../types/global';
+import {useTranslation} from 'react-i18next';
 
 const Home = ({navigation}: NativeStackScreenProps<RootNavigatorParamList>) => {
   const [isSearchInputFocused, setIsSearchInputFocused] = useState(false);
   const searchInputRef = useRef<TextInput | null>(null);
-
+  const {t} = useTranslation();
   const user = useAppSelector(state => state.user);
 
   const ACTIVITIES = [
     {
       icon: DailyActivitiesIconImg,
-      activity: 'Daily Activities',
+      activity: t('common:dailyActivitiesTitle'),
       screen: 'DailyActivities',
     },
     {
       icon: WeeklyActivitiesIconImg,
-      activity: 'Weekly Activities',
+      activity: t('common:weeklyActivitiesTitle'),
       screen: 'WeeklyActivities',
     },
     {
       icon: MonthlyActivitiesIconImg,
-      activity: 'Monthly Activities',
+      activity: t('common:monthlyActivitiesTitle'),
       screen: 'MonthlyActivities',
     },
   ];
@@ -113,7 +114,7 @@ const Home = ({navigation}: NativeStackScreenProps<RootNavigatorParamList>) => {
           )}
           <Input
             innerRef={searchInputRef}
-            placeholder="Search activities here"
+            placeholder={t('common:searchActivitiesPlaceholder') as string}
             style={styles.searchInput}
             onFocus={() => handleOnSearchInputFocus(true)}
             onEndEditing={() => handleOnSearchInputFocus(false)}
@@ -125,7 +126,7 @@ const Home = ({navigation}: NativeStackScreenProps<RootNavigatorParamList>) => {
       </View>
       <ScrollView style={[globalStyles.container, styles.scrollView]}>
         <View style={styles.greetingContainer}>
-          <Text style={styles.salam}>As salaamu alaekum</Text>
+          <Text style={styles.salam}>{t('common:salam')}</Text>
           <Text style={styles.name}>{user.name},</Text>
           {/* <Button text={'Test'} variant="solid" onPress={handleOnTestPress} /> */}
         </View>
@@ -135,7 +136,9 @@ const Home = ({navigation}: NativeStackScreenProps<RootNavigatorParamList>) => {
         </View>
 
         <View style={styles.activities}>
-          <Text style={styles.activitiesTitle}>Activities</Text>
+          <Text style={styles.activitiesTitle}>
+            {t('common:activitiesTitle')}
+          </Text>
 
           <View style={styles.activityList}>
             {ACTIVITIES.map((activity, index) => (
@@ -178,7 +181,7 @@ const styles = StyleSheet.create({
   },
   searchInputIcon: {
     position: 'absolute',
-    left: 20,
+    left: '8%',
     zIndex: 2,
   },
   searchInput: {

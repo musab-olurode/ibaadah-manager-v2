@@ -20,3 +20,12 @@ export const getUser = async (): Promise<User> => {
 export const setUser = async (state: User) => {
   await AsyncStorage.setItem(StorageKeys.USER, JSON.stringify(state));
 };
+
+export const setUserLanguage = async (language: string) => {
+  await AsyncStorage.setItem(StorageKeys.USER_LANGUAGE, language);
+};
+
+export const getUserLanguage = async () => {
+  const language = await AsyncStorage.getItem(StorageKeys.USER_LANGUAGE);
+  return language;
+};

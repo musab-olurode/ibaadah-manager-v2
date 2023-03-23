@@ -25,8 +25,12 @@ import {
 import {useIsFocused} from '@react-navigation/native';
 import {ActivityService} from '../services/ActivityService';
 import {ActivityType} from '../types/global';
-import {CUSTOM_ACTIVITY_ICONS} from '../utils/activities';
+import {
+  CUSTOM_ACTIVITY_ICONS,
+  resolveActivityDetails,
+} from '../utils/activities';
 import ChevronDownIconImg from '../assets/icons/chevron-down.svg';
+import {useTranslation} from 'react-i18next';
 
 const ManageActivities = ({
   navigation,
@@ -43,23 +47,23 @@ const ManageActivities = ({
     CUSTOM_ACTIVITY_ICONS[0],
   );
   const [openActionSheet, setOpenActionSheet] = useState(false);
-
+  const {t} = useTranslation();
   const isFocused = useIsFocused();
 
   const ACTIONS = [
     {
       icon: CreateActivityIconImg,
-      name: `New Personal ${category} Activity`,
+      name: t(`common:newPersonal${category}Activity`),
       onPress: () => handleOnPressCreateActivity(),
     },
     {
       icon: DeleteActivityIconImg,
-      name: `Edit Personal ${category} Activity`,
+      name: t(`common:editPersonal${category}Activity`),
       onPress: () => handleOnPressEditActivity(),
     },
     {
       icon: EditActivityIconImg,
-      name: `Remove Personal ${category} Activity`,
+      name: t(`common:removePersonal${category}Activity`),
       onPress: () => handleOnPressRemoveActivity(),
     },
   ];
@@ -197,14 +201,12 @@ const ManageActivities = ({
                   onPress={() => setModalVisible(false)}>
                   <ModalCloseIcon />
                 </Pressable>
-                <Text
-                  style={[
-                    globalStyles.text,
-                    styles.modalHeaderText,
-                  ]}>{`New ${category} Activity`}</Text>
+                <Text style={[globalStyles.text, styles.modalHeaderText]}>
+                  {t(`common:new${category}Activity`)}
+                </Text>
               </View>
               <Input
-                placeholder="Activity Title"
+                placeholder={t('common:activityTitle') as string}
                 onChangeText={handleOnChangeCustomActivityTitle}
                 style={[styles.input, styles.topInput]}
               />
@@ -225,7 +227,7 @@ const ManageActivities = ({
                   value="enable-notifications"
                   isDisabled
                   onChange={isSelected => setEnableNotification(isSelected)}>
-                  Enable Notifications
+                  {t('common:enableNotifications')}
                 </Checkbox>
 
                 <Pressable
@@ -241,7 +243,7 @@ const ManageActivities = ({
                 </Pressable>
               </View>
               <Button
-                text="Add"
+                text={t('common:add') as string}
                 variant="outline"
                 disabled={customActivityTitle.length === 0}
                 style={styles.createActivityBtn}
@@ -264,7 +266,9 @@ const ManageActivities = ({
                   style={styles.customActivityIcon}
                   source={customActivityIcon.icon}
                 />
-                <Text style={globalStyles.text}>{customActivityIcon.name}</Text>
+                <Text style={globalStyles.text}>
+                  {resolveActivityDetails(customActivityIcon.name, t)}
+                </Text>
               </View>
             </Actionsheet.Item>
           ))}

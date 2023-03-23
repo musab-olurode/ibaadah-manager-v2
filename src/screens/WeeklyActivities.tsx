@@ -4,7 +4,7 @@ import {globalStyles} from '../styles/global';
 import ActivityItem from '../components/ActivityItem';
 import Accordion from 'react-native-collapsible/Accordion';
 import {ActivityCategory} from '../types/global';
-import {WEEKLY_ACTIVITIES} from '../utils/activities';
+import {resolveActivityDetails, WEEKLY_ACTIVITIES} from '../utils/activities';
 import PlusIconImg from '../assets/icons/plus.svg';
 import {Fab} from 'native-base';
 import {useIsFocused} from '@react-navigation/native';
@@ -13,13 +13,14 @@ import {ActivityService} from '../services/ActivityService';
 import {RawActivity} from '../types/global';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootNavigatorParamList} from '../navigators/RootNavigator';
+import {useTranslation} from 'react-i18next';
 
 const WeeklyActivities = ({
   navigation,
 }: NativeStackScreenProps<RootNavigatorParamList>) => {
   const [activeSections, setActiveSections] = useState<number[]>([]);
   const [weeklyActivities, setWeeklyActivities] = useState<Activity[]>([]);
-
+  const {t} = useTranslation();
   const isFocused = useIsFocused();
 
   const updateSections = (sections: number[]) => {
@@ -88,7 +89,7 @@ const WeeklyActivities = ({
             <ActivityItem
               key={contentIndex}
               icon={contentItem.icon}
-              activity={contentItem.title}
+              activity={resolveActivityDetails(contentItem.title, t)}
               style={styles.contentItemActivity}
               showEndIcon={true}
               endIcon={'checkbox'}

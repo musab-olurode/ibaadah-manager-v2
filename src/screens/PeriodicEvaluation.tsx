@@ -40,6 +40,8 @@ import {Moment} from 'moment';
 import {useIsFocused} from '@react-navigation/native';
 import {ActivityService} from '../services/ActivityService';
 import {useAppSelector} from '../redux/hooks';
+import {useTranslation} from 'react-i18next';
+import {resolveActivityDetails} from '../utils/activities';
 
 const PeriodicEvaluation = ({
   route,
@@ -64,7 +66,7 @@ const PeriodicEvaluation = ({
     TotalGroupedActivityEvaluation[]
   >([]);
   const [currentDate, setCurrentDate] = useState(new Date());
-
+  const {t} = useTranslation();
   const isFocused = useIsFocused();
   const globalActivity = useAppSelector(state => state.activity);
 
@@ -272,23 +274,31 @@ const PeriodicEvaluation = ({
         </View>
       )}
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionHeaderTitle}>{activityGroup}</Text>
+        <Text style={styles.sectionHeaderTitle}>
+          {resolveActivityDetails(activityGroup, t)}
+        </Text>
         <View style={styles.selectContainer}>
           <Select
             variant="unstyled"
             style={styles.filter as StyleProp<ViewStyle>}
             dropdownIcon={<FilterIconImg style={styles.filterIcon} />}
             selectedValue={subFilter}
-            accessibilityLabel="Choose Filter"
-            placeholder="Choose Filter"
+            accessibilityLabel={t('common:chooseFilter') as string}
+            placeholder={t('common:chooseFilter') as string}
             onValueChange={handleOnSelectSubFilter}
             isDisabled={
               ![ActivityCategory.Daily, ActivityCategory.Solah].includes(
                 category,
               )
             }>
-            <Select.Item label="Individual" value={SubFilterType.INDIVIDUAL} />
-            <Select.Item label="Total" value={SubFilterType.TOTAL} />
+            <Select.Item
+              label={t('common:individual')}
+              value={SubFilterType.INDIVIDUAL}
+            />
+            <Select.Item
+              label={t('common:total')}
+              value={SubFilterType.TOTAL}
+            />
           </Select>
         </View>
       </View>
@@ -300,7 +310,7 @@ const PeriodicEvaluation = ({
         {periodicEvaluation.map((activity, index) => (
           <Chip
             key={index}
-            title={activity.group}
+            title={resolveActivityDetails(activity.group, t)}
             style={styles.chip}
             active={selectedGroup === activity.group}
             onPress={() => handleActivityGroupSelection(activity.group)}
@@ -325,7 +335,7 @@ const PeriodicEvaluation = ({
             {selectedActivityGroup?.activities.map((content, index) => (
               <ActivityItem
                 key={`breakdown-${index}`}
-                activity={content.title}
+                activity={resolveActivityDetails(content.title, t)}
                 defaultCheckboxState={content.completed}
                 hideStartIcon={true}
                 showEndIcon={true}

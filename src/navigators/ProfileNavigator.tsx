@@ -9,6 +9,8 @@ import DailyEvaluation from '../screens/DailyEvaluation';
 import {capitalizeFirstLetter} from '../utils/global';
 import PeriodicEvaluation from '../screens/PeriodicEvaluation';
 import Glossary from '../screens/Glossary';
+import {useTranslation} from 'react-i18next';
+import {resolveActivityDetails} from '../utils/activities';
 
 export type ProfileNavigatorParamList = {
   Profile: undefined;
@@ -26,13 +28,14 @@ const Stack = createNativeStackNavigator<ProfileNavigatorParamList>();
 
 const formatFilter = (filter: FilterType) => {
   const words = filter.split('_');
-
-  return `${capitalizeFirstLetter(words[0])} ${
+  return `${words[0].toLowerCase()}${
     words.length === 2 ? capitalizeFirstLetter(words[1]) : ''
   }`.trim();
 };
 
 const ProfileNavigator = () => {
+  const {t} = useTranslation();
+
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -48,7 +51,9 @@ const ProfileNavigator = () => {
         name="EvaluationList"
         component={EvaluationList}
         options={({route}) => ({
-          headerTitle: `${route.params.category} Activities Evaluation`,
+          headerTitle: t(
+            `common:${route.params.category.toLowerCase()}ActivitiesEvaluation`,
+          ) as string,
           headerStyle: styles.flatHeader,
           headerShadowVisible: false,
         })}
@@ -57,7 +62,10 @@ const ProfileNavigator = () => {
         name="DailyEvaluation"
         component={DailyEvaluation}
         options={({route}) => ({
-          headerTitle: `${route.params.activityGroup} (Today)`,
+          headerTitle: `${resolveActivityDetails(
+            route.params.activityGroup,
+            t,
+          )} (${t('common:today')})`,
           headerStyle: styles.flatHeader,
           headerShadowVisible: false,
         })}
@@ -66,9 +74,10 @@ const ProfileNavigator = () => {
         name="PeriodicEvaluation"
         component={PeriodicEvaluation}
         options={({route}) => ({
-          headerTitle: `${route.params.activityGroup} (${formatFilter(
-            route.params.filter,
-          )})`,
+          headerTitle: `${resolveActivityDetails(
+            route.params.activityGroup,
+            t,
+          )} (${t(`common:${formatFilter(route.params.filter)}`)})`,
           headerStyle: styles.flatHeader,
           headerShadowVisible: false,
         })}

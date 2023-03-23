@@ -1,4 +1,5 @@
 import React from 'react';
+import {useTranslation} from 'react-i18next';
 import {StyleSheet, Text, View, StyleProp, ViewStyle} from 'react-native';
 import * as Progress from 'react-native-progress';
 import {
@@ -8,6 +9,7 @@ import {
   normalizeFont,
 } from '../styles/global';
 import {TotalEvaluationGroup} from '../types/global';
+import {resolveActivityDetails} from '../utils/activities';
 
 export interface TotalActivityBreakdownProps {
   style?: StyleProp<ViewStyle>;
@@ -20,9 +22,12 @@ const TotalActivityBreakdown = ({
   progress,
   activities,
 }: TotalActivityBreakdownProps) => {
+  const {t} = useTranslation();
+
   const formatCount = (count: number) => {
     return count < 10 ? `0${count}` : count;
   };
+
   return (
     <View style={[styles.card, style]}>
       <Progress.Circle
@@ -47,7 +52,9 @@ const TotalActivityBreakdown = ({
             key={`breakdown-activity-${index}`}
             style={[index === activities.length - 1 && styles.breakdownItem]}>
             <View style={styles.activityRow}>
-              <Text style={styles.text}>{activity.title}</Text>
+              <Text style={styles.text}>
+                {resolveActivityDetails(activity.title, t)}
+              </Text>
               <View style={styles.dots} />
               <Text style={[styles.text, styles.countText]}>
                 {formatCount(activity.completedCount)}/{activity.totalCount}

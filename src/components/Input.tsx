@@ -6,7 +6,7 @@ import {
   StyleProp,
   ViewStyle,
 } from 'react-native';
-import {GlobalColors} from '../styles/global';
+import {GlobalColors, globalStyles} from '../styles/global';
 
 interface InputProps extends TextInputProps {
   innerRef?: React.ClassAttributes<TextInput>['ref'];
@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(128, 128, 128, 0.2)',
     width: '100%',
-    color: GlobalColors['gray.2'],
+    color: globalStyles.text.color,
   },
 });
 
