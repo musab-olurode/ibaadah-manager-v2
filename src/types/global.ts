@@ -86,4 +86,6 @@ export interface ReminderStorage {
   particularActivity: string;
   hour: number;
   minute: number;
+  date?: number;
+  month?: number;
 }

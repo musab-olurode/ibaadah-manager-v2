@@ -5,7 +5,6 @@ export const createChannel = () => {
     {
       channelId: 'ibaadah-id',
       channelName: 'My Ibaadah Manager',
-      playSound: true,
       vibrate: true,
       importance: Importance.HIGH,
     },
@@ -14,3 +13,17 @@ export const createChannel = () => {
     },
   );
 };
+export const monthNames = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];

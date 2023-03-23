@@ -38,9 +38,7 @@ const RemindersSettings = ({
     All_ACTIVITIES = MONTHLY_ACTIVITIES;
     repeatType = 'time';
   }
-  const filteredDailyActivity = All_ACTIVITIES.filter(
-    i => i.group === activity,
-  );
+  const filteredActivity = All_ACTIVITIES.filter(i => i.group === activity);
   return (
     <ScrollView style={globalStyles.container}>
       <View>
@@ -65,7 +63,7 @@ const RemindersSettings = ({
                 }
               />
             ))
-          : filteredDailyActivity.map(action =>
+          : filteredActivity.map(action =>
               action.activities.map((content, index) => (
                 <ActivityItem
                   key={index}
