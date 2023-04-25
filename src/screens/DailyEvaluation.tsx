@@ -1,12 +1,14 @@
 import {useIsFocused} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {ScrollView, StyleSheet, Text} from 'react-native';
 import DailyActivityEvaluationCard from '../components/DailyActivityEvaluationCard';
 import {ProfileNavigatorParamList} from '../navigators/ProfileNavigator';
 import {ActivityService} from '../services/ActivityService';
 import {globalFonts, globalStyles} from '../styles/global';
 import {GroupedActivityEvaluation} from '../types/global';
+import {resolveActivityDetails} from '../utils/activities';
 
 const DailyEvaluation = ({
   route,
@@ -16,7 +18,7 @@ const DailyEvaluation = ({
   const [dailyActivitiesEvaluation, setDailyActivitiesEvaluation] = useState<
     GroupedActivityEvaluation[]
   >([]);
-
+  const {t} = useTranslation();
   const isFocused = useIsFocused();
 
   const getCurrentDate = () => {
@@ -40,7 +42,7 @@ const DailyEvaluation = ({
         <DailyActivityEvaluationCard
           key={`activity-${index}`}
           style={styles.card}
-          group={activity.group}
+          group={resolveActivityDetails(activity.group, t)}
           progress={activity.progress}
           activities={activity.activities}
         />

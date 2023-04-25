@@ -71,6 +71,7 @@ import CustomActivityIcon7Img from '../assets/icons/custom-icon-7.png';
 import CustomActivityIcon8Img from '../assets/icons/custom-icon-8.png';
 import CustomActivityIcon9Img from '../assets/icons/custom-icon-9.png';
 import CustomActivityIcon10Img from '../assets/icons/custom-icon-10.png';
+import {TFunction} from 'i18next';
 
 export const SOLAH: RawActivity[] = [
   {
@@ -345,3 +346,83 @@ export const CUSTOM_ACTIVITY_ICONS = [
     icon: CustomActivityIcon10Img,
   },
 ];
+
+export const resolveActivityDetails = (
+  title: string,
+  t: TFunction<'translation', undefined, 'translation'>,
+) => {
+  const spellings: {[key: string]: string}[] = [
+    {Solah: t('common:solah')},
+    {Rawatib: t('common:rawatib')},
+    {Nawafil: t('common:nawafil')},
+    {Dhua: t('common:dhua')},
+    {'Shafi & Witr': t('common:shafiAndWitr')},
+    {Adhkar: t('common:adhkar')},
+    {Fajr: t('common:fajr')},
+    {'Jama’ah': t('common:jamaah')},
+    {Alone: t('common:alone')},
+    {'Adhkar After': t('common:adhkarAfter')},
+    {Dhur: t('common:dhur')},
+    {Asr: t('common:asr')},
+    {Maghrib: t('common:maghrib')},
+    {"Isha'i": t('common:ishai')},
+    {Tahajjud: t('common:tahajjud')},
+    {Taobah: t('common:taobah')},
+    {'Shafi & Witr': t('common:shafiAndWitr')},
+    {Adhkar: t('common:adhkar')},
+    {Morning: t('common:morning')},
+    {Evening: t('common:evening')},
+    {'Qur’an': t('common:quran')},
+    {Tilawah: t('common:tilawah')},
+    {Hifdh: t('common:hifdh')},
+    {'Muraja’ah': t('common:murajah')},
+    {Tadabur: t('common:tadabur')},
+    {'Health Habits': t('common:healthHabits')},
+    {'Daily Exercise': t('common:exercise')},
+    {Bath: t('common:bath')},
+    {'Tooth Brushing': t('common:teethBrush')},
+    {'Healthy Food': t('common:healthyFood')},
+    {'Book Reading': t('common:books')},
+    {'Islamic Books': t('common:islamicBook')},
+    {'Self Development': t('common:selfDevelopment')},
+    {Fasting: t('common:fasting')},
+    {Monday: t('common:monday')},
+    {Thursday: t('common:thursday')},
+    {'Friday’s Sunnah': t('common:fridaySunnah')},
+    {Showering: t('common:showering')},
+    {'Cutting of nails': t('common:nailCutting')},
+    {'Going to the Mosque early': t('common:earlyMosqueGoing')},
+    {'Read suratul Al Khaf': t('common:suratulKhaf')},
+    {'Dua between Asr & Maghrib': t('common:duaBetweenAsrAndMaghrib')},
+    {Sadaqah: t('common:sadaqah')},
+    {'Donate to the needy': t('common:donation')},
+    {'Family Sitting': t('common:familySitting')},
+    {'Discussion with Family': t('common:familyDiscussion')},
+    {'13th of the month': t('common:thirteenth')},
+    {'14th of the month': t('common:fourteenth')},
+    {'15th of the month': t('common:fifteenth')},
+    {'Saving Money': t('common:savingMoney')},
+    {'For charity': t('common:forCharity')},
+    {'For yourself': t('common:forOneself')},
+    {Ziyaarah: t('common:ziyaarah')},
+    {Soliheen: t('common:soliheen')},
+    {'Visit a Brother': t('common:brotherlyVisit')},
+    {'Visit Family': t('common:familyVisit')},
+    {'Visit the Sick': t('common:sickVisitation')},
+    {'Visit the Cemetary': t('common:cemetaryVisitation')},
+    {'Custom Icon 1': t('common:customIcon1')},
+    {'Custom Icon 2': t('common:customIcon2')},
+    {'Custom Icon 3': t('common:customIcon3')},
+    {'Custom Icon 4': t('common:customIcon4')},
+    {'Custom Icon 5': t('common:customIcon5')},
+    {'Custom Icon 6': t('common:customIcon6')},
+    {'Custom Icon 7': t('common:customIcon7')},
+    {'Custom Icon 8': t('common:customIcon8')},
+    {'Custom Icon 9': t('common:customIcon9')},
+    {'Custom Icon 10': t('common:customIcon10')},
+  ];
+  const providedSpelling = spellings.find(
+    spelling => Object.keys(spelling)[0] === title,
+  );
+  return providedSpelling ? providedSpelling[title] : title;
+};

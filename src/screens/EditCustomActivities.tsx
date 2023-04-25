@@ -18,6 +18,7 @@ import {
 } from '@react-native-community/datetimepicker';
 import {CUSTOM_ACTIVITY_ICONS} from '../utils/activities';
 import ChevronDownIconImg from '../assets/icons/chevron-down.svg';
+import {useTranslation} from 'react-i18next';
 
 const EditCustomActivities = ({
   route,
@@ -33,8 +34,8 @@ const EditCustomActivities = ({
     CUSTOM_ACTIVITY_ICONS[0],
   );
   const [openActionSheet, setOpenActionSheet] = useState(false);
-
   const isFocused = useIsFocused();
+  const {t} = useTranslation();
 
   const handleOnPressItem = (activity: Activity) => {
     const _selectedCustomIcon = CUSTOM_ACTIVITY_ICONS.find(
@@ -145,14 +146,12 @@ const EditCustomActivities = ({
                 onPress={() => setModalVisible(false)}>
                 <ModalCloseIcon />
               </Pressable>
-              <Text
-                style={[
-                  globalStyles.text,
-                  styles.modalHeaderText,
-                ]}>{`New ${category} Activity`}</Text>
+              <Text style={[globalStyles.text, styles.modalHeaderText]}>
+                {t(`common:edit${category}Activity`)}
+              </Text>
             </View>
             <Input
-              placeholder="Activity Title"
+              placeholder={t('common:activityTitle') as string}
               defaultValue={activityToEdit?.title}
               onChangeText={handleOnEditCustomActivityTitle}
               style={[styles.input, styles.topInput]}
@@ -174,7 +173,7 @@ const EditCustomActivities = ({
                 value="enable-notifications"
                 isDisabled
                 onChange={isSelected => setEnableNotification(isSelected)}>
-                Enable Notifications
+                {t('common:enableNotifications')}
               </Checkbox>
               <Pressable
                 disabled={!enableNotification}
@@ -189,7 +188,7 @@ const EditCustomActivities = ({
               </Pressable>
             </View>
             <Button
-              text="Update"
+              text={t('common:update') as string}
               variant="outline"
               disabled={!activityToEdit || !activityToEdit.title}
               style={styles.createActivityBtn}

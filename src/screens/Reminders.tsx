@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text, ScrollView, View} from 'react-native';
 import ActivityItem from '../components/ActivityItem';
 import {globalStyles, normalizeFont} from '../styles/global';
@@ -7,36 +7,88 @@ import WeeklyActivitiesIconImg from '../assets/icons/weekly-activities.png';
 import MonthlyActivitiesIconImg from '../assets/icons/monthly-activities.png';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootNavigatorParamList} from '../navigators/RootNavigator';
-import {createChannel} from '../utils/notificationService';
+import {
+  ShowNotifications,
+  createChannel,
+  fetchSolatTimeAPI,
+} from '../utils/notificationService';
+import Geolocation from '@react-native-community/geolocation';
+import {getApiReminderData, setApiReminderData} from '../utils/storage';
+import {ActivityCategory} from '../types/global';
 
 const Reminders = ({
   navigation,
 }: NativeStackScreenProps<RootNavigatorParamList>) => {
+  const [apiSolah, setApiSolah] = useState({});
+
   const ACTIONS = [
     {
       icon: DailyActivitiesIconImg,
       name: 'Daily Activities',
-      onPress: () => handleOnActivityGroup('Daily'),
+      onPress: () => handleOnActivityGroup(ActivityCategory.Daily),
     },
     {
       icon: WeeklyActivitiesIconImg,
       name: 'Weekly Activities',
-      onPress: () => handleOnActivityGroup('Weekly'),
+      onPress: () => handleOnActivityGroup(ActivityCategory.Weekly),
     },
     {
       icon: MonthlyActivitiesIconImg,
       name: 'Monthly Activities',
-      onPress: () => handleOnActivityGroup('Monthly'),
+      onPress: () => handleOnActivityGroup(ActivityCategory.Monthly),
     },
   ];
+  const fetchSolatTime = (
+    latitude: number,
+    longitude: number,
+    dbApiData?: any,
+  ) => {
+    fetchSolatTimeAPI(latitude, longitude)
+      .then(fetchedData => {
+        const result = {
+          ...fetchedData.data.timings,
+          ...fetchedData.data.date,
+          latitude: fetchedData.data.meta.latitude,
+          longitude: fetchedData.data.meta.longitude,
+        };
+        setApiSolah(result);
+        result && setApiReminderData(JSON.stringify(result));
+      })
+      .catch(err =>
+        setApiSolah(
+          dbApiData || {
+            code: 404,
+            message: err.message,
+          },
+        ),
+      );
+  };
   useEffect(() => {
     createChannel();
+    getApiReminderData().then(data => {
+      const dbApiData = JSON.parse(data!);
+
+      Geolocation.getCurrentPosition(i => {
+        const latitude = i.coords.latitude;
+        const longitude = i.coords.longitude;
+        if (dbApiData) {
+          Number(dbApiData.gregorian.day) !== new Date().getDate() ||
+          Math.trunc(dbApiData.latitude) !== Math.trunc(latitude) ||
+          Math.trunc(dbApiData.longitude) !== Math.trunc(longitude)
+            ? fetchSolatTime(latitude, longitude, dbApiData)
+            : setApiSolah(dbApiData);
+        } else {
+          fetchSolatTime(latitude, longitude);
+        }
+      });
+    });
+    ShowNotifications();
   }, []);
 
   function handleOnActivityGroup(
     category: RootNavigatorParamList['RemindersList']['category'],
   ) {
-    navigation.push('RemindersList', {category});
+    navigation.push('RemindersList', {category, apiSolah});
   }
   return (
     <ScrollView style={globalStyles.container}>

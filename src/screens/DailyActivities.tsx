@@ -10,18 +10,19 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useIsFocused} from '@react-navigation/native';
 import {RootNavigatorParamList} from '../navigators/RootNavigator';
 import {ActivityCategory} from '../types/global';
-import {DAILY_ACTIVITIES} from '../utils/activities';
+import {DAILY_ACTIVITIES, resolveActivityDetails} from '../utils/activities';
 import {Activity} from '../database/entities/Activity';
 import {ActivityService} from '../services/ActivityService';
 import {RawActivity} from '../types/global';
 import {In} from 'typeorm';
+import {useTranslation} from 'react-i18next';
 
 const DailyActivities = ({
   navigation,
 }: NativeStackScreenProps<RootNavigatorParamList>) => {
   const [activeSections, setActiveSections] = useState<number[]>([]);
   const [dailyActivities, setDailyActivities] = useState<Activity[]>([]);
-
+  const {t} = useTranslation();
   const isFocused = useIsFocused();
 
   const updateSections = (sections: number[]) => {
@@ -75,7 +76,7 @@ const DailyActivities = ({
       return (
         <ActivityItem
           icon={section.icon}
-          activity={section.group}
+          activity={resolveActivityDetails(section.group, t)}
           style={[styles.accordionHeader, !isActive && styles.activityItem]}
           showEndIcon={true}
           endIcon={isActive ? 'chevron-up' : 'chevron-down'}
@@ -94,7 +95,7 @@ const DailyActivities = ({
             <ActivityItem
               key={contentIndex}
               icon={contentItem.icon}
-              activity={contentItem.title}
+              activity={resolveActivityDetails(contentItem.title, t)}
               style={styles.contentItemActivity}
               showEndIcon={true}
               endIcon={'checkbox'}
@@ -124,7 +125,7 @@ const DailyActivities = ({
     <ScrollView style={globalStyles.container}>
       <ActivityItem
         icon={SolahIconImg}
-        activity="Solah"
+        activity={t('common:solah')}
         style={styles.activityItem}
         onPress={onPressSolah}
       />

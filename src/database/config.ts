@@ -14,12 +14,6 @@ export const connectDB = async () => {
   await AppDataSource.initialize()
     .then(async () => {
       console.log('Database connected');
-      // show all tables in the database
-      AppDataSource.query(
-        'SELECT name FROM sqlite_master WHERE type="table"',
-      ).then((tables: any) => {
-        console.log('Tables in the database: ', tables);
-      });
     })
     .catch(error => {
       console.log('Database connection failed', error);

@@ -9,44 +9,48 @@ import {
   MONTHLY_ACTIVITIES,
   SOLAH,
   WEEKLY_ACTIVITIES,
+  resolveActivityDetails,
 } from '../utils/activities';
 
 import {StorageKeys} from '../types/global';
 import {ClockButton} from '../components/ClockButton';
+import {useTranslation} from 'react-i18next';
 
 const RemindersSettings = ({
   route,
 }: NativeStackScreenProps<RootNavigatorParamList>) => {
-  const {activity, category} =
+  const {activity, category, apiSolah} =
     route.params as RootNavigatorParamList['RemindersSettings'];
   let All_ACTIVITIES;
-  let filteredReminder: string;
+  let reminderKeyInDb: string;
   let uniqueId: number;
-  let repeatType: 'day' | 'week' | 'time';
+  let repeatType: 'day' | 'week' | 'time' = 'day';
+  const {t} = useTranslation();
   if (category === 'Daily') {
     All_ACTIVITIES = DAILY_ACTIVITIES;
-    filteredReminder = StorageKeys.DAILY_REMINDER;
-    repeatType = 'day';
+    reminderKeyInDb = StorageKeys.DAILY_REMINDER;
     uniqueId = 11;
   } else if (category === 'Weekly') {
     All_ACTIVITIES = WEEKLY_ACTIVITIES;
-    filteredReminder = StorageKeys.WEEKLY_REMINDER;
+    reminderKeyInDb = StorageKeys.WEEKLY_REMINDER;
     repeatType = 'week';
     uniqueId = 22;
   } else if (category === 'Monthly') {
     All_ACTIVITIES = MONTHLY_ACTIVITIES;
-    filteredReminder = StorageKeys.MONTHLY_REMINDER;
-    repeatType = 'time';
+    reminderKeyInDb = StorageKeys.MONTHLY_REMINDER;
     uniqueId = 33;
   } else {
     All_ACTIVITIES = MONTHLY_ACTIVITIES;
-    repeatType = 'time';
+    repeatType = 'day';
   }
-  const filteredActivity = All_ACTIVITIES.filter(i => i.group === activity);
+  const filteredActivity = All_ACTIVITIES.filter(
+    i => resolveActivityDetails(i.group, t) === activity,
+  );
+
   return (
     <ScrollView style={globalStyles.container}>
       <View>
-        {activity === 'Solah'
+        {activity === t('common:solah')
           ? SOLAH.map((action, index) => (
               <ActivityItem
                 key={index}
@@ -59,12 +63,11 @@ const RemindersSettings = ({
                     action={action}
                     activity={activity}
                     route={route}
-                    index={index}
+                    index={index + uniqueId + action.icon}
                     category={category}
-                    filteredReminder={filteredReminder}
+                    reminderKeyInDb={reminderKeyInDb}
                     repeatType={repeatType}
-                    uniqueId={uniqueId}
-                    actionId={action.icon}
+                    apiSolah={apiSolah}
                   />
                 }
               />
@@ -74,7 +77,7 @@ const RemindersSettings = ({
                 <ActivityItem
                   key={index}
                   hideStartIcon
-                  activity={content.title}
+                  activity={resolveActivityDetails(content.title, t)}
                   style={styles.activityItem}
                   showEndIcon
                   customEndIcon={
@@ -82,12 +85,11 @@ const RemindersSettings = ({
                       action={content}
                       activity={activity}
                       route={route}
-                      index={index}
+                      index={index + uniqueId + action.icon}
                       category={category}
-                      filteredReminder={filteredReminder}
+                      reminderKeyInDb={reminderKeyInDb}
                       repeatType={repeatType}
-                      uniqueId={uniqueId}
-                      actionId={action.icon}
+                      apiSolah={apiSolah}
                     />
                   }
                 />

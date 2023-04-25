@@ -27,3 +27,24 @@ export const setReminder = async (state: ReminderStorage[], db: string) => {
 export const clearReminder = async (state: string) => {
   await AsyncStorage.removeItem(state);
 };
+
+export const setApiReminderData = async (data: string) => {
+  await AsyncStorage.setItem(StorageKeys.APISOLAT, data);
+};
+
+export const getApiReminderData = async () => {
+  return await AsyncStorage.getItem(StorageKeys.APISOLAT);
+};
+
+export const clearApiReminderData = async () => {
+  await AsyncStorage.removeItem(StorageKeys.APISOLAT);
+};
+
+export const setUserLanguage = async (language: string) => {
+  await AsyncStorage.setItem(StorageKeys.USER_LANGUAGE, language);
+};
+
+export const getUserLanguage = async () => {
+  const language = await AsyncStorage.getItem(StorageKeys.USER_LANGUAGE);
+  return language;
+};

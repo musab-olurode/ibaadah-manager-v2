@@ -24,6 +24,8 @@ import {setGlobalActivityDetails} from '../redux/activity/activitySlice';
 import {ActivityCategory} from '../types/global';
 import EditCustomActivities from '../screens/EditCustomActivities';
 import RemoveCustomActivities from '../screens/RemoveCustomActivities';
+import {useTranslation} from 'react-i18next';
+import {resolveActivityDetails} from '../utils/activities';
 
 export type RootNavigatorParamList = {
   Onboarding: undefined;
@@ -43,10 +45,14 @@ export type RootNavigatorParamList = {
   };
   ProfileNavigator: undefined;
   Reminders: undefined;
-  RemindersList: {category: Exclude<ActivityCategory, ActivityCategory.Solah>};
+  RemindersList: {
+    category: Exclude<ActivityCategory, ActivityCategory.Solah>;
+    apiSolah: any;
+  };
   RemindersSettings: {
     activity: string;
     category: 'Daily' | 'Weekly' | 'Monthly' | 'Solah';
+    apiSolah: any;
   };
 };
 
@@ -55,6 +61,7 @@ const Stack = createNativeStackNavigator<RootNavigatorParamList>();
 const RootNavigator = () => {
   const [showOnboarding, setShowOnboarding] = useState<boolean>(true);
   const dispatch = useAppDispatch();
+  const {t} = useTranslation();
 
   const populateUserInState = async () => {
     const user = await getUser();
@@ -100,7 +107,7 @@ const RootNavigator = () => {
         name="DailyActivities"
         component={DailyActivities}
         options={{
-          headerTitle: 'Daily Activities',
+          headerTitle: t('common:dailyActivitiesTitle') as string,
           headerStyle: styles.flatHeader,
           headerTitleStyle: styles.flatHeaderText,
           headerShadowVisible: false,
@@ -110,7 +117,7 @@ const RootNavigator = () => {
         name="Solah"
         component={Solah}
         options={{
-          headerTitle: 'Solah',
+          headerTitle: t('common:solah') as string,
           headerStyle: styles.flatHeader,
           headerTitleStyle: styles.flatHeaderText,
           headerShadowVisible: false,
@@ -120,7 +127,7 @@ const RootNavigator = () => {
         name="WeeklyActivities"
         component={WeeklyActivities}
         options={{
-          headerTitle: 'Weekly Activities',
+          headerTitle: t('common:weeklyActivitiesTitle') as string,
           headerStyle: styles.flatHeader,
           headerTitleStyle: styles.flatHeaderText,
           headerShadowVisible: false,
@@ -130,7 +137,7 @@ const RootNavigator = () => {
         name="MonthlyActivities"
         component={MonthlyActivities}
         options={{
-          headerTitle: 'Monthly Activities',
+          headerTitle: t('common:monthlyActivitiesTitle') as string,
           headerStyle: styles.flatHeader,
           headerTitleStyle: styles.flatHeaderText,
           headerShadowVisible: false,
@@ -140,7 +147,9 @@ const RootNavigator = () => {
         name="ManageActivities"
         component={ManageActivities}
         options={({route}) => ({
-          headerTitle: `Add/Remove ${route.params.category} Activities`,
+          headerTitle: t(
+            `navigate:addRemove${route.params.category}Activities`,
+          ) as string,
           headerStyle: styles.flatHeader,
           headerTitleStyle: styles.flatHeaderText,
           headerShadowVisible: false,
@@ -150,7 +159,9 @@ const RootNavigator = () => {
         name="EditCustomActivities"
         component={EditCustomActivities}
         options={({route}) => ({
-          headerTitle: `Edit Custom ${route.params.category} Activities`,
+          headerTitle: t(
+            `navigate:editCustom${route.params.category}Activities`,
+          ) as string,
           headerStyle: styles.flatHeader,
           headerTitleStyle: styles.flatHeaderText,
           headerShadowVisible: false,
@@ -160,7 +171,9 @@ const RootNavigator = () => {
         name="RemoveCustomActivities"
         component={RemoveCustomActivities}
         options={({route}) => ({
-          headerTitle: `Remove Custom ${route.params.category} Activities`,
+          headerTitle: t(
+            `navigate:removeCustom${route.params.category}Activities`,
+          ) as string,
           headerStyle: styles.flatHeader,
           headerTitleStyle: styles.flatHeaderText,
           headerShadowVisible: false,
@@ -170,7 +183,7 @@ const RootNavigator = () => {
         name="Reminders"
         component={Reminders}
         options={{
-          headerTitle: 'Reminders',
+          headerTitle: t('navigate:reminders') as string,
           headerStyle: styles.flatHeader,
           headerTitleStyle: styles.flatHeaderText,
           headerShadowVisible: false,
@@ -180,7 +193,9 @@ const RootNavigator = () => {
         name="RemindersList"
         component={RemindersList}
         options={({route}) => ({
-          headerTitle: `${route.params.category} Activities`,
+          headerTitle: t(
+            `common:${route.params.category.toLowerCase()}ActivitiesTitle`,
+          ) as string,
           headerStyle: styles.flatHeader,
           headerTitleStyle: styles.flatHeaderText,
           headerShadowVisible: false,
@@ -190,7 +205,7 @@ const RootNavigator = () => {
         name="RemindersSettings"
         component={RemindersSettings}
         options={({route}) => ({
-          headerTitle: `${route.params.activity}`,
+          headerTitle: resolveActivityDetails(route.params.activity, t),
           headerTitleStyle: styles.flatHeaderText,
           headerStyle: styles.flatHeader,
           headerShadowVisible: false,

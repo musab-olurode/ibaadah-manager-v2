@@ -34,9 +34,11 @@ export enum StorageKeys {
   USER = 'USER',
   ONBOARDING = 'ONBOARDING',
   ACTIVITIES = 'ACTIVITIES',
+  USER_LANGUAGE = 'USER_LANGUAGE',
   DAILY_REMINDER = 'DAILY_REMINDER',
   WEEKLY_REMINDER = 'WEEKLY_REMINDER',
   MONTHLY_REMINDER = 'MONTHLY_REMINDER',
+  APISOLAT = 'APISOLAT',
 }
 
 interface RawActivitySubActivity {
@@ -98,5 +100,6 @@ export interface ReminderStorage {
   hour: number;
   minute: number;
   date?: number;
+  day?: string;
   month?: number;
 }

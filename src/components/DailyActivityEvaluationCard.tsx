@@ -1,5 +1,6 @@
 import {Checkbox} from 'native-base';
 import React from 'react';
+import {useTranslation} from 'react-i18next';
 import {StyleProp, StyleSheet, Text, View, ViewStyle} from 'react-native';
 import * as Progress from 'react-native-progress';
 import {
@@ -8,6 +9,7 @@ import {
   globalStyles,
   normalizeFont,
 } from '../styles/global';
+import {resolveActivityDetails} from '../utils/activities';
 
 export interface DailyActivityEvaluationCardProps {
   group: string;
@@ -22,6 +24,8 @@ const DailyActivityEvaluationCard = ({
   activities,
   style,
 }: DailyActivityEvaluationCardProps) => {
+  const {t} = useTranslation();
+
   return (
     <View style={[styles.card, style]}>
       <Progress.Circle
@@ -45,9 +49,11 @@ const DailyActivityEvaluationCard = ({
         <View style={styles.actions}>
           {activities.map((activity, index) => (
             <View key={`action-${index}`} style={styles.actionRow}>
-              <Text style={styles.actionTitle}>{activity.title}</Text>
+              <Text style={styles.actionTitle}>
+                {resolveActivityDetails(activity.title, t)}
+              </Text>
               <Checkbox
-                value={activity.title}
+                value={resolveActivityDetails(activity.title, t)}
                 accessibilityLabel={`${activity.title} check`}
                 size="sm"
                 isDisabled

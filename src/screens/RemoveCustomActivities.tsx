@@ -10,6 +10,8 @@ import {FlatList, Checkbox} from 'native-base';
 import Button from '../components/Button';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootNavigatorParamList} from '../navigators/RootNavigator';
+import {useTranslation} from 'react-i18next';
+import {resolveActivityDetails} from '../utils/activities';
 
 const RemoveCustomActivities = ({
   route,
@@ -21,7 +23,7 @@ const RemoveCustomActivities = ({
     Activity[]
   >([]);
   const [selectAll, setSelectAll] = useState(false);
-
+  const {t} = useTranslation();
   const isFocused = useIsFocused();
 
   const handleOnPressItem = (activity: Activity) => {
@@ -68,7 +70,7 @@ const RemoveCustomActivities = ({
   const renderItem = ({item}: {item: Activity}) => (
     <ActivityItem
       icon={item.icon}
-      activity={item.title}
+      activity={resolveActivityDetails(item.title, t)}
       style={styles.activityItem}
       showEndIcon
       bindItemToCheckbox
@@ -97,7 +99,7 @@ const RemoveCustomActivities = ({
         </Text>
         <Checkbox
           value="select-all"
-          accessibilityLabel="Select all"
+          accessibilityLabel={t('common:selectAll') as string}
           isChecked={selectAll}
           onChange={handleOnChangeSelectAll}
         />
@@ -115,7 +117,7 @@ const RemoveCustomActivities = ({
             customActivitiesToRemove.length === 0 && styles.disabledBtn,
           ]}
           variant="solid"
-          text="Remove Selected"
+          text={t('common:removeSelected') as string}
           onPress={handleOnPressRemoveActivities}
         />
       </View>
@@ -138,6 +140,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   removeBtnContainer: {
+    paddingRight: 16,
     marginVertical: 4,
     display: 'flex',
     flexDirection: 'row',
