@@ -1,66 +1,100 @@
 import React from 'react';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {StyleSheet, View, ScrollView, Text} from 'react-native';
+import {StyleSheet, View, ScrollView} from 'react-native';
 import ActivityItem from '../components/ActivityItem';
 import {RootNavigatorParamList} from '../navigators/RootNavigator';
-import {GlobalColors, globalStyles, normalizeFont} from '../styles/global';
-import {SOLAH} from '../utils/activities';
-import {Pressable} from 'native-base';
-import ChevronDownIconImg from '../assets/icons/small-chevron-down.svg';
+import {globalStyles} from '../styles/global';
 import {
-  DateTimePickerEvent,
-  DateTimePickerAndroid,
-} from '@react-native-community/datetimepicker';
+  DAILY_ACTIVITIES,
+  MONTHLY_ACTIVITIES,
+  SOLAH,
+  WEEKLY_ACTIVITIES,
+  resolveActivityDetails,
+} from '../utils/activities';
+
+import {StorageKeys} from '../types/global';
+import {ClockButton} from '../components/ClockButton';
+import {useTranslation} from 'react-i18next';
 
 const RemindersSettings = ({
   route,
 }: NativeStackScreenProps<RootNavigatorParamList>) => {
-  const {activity} =
+  const {activity, category, apiSolah} =
     route.params as RootNavigatorParamList['RemindersSettings'];
-
-  const handleOnChangeNotificationDate = (
-    event: DateTimePickerEvent,
-    date?: Date,
-  ) => {
-    switch (event.type) {
-      case 'set':
-        date!.setSeconds(0);
-        date!.setMilliseconds(0);
-        console.log(date!);
-        break;
-      default:
-        break;
-    }
-  };
-
-  const handleOnPressShowTimePicker = () => {
-    DateTimePickerAndroid.open({
-      mode: 'time',
-      value: new Date(),
-      onChange: handleOnChangeNotificationDate,
-    });
-  };
+  let All_ACTIVITIES;
+  let reminderKeyInDb: string;
+  let uniqueId: number;
+  let repeatType: 'day' | 'week' | 'time' = 'day';
+  const {t} = useTranslation();
+  if (category === 'Daily') {
+    All_ACTIVITIES = DAILY_ACTIVITIES;
+    reminderKeyInDb = StorageKeys.DAILY_REMINDER;
+    uniqueId = 11;
+  } else if (category === 'Weekly') {
+    All_ACTIVITIES = WEEKLY_ACTIVITIES;
+    reminderKeyInDb = StorageKeys.WEEKLY_REMINDER;
+    repeatType = 'week';
+    uniqueId = 22;
+  } else if (category === 'Monthly') {
+    All_ACTIVITIES = MONTHLY_ACTIVITIES;
+    reminderKeyInDb = StorageKeys.MONTHLY_REMINDER;
+    uniqueId = 33;
+  } else {
+    All_ACTIVITIES = MONTHLY_ACTIVITIES;
+    repeatType = 'day';
+  }
+  const filteredActivity = All_ACTIVITIES.filter(
+    i => resolveActivityDetails(i.group, t) === activity,
+  );
 
   return (
     <ScrollView style={globalStyles.container}>
       <View>
-        {SOLAH.map((action, index) => (
-          <ActivityItem
-            key={index}
-            hideStartIcon
-            activity={action.group}
-            style={styles.activityItem}
-            showEndIcon
-            customEndIcon={
-              <Pressable
-                style={styles.timePickerBtn}
-                onPress={handleOnPressShowTimePicker}>
-                <Text style={styles.timePickerBtnText}>05:40 AM</Text>
-                <ChevronDownIconImg fill="white" style={styles.chevron} />
-              </Pressable>
-            }
-          />
-        ))}
+        {activity === t('common:solah')
+          ? SOLAH.map((action, index) => (
+              <ActivityItem
+                key={index}
+                hideStartIcon
+                activity={action.group}
+                style={styles.activityItem}
+                showEndIcon
+                customEndIcon={
+                  <ClockButton
+                    action={action}
+                    activity={activity}
+                    route={route}
+                    index={index + uniqueId + action.icon}
+                    category={category}
+                    reminderKeyInDb={reminderKeyInDb}
+                    repeatType={repeatType}
+                    apiSolah={apiSolah}
+                  />
+                }
+              />
+            ))
+          : filteredActivity.map(action =>
+              action.activities.map((content, index) => (
+                <ActivityItem
+                  key={index}
+                  hideStartIcon
+                  activity={resolveActivityDetails(content.title, t)}
+                  style={styles.activityItem}
+                  showEndIcon
+                  customEndIcon={
+                    <ClockButton
+                      action={content}
+                      activity={activity}
+                      route={route}
+                      index={index + uniqueId + action.icon}
+                      category={category}
+                      reminderKeyInDb={reminderKeyInDb}
+                      repeatType={repeatType}
+                      apiSolah={apiSolah}
+                    />
+                  }
+                />
+              )),
+            )}
       </View>
     </ScrollView>
   );
@@ -69,21 +103,6 @@ const RemindersSettings = ({
 const styles = StyleSheet.create({
   activityItem: {
     marginBottom: 24,
-  },
-  timePickerBtn: {
-    backgroundColor: GlobalColors.primary,
-    borderRadius: 100,
-    padding: 14,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  timePickerBtnText: {
-    ...globalStyles.text,
-    color: 'white',
-    fontSize: normalizeFont(12),
-  },
-  chevron: {
-    marginLeft: 8,
   },
 });
 

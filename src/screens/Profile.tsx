@@ -8,7 +8,12 @@ import {
   Pressable,
   PermissionsAndroid,
 } from 'react-native';
-import {GlobalColors, globalStyles, normalizeFont} from '../styles/global';
+import {
+  GlobalColors,
+  globalFonts,
+  globalStyles,
+  normalizeFont,
+} from '../styles/global';
 import ActivityItem from '../components/ActivityItem';
 import DailyActivitiesIconImg from '../assets/icons/daily-activities.png';
 import WeeklyActivitiesIconImg from '../assets/icons/weekly-activities.png';
@@ -43,6 +48,7 @@ const Profile = ({
   });
   const [modalVisible, setModalVisible] = useState(false);
   const [name, setName] = useState(user.name);
+  const [errorInputText, setErrorInput] = useState('');
   const {t} = useTranslation();
   const toast = useToast();
 
@@ -126,9 +132,15 @@ const Profile = ({
   };
 
   const handleOnSubmitName = async () => {
-    dispatch(setUserDetails({...user, name}));
-    await setUser({name});
-    setModalVisible(false);
+    if (!name) {
+      setErrorInput('Please Input a Name');
+    } else if (name.length < 2) {
+      setErrorInput('Please Input a valid Name');
+    } else {
+      dispatch(setUserDetails({...user, name}));
+      await setUser({name});
+      setModalVisible(false);
+    }
   };
 
   const handleOnPressGotoGlossary = () => {
@@ -216,6 +228,7 @@ const Profile = ({
               style={styles.nameInput}
               onChangeText={text => setName(text)}
             />
+            <Text style={styles.errorInputText}>{errorInputText}</Text>
             <Button
               text={t('common:save') as string}
               variant="solid"
@@ -290,9 +303,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   nameInput: {
-    marginVertical: 40,
+    marginTop: 40,
+    marginBottom: 10,
     height: 40,
     paddingHorizontal: 32,
+  },
+  errorInputText: {
+    marginVertical: 20,
+    color: 'red',
+    ...globalFonts.aeonik.regular,
   },
   saveBtn: {
     paddingVertical: 10,

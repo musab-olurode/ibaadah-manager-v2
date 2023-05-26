@@ -1,4 +1,4 @@
-import {StorageKeys} from '../types/global';
+import {StorageKeys, ReminderStorage} from '../types/global';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export interface User {
@@ -19,6 +19,25 @@ export const getUser = async (): Promise<User> => {
 
 export const setUser = async (state: User) => {
   await AsyncStorage.setItem(StorageKeys.USER, JSON.stringify(state));
+};
+
+export const setReminder = async (state: ReminderStorage[], db: string) => {
+  await AsyncStorage.setItem(db, JSON.stringify(state));
+};
+export const clearReminder = async (state: string) => {
+  await AsyncStorage.removeItem(state);
+};
+
+export const setApiReminderData = async (data: string) => {
+  await AsyncStorage.setItem(StorageKeys.APISOLAT, data);
+};
+
+export const getApiReminderData = async () => {
+  return await AsyncStorage.getItem(StorageKeys.APISOLAT);
+};
+
+export const clearApiReminderData = async () => {
+  await AsyncStorage.removeItem(StorageKeys.APISOLAT);
 };
 
 export const setUserLanguage = async (language: string) => {

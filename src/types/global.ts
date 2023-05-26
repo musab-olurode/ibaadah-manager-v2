@@ -35,6 +35,10 @@ export enum StorageKeys {
   ONBOARDING = 'ONBOARDING',
   ACTIVITIES = 'ACTIVITIES',
   USER_LANGUAGE = 'USER_LANGUAGE',
+  DAILY_REMINDER = 'DAILY_REMINDER',
+  WEEKLY_REMINDER = 'WEEKLY_REMINDER',
+  MONTHLY_REMINDER = 'MONTHLY_REMINDER',
+  APISOLAT = 'APISOLAT',
 }
 
 interface RawActivitySubActivity {
@@ -87,4 +91,15 @@ export interface TotalGroupedActivityEvaluation {
   group: string;
   progress: number;
   activities: TotalEvaluationGroup[];
+}
+export interface ReminderStorage {
+  title: string;
+  message: string;
+  bigText?: string;
+  particularActivity: string;
+  hour: number;
+  minute: number;
+  date?: number;
+  day?: string;
+  month?: number;
 }

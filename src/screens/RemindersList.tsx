@@ -8,17 +8,20 @@ import {
   DAILY_ACTIVITIES,
   MONTHLY_ACTIVITIES,
   WEEKLY_ACTIVITIES,
+  resolveActivityDetails,
 } from '../utils/activities';
 import ReminderIconImg from '../assets/icons/reminder.png';
+import {useTranslation} from 'react-i18next';
 
 const RemindersList = ({
   route,
   navigation,
 }: NativeStackScreenProps<RootNavigatorParamList>) => {
-  const {category} = route.params as RootNavigatorParamList['RemindersList'];
-
+  const {category, apiSolah} =
+    route.params as RootNavigatorParamList['RemindersList'];
+  const {t} = useTranslation();
   const handleOnPressItem = (activity: string) => {
-    navigation.push('RemindersSettings', {activity});
+    navigation.push('RemindersSettings', {activity, category, apiSolah});
   };
 
   return (
@@ -28,25 +31,27 @@ const RemindersList = ({
           <View>
             <ActivityItem
               hideStartIcon
-              activity="Solah"
+              activity={t('common:solah')}
               style={styles.activityItem}
               showEndIcon
               customEndIcon={
                 <Image style={styles.bellIcon} source={ReminderIconImg} />
               }
-              onPress={() => handleOnPressItem('Solah')}
+              onPress={() => handleOnPressItem(t('common:solah'))}
             />
             {DAILY_ACTIVITIES.map((activity, index) => (
               <ActivityItem
                 key={index}
                 hideStartIcon
-                activity={activity.group}
+                activity={resolveActivityDetails(activity.group, t)}
                 style={styles.activityItem}
                 showEndIcon
                 customEndIcon={
                   <Image style={styles.bellIcon} source={ReminderIconImg} />
                 }
-                onPress={() => handleOnPressItem(activity.group)}
+                onPress={() =>
+                  handleOnPressItem(resolveActivityDetails(activity.group, t))
+                }
               />
             ))}
           </View>
@@ -57,13 +62,15 @@ const RemindersList = ({
               <ActivityItem
                 key={index}
                 hideStartIcon
-                activity={activity.group}
+                activity={resolveActivityDetails(activity.group, t)}
                 style={styles.activityItem}
                 showEndIcon
                 customEndIcon={
                   <Image style={styles.bellIcon} source={ReminderIconImg} />
                 }
-                onPress={() => handleOnPressItem(activity.group)}
+                onPress={() =>
+                  handleOnPressItem(resolveActivityDetails(activity.group, t))
+                }
               />
             ))}
           </View>
@@ -74,13 +81,15 @@ const RemindersList = ({
               <ActivityItem
                 key={index}
                 hideStartIcon
-                activity={activity.group}
+                activity={resolveActivityDetails(activity.group, t)}
                 style={styles.activityItem}
                 showEndIcon
                 customEndIcon={
                   <Image style={styles.bellIcon} source={ReminderIconImg} />
                 }
-                onPress={() => handleOnPressItem(activity.group)}
+                onPress={() =>
+                  handleOnPressItem(resolveActivityDetails(activity.group, t))
+                }
               />
             ))}
           </View>

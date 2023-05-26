@@ -45,8 +45,15 @@ export type RootNavigatorParamList = {
   };
   ProfileNavigator: undefined;
   Reminders: undefined;
-  RemindersList: {category: Exclude<ActivityCategory, ActivityCategory.Solah>};
-  RemindersSettings: {activity: string};
+  RemindersList: {
+    category: Exclude<ActivityCategory, ActivityCategory.Solah>;
+    apiSolah: any;
+  };
+  RemindersSettings: {
+    activity: string;
+    category: 'Daily' | 'Weekly' | 'Monthly' | 'Solah';
+    apiSolah: any;
+  };
 };
 
 const Stack = createNativeStackNavigator<RootNavigatorParamList>();
