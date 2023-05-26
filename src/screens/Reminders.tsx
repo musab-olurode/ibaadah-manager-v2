@@ -7,11 +7,7 @@ import WeeklyActivitiesIconImg from '../assets/icons/weekly-activities.png';
 import MonthlyActivitiesIconImg from '../assets/icons/monthly-activities.png';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootNavigatorParamList} from '../navigators/RootNavigator';
-import {
-  ShowNotifications,
-  createChannel,
-  fetchSolatTimeAPI,
-} from '../utils/notificationService';
+import {createChannel, fetchSolatTimeAPI} from '../utils/notificationService';
 import Geolocation from '@react-native-community/geolocation';
 import {getApiReminderData, setApiReminderData} from '../utils/storage';
 import {ActivityCategory} from '../types/global';
@@ -68,7 +64,9 @@ const Reminders = ({
     getApiReminderData().then(data => {
       const dbApiData = JSON.parse(data!);
 
+      console.log('Line before geolocation test for android 12');
       Geolocation.getCurrentPosition(i => {
+        console.log('Android 12 location works');
         const latitude = i.coords.latitude;
         const longitude = i.coords.longitude;
         if (dbApiData) {
@@ -82,7 +80,6 @@ const Reminders = ({
         }
       });
     });
-    ShowNotifications();
   }, []);
 
   function handleOnActivityGroup(

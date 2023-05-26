@@ -36,6 +36,7 @@ const Onboarding = () => {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
   const [name, setName] = useState('');
+  const [errorInputText, setErrorInput] = useState('');
 
   const pagerRef = useRef<PagerView>(null);
   const homeNavigation =
@@ -147,14 +148,20 @@ const Onboarding = () => {
   };
 
   const handleOnSubmitName = async () => {
-    dispatch(setUserDetails({name}));
-    await setUser({name});
-    await setOnboardingState('true');
+    if (!name) {
+      setErrorInput('Please Input a Name');
+    } else if (name.length < 2) {
+      setErrorInput('Please Input a valid Name');
+    } else {
+      dispatch(setUserDetails({name}));
+      await setUser({name});
+      await setOnboardingState('true');
 
-    homeNavigation.reset({
-      index: 0,
-      routes: [{name: 'Home'}],
-    });
+      homeNavigation.reset({
+        index: 0,
+        routes: [{name: 'Home'}],
+      });
+    }
   };
 
   return (
@@ -215,6 +222,7 @@ const Onboarding = () => {
               style={styles.nameInput}
               onChangeText={text => setName(text)}
             />
+            <Text style={styles.errorInputText}>{errorInputText}</Text>
             <Button
               text="Save"
               variant="solid"
@@ -279,9 +287,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   nameInput: {
-    marginVertical: 40,
+    marginTop: 40,
+    marginBottom: 10,
     height: 40,
     paddingHorizontal: 32,
+  },
+  errorInputText: {
+    marginVertical: 20,
+    color: 'red',
+    ...globalFonts.aeonik.regular,
   },
   saveBtn: {
     paddingVertical: 10,

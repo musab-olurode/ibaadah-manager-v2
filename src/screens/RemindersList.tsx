@@ -23,7 +23,7 @@ const RemindersList = ({
   const handleOnPressItem = (activity: string) => {
     navigation.push('RemindersSettings', {activity, category, apiSolah});
   };
-  // apiSolah.Fajr && console.log(apiSolah);
+
   return (
     <ScrollView style={globalStyles.container}>
       <View>
