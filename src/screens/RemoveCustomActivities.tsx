@@ -5,13 +5,14 @@ import ActivityItem from '../components/ActivityItem';
 import {Activity} from '../database/entities/Activity';
 import {useIsFocused} from '@react-navigation/native';
 import {ActivityService} from '../services/ActivityService';
-import {ActivityType} from '../types/global';
+import {ActivityType, Theme} from '../types/global';
 import {FlatList, Checkbox} from 'native-base';
 import Button from '../components/Button';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootNavigatorParamList} from '../navigators/RootNavigator';
 import {useTranslation} from 'react-i18next';
 import {resolveActivityDetails} from '../utils/activities';
+import usePreferredTheme from '../hooks/usePreferredTheme';
 
 const RemoveCustomActivities = ({
   route,
@@ -25,6 +26,7 @@ const RemoveCustomActivities = ({
   const [selectAll, setSelectAll] = useState(false);
   const {t} = useTranslation();
   const isFocused = useIsFocused();
+  const preferredTheme = usePreferredTheme();
 
   const handleOnPressItem = (activity: Activity) => {
     const isActivitySelected = customActivitiesToRemove.find(
@@ -69,6 +71,7 @@ const RemoveCustomActivities = ({
 
   const renderItem = ({item}: {item: Activity}) => (
     <ActivityItem
+      isDarkMode={preferredTheme === Theme.DARK}
       icon={item.icon}
       activity={resolveActivityDetails(item.title, t)}
       style={styles.activityItem}
@@ -93,8 +96,17 @@ const RemoveCustomActivities = ({
 
   return (
     <>
-      <View style={styles.selectAllContainer}>
-        <Text style={[globalStyles.text, styles.selectAllText]}>
+      <View
+        style={[
+          styles.selectAllContainer,
+          preferredTheme === Theme.DARK && globalStyles.darkModeContainer,
+        ]}>
+        <Text
+          style={[
+            globalStyles.text,
+            styles.selectAllText,
+            preferredTheme === Theme.DARK && globalStyles.darkModeText,
+          ]}>
           Select All
         </Text>
         <Checkbox
@@ -105,11 +117,18 @@ const RemoveCustomActivities = ({
         />
       </View>
       <FlatList
-        style={globalStyles.container}
+        style={[
+          globalStyles.container,
+          preferredTheme === Theme.DARK && globalStyles.darkModeContainer,
+        ]}
         data={customActivities}
         renderItem={renderItem}
       />
-      <View style={styles.removeBtnContainer}>
+      <View
+        style={[
+          styles.removeBtnContainer,
+          preferredTheme === Theme.DARK && globalStyles.darkModeContainer,
+        ]}>
         <Button
           disabled={customActivitiesToRemove.length === 0}
           style={[
@@ -141,7 +160,7 @@ const styles = StyleSheet.create({
   },
   removeBtnContainer: {
     paddingRight: 16,
-    marginVertical: 4,
+    paddingVertical: 4,
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'flex-end',

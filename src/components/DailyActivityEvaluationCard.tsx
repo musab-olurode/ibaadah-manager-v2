@@ -1,7 +1,14 @@
 import {Checkbox} from 'native-base';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
-import {StyleProp, StyleSheet, Text, View, ViewStyle} from 'react-native';
+import {
+  StyleProp,
+  StyleSheet,
+  Text,
+  TextStyle,
+  View,
+  ViewStyle,
+} from 'react-native';
 import * as Progress from 'react-native-progress';
 import {
   GlobalColors,
@@ -16,6 +23,7 @@ export interface DailyActivityEvaluationCardProps {
   progress: number;
   style?: StyleProp<ViewStyle>;
   activities: {title: string; completed: boolean}[];
+  isDarkMode?: boolean;
 }
 
 const DailyActivityEvaluationCard = ({
@@ -23,11 +31,13 @@ const DailyActivityEvaluationCard = ({
   progress,
   activities,
   style,
+  isDarkMode,
 }: DailyActivityEvaluationCardProps) => {
   const {t} = useTranslation();
 
   return (
-    <View style={[styles.card, style]}>
+    <View
+      style={[styles.card, style, isDarkMode && globalStyles.darkModeOverlay]}>
       <Progress.Circle
         size={70}
         progress={progress}
@@ -39,17 +49,33 @@ const DailyActivityEvaluationCard = ({
             : `${percentage.toFixed(2)}%`;
         }}
         style={styles.progress}
-        textStyle={styles.progressText}
+        textStyle={
+          [
+            styles.progressText,
+            isDarkMode && globalStyles.darkModeText,
+          ] as unknown as TextStyle
+        }
         color={GlobalColors.primary}
         unfilledColor="#DEEDE7"
         borderColor="#DEEDE7"
       />
       <View style={styles.details}>
-        <Text style={[globalStyles.text, styles.group]}>{group}</Text>
+        <Text
+          style={[
+            globalStyles.text,
+            styles.group,
+            isDarkMode && globalStyles.darkModeText,
+          ]}>
+          {group}
+        </Text>
         <View style={styles.actions}>
           {activities.map((activity, index) => (
             <View key={`action-${index}`} style={styles.actionRow}>
-              <Text style={styles.actionTitle}>
+              <Text
+                style={[
+                  styles.actionTitle,
+                  isDarkMode && globalStyles.darkModeText,
+                ]}>
                 {resolveActivityDetails(activity.title, t)}
               </Text>
               <Checkbox
@@ -86,7 +112,7 @@ const styles = StyleSheet.create({
     marginRight: 24,
   },
   progressText: {
-    color: '#505050',
+    color: GlobalColors.gray,
     fontSize: normalizeFont(18),
     ...globalFonts.spaceGrotesk.bold,
   },

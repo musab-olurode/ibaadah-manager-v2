@@ -7,6 +7,7 @@ import {
   Text,
   Pressable,
   PermissionsAndroid,
+  ViewStyle,
 } from 'react-native';
 import {GlobalColors, globalStyles, normalizeFont} from '../styles/global';
 import ActivityItem from '../components/ActivityItem';
@@ -32,7 +33,8 @@ import {setUserDetails} from '../redux/user/userSlice';
 import RNFS from 'react-native-fs';
 import {avatarFolder} from '../utils/constants';
 import {useTranslation} from 'react-i18next';
-import {ActivityCategory} from '../types/global';
+import {ActivityCategory, Theme} from '../types/global';
+import usePreferredTheme from '../hooks/usePreferredTheme';
 
 const Profile = ({
   navigation,
@@ -45,6 +47,7 @@ const Profile = ({
   const [name, setName] = useState(user.name);
   const {t} = useTranslation();
   const toast = useToast();
+  const preferredTheme = usePreferredTheme();
 
   const dispatch = useAppDispatch();
 
@@ -164,7 +167,11 @@ const Profile = ({
   };
 
   return (
-    <ScrollView style={globalStyles.container}>
+    <ScrollView
+      style={[
+        globalStyles.container,
+        preferredTheme === Theme.DARK && globalStyles.darkModeContainer,
+      ]}>
       <View style={styles.header}>
         <View style={styles.avatarContainer}>
           <Pressable onPress={editAvatar}>
@@ -175,20 +182,42 @@ const Profile = ({
             />
           </Pressable>
           <Pressable
-            style={styles.editProfileBtn}
+            style={[
+              styles.editProfileBtn,
+              preferredTheme === Theme.DARK && globalStyles.darkModeOverlay,
+            ]}
             onPress={() => setModalVisible(true)}>
-            <EditIconImg />
+            <EditIconImg
+              style={[
+                styles.editIcon as ViewStyle,
+                preferredTheme === Theme.DARK &&
+                  (globalStyles.darkModeText as ViewStyle),
+              ]}
+            />
           </Pressable>
         </View>
 
-        <Text style={styles.name}>{user.name}</Text>
+        <Text
+          style={[
+            styles.name,
+            preferredTheme === Theme.DARK && globalStyles.darkModeText,
+          ]}>
+          {user.name}
+        </Text>
       </View>
 
-      <Text style={styles.sectionTitle}>{t('common:selfEvaluation')}</Text>
+      <Text
+        style={[
+          styles.sectionTitle,
+          preferredTheme === Theme.DARK && globalStyles.darkModeText,
+        ]}>
+        {t('common:selfEvaluation')}
+      </Text>
 
       <View>
         {ACTIONS.map((action, index) => (
           <ActivityItem
+            isDarkMode={preferredTheme === Theme.DARK}
             key={index}
             icon={action.icon}
             activity={action.name}
@@ -198,22 +227,45 @@ const Profile = ({
         ))}
       </View>
 
-      <Text style={styles.sectionTitle}>{t('common:glossary')}</Text>
+      <Text
+        style={[
+          styles.sectionTitle,
+          preferredTheme === Theme.DARK && globalStyles.darkModeText,
+        ]}>
+        {t('common:glossary')}
+      </Text>
 
       <ActivityItem
+        isDarkMode={preferredTheme === Theme.DARK}
         icon={GlossaryIconImg}
         activity={t('common:meaningOfWords') as string}
         style={[styles.activityItem, styles.glossaryItem]}
         onPress={handleOnPressGotoGlossary}
       />
       <Modal isOpen={modalVisible} avoidKeyboard>
-        <Modal.Content>
+        <Modal.Content
+          borderRadius={0}
+          backgroundColor={
+            preferredTheme === Theme.DARK
+              ? GlobalColors.darkModeOverlay
+              : undefined
+          }>
           <View style={styles.modalBody}>
-            <Text style={globalStyles.text}>What should we call you</Text>
+            <Text
+              style={[
+                globalStyles.text,
+                preferredTheme === Theme.DARK && globalStyles.darkModeText,
+              ]}>
+              What should we call you
+            </Text>
             <Input
               placeholder={t('common:enterName') as string}
               defaultValue={name}
-              style={styles.nameInput}
+              isDarkMode={preferredTheme === Theme.DARK}
+              style={[
+                styles.nameInput,
+                preferredTheme === Theme.DARK && globalStyles.darkModeOverlay,
+              ]}
               onChangeText={text => setName(text)}
             />
             <Button
@@ -273,6 +325,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 1,
     shadowRadius: 40,
     elevation: 24,
+  },
+  editIcon: {
+    color: '#505050',
   },
   sectionTitle: {
     ...globalStyles.text,

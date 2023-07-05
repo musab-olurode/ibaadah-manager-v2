@@ -3,7 +3,7 @@ import {StyleSheet, ScrollView, View} from 'react-native';
 import {globalStyles} from '../styles/global';
 import ActivityItem from '../components/ActivityItem';
 import Accordion from 'react-native-collapsible/Accordion';
-import {ActivityCategory} from '../types/global';
+import {ActivityCategory, Theme} from '../types/global';
 import {resolveActivityDetails, WEEKLY_ACTIVITIES} from '../utils/activities';
 import PlusIconImg from '../assets/icons/plus.svg';
 import {Fab} from 'native-base';
@@ -14,6 +14,7 @@ import {RawActivity} from '../types/global';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootNavigatorParamList} from '../navigators/RootNavigator';
 import {useTranslation} from 'react-i18next';
+import usePreferredTheme from '../hooks/usePreferredTheme';
 
 const WeeklyActivities = ({
   navigation,
@@ -22,6 +23,7 @@ const WeeklyActivities = ({
   const [weeklyActivities, setWeeklyActivities] = useState<Activity[]>([]);
   const {t} = useTranslation();
   const isFocused = useIsFocused();
+  const preferredTheme = usePreferredTheme();
 
   const updateSections = (sections: number[]) => {
     setActiveSections(sections);
@@ -53,6 +55,7 @@ const WeeklyActivities = ({
     };
     setWeeklyActivities(_weeklyActivities);
     await ActivityService.update(id, _weeklyActivities[changedActivityIndex]);
+    await getWeeklyActivities();
   };
 
   const renderHeader = (
@@ -69,6 +72,7 @@ const WeeklyActivities = ({
     } else {
       return (
         <ActivityItem
+          isDarkMode={preferredTheme === Theme.DARK}
           icon={section.icon}
           activity={section.group}
           style={[styles.accordionHeader, !isActive && styles.activityItem]}
@@ -82,11 +86,16 @@ const WeeklyActivities = ({
 
   const renderContent = ({group}: {group: string}, _index: number) => {
     return (
-      <View style={styles.content}>
+      <View
+        style={[
+          styles.content,
+          preferredTheme === Theme.DARK && globalStyles.darkModeOverlay,
+        ]}>
         {weeklyActivities
           .filter(activity => activity.group === group)
           .map((contentItem, contentIndex) => (
             <ActivityItem
+              isDarkMode={preferredTheme === Theme.DARK}
               key={contentIndex}
               icon={contentItem.icon}
               activity={resolveActivityDetails(contentItem.title, t)}
@@ -105,18 +114,23 @@ const WeeklyActivities = ({
     );
   };
 
+  const getWeeklyActivities = async () => {
+    const _weeklyActivities = await ActivityService.getOrCreateForThisWeek({
+      category: ActivityCategory.Weekly,
+    });
+    setWeeklyActivities(_weeklyActivities);
+  };
+
   useEffect(() => {
-    const getWeeklyActivities = async () => {
-      const _weeklyActivities = await ActivityService.getOrCreateForThisWeek({
-        category: ActivityCategory.Weekly,
-      });
-      setWeeklyActivities(_weeklyActivities);
-    };
     getWeeklyActivities();
   }, [isFocused]);
 
   return (
-    <ScrollView style={globalStyles.container}>
+    <ScrollView
+      style={[
+        globalStyles.container,
+        preferredTheme === Theme.DARK && globalStyles.darkModeContainer,
+      ]}>
       <Accordion
         containerStyle={styles.accordion}
         sections={WEEKLY_ACTIVITIES}

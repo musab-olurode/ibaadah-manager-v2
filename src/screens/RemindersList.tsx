@@ -10,23 +10,31 @@ import {
   WEEKLY_ACTIVITIES,
 } from '../utils/activities';
 import ReminderIconImg from '../assets/icons/reminder.png';
+import usePreferredTheme from '../hooks/usePreferredTheme';
+import {Theme} from '../types/global';
 
 const RemindersList = ({
   route,
   navigation,
 }: NativeStackScreenProps<RootNavigatorParamList>) => {
   const {category} = route.params as RootNavigatorParamList['RemindersList'];
+  const preferredTheme = usePreferredTheme();
 
   const handleOnPressItem = (activity: string) => {
     navigation.push('RemindersSettings', {activity});
   };
 
   return (
-    <ScrollView style={globalStyles.container}>
+    <ScrollView
+      style={[
+        globalStyles.container,
+        preferredTheme === Theme.DARK && globalStyles.darkModeContainer,
+      ]}>
       <View>
         {category === 'Daily' && (
           <View>
             <ActivityItem
+              isDarkMode={preferredTheme === Theme.DARK}
               hideStartIcon
               activity="Solah"
               style={styles.activityItem}
@@ -38,6 +46,7 @@ const RemindersList = ({
             />
             {DAILY_ACTIVITIES.map((activity, index) => (
               <ActivityItem
+                isDarkMode={preferredTheme === Theme.DARK}
                 key={index}
                 hideStartIcon
                 activity={activity.group}
@@ -56,6 +65,7 @@ const RemindersList = ({
             {WEEKLY_ACTIVITIES.map((activity, index) => (
               <ActivityItem
                 key={index}
+                isDarkMode={preferredTheme === Theme.DARK}
                 hideStartIcon
                 activity={activity.group}
                 style={styles.activityItem}
@@ -73,6 +83,7 @@ const RemindersList = ({
             {MONTHLY_ACTIVITIES.map((activity, index) => (
               <ActivityItem
                 key={index}
+                isDarkMode={preferredTheme === Theme.DARK}
                 hideStartIcon
                 activity={activity.group}
                 style={styles.activityItem}

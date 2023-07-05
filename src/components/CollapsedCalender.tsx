@@ -16,6 +16,7 @@ export interface CollapsedCalenderProps {
   type: FilterType.THIS_WEEK | FilterType.LAST_WEEK;
   firstDate: Date;
   isDisabled?: boolean;
+  isDarkMode?: boolean;
 }
 
 const CollapsedCalender = ({
@@ -24,6 +25,7 @@ const CollapsedCalender = ({
   defaultDate,
   firstDate,
   isDisabled,
+  isDarkMode,
 }: CollapsedCalenderProps) => {
   const [daysInTheWeek, setDaysInTheWeek] = useState<Date[]>(
     new Array(7).fill(new Date()),
@@ -93,6 +95,9 @@ const CollapsedCalender = ({
             style={[
               styles.date,
               date.getDate() === selectedDate.getDate() && styles.selectedDate,
+              date.getDate() === selectedDate.getDate() && isDarkMode
+                ? globalStyles.darkModeOverlay
+                : {},
             ]}
             onPress={() => handleOnSelectDate(date)}>
             <Text
@@ -103,6 +108,9 @@ const CollapsedCalender = ({
                   styles.disabledDate,
                 date.getDate() === selectedDate.getDate() &&
                   styles.selectedDateText,
+                date.getDate() === selectedDate.getDate() && isDarkMode
+                  ? globalStyles.darkModeText
+                  : {},
                 globalFonts.aeonik.bold,
               ]}>
               {date.getDate()}

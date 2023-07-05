@@ -7,7 +7,12 @@ import {
   Dimensions,
   Animated,
 } from 'react-native';
-import {globalFonts, globalStyles, normalizeFont} from '../styles/global';
+import {
+  GlobalColors,
+  globalFonts,
+  globalStyles,
+  normalizeFont,
+} from '../styles/global';
 import PagerView, {
   PagerViewOnPageScrollEventData,
   PagerViewOnPageSelectedEvent,
@@ -29,6 +34,9 @@ import {setOnboardingState} from '../utils/onboarding';
 import {setUser} from '../utils/storage';
 import {useAppDispatch} from '../redux/hooks';
 import {setUserDetails} from '../redux/user/userSlice';
+import {Theme} from '../types/global';
+import usePreferredTheme from '../hooks/usePreferredTheme';
+import {useTranslation} from 'react-i18next';
 
 const AnimatedPagerView = Animated.createAnimatedComponent(PagerView);
 
@@ -42,20 +50,40 @@ const Onboarding = () => {
     useNavigation<NativeStackNavigationProp<RootNavigatorParamList>>();
 
   const width = Dimensions.get('window').width;
-
   const dispatch = useAppDispatch();
+  const preferredTheme = usePreferredTheme();
+  const {t} = useTranslation();
 
   const ONBOARDING_DATA = [
     {
       icon: Onboarding1Img,
       text: (
         <View>
-          <Text style={[globalStyles.text, styles.pageText]}>Manage your</Text>
+          <Text
+            style={[
+              globalStyles.text,
+              styles.pageText,
+              preferredTheme === Theme.DARK && globalStyles.darkModeText,
+            ]}>
+            Manage your
+          </Text>
           <View>
-            <Text style={[globalStyles.text, styles.pageText]}>Ibaadah</Text>
+            <Text
+              style={[
+                globalStyles.text,
+                styles.pageText,
+                preferredTheme === Theme.DARK && globalStyles.darkModeText,
+              ]}>
+              Ibaadah
+            </Text>
             <IbaadahEllipseImg style={styles.ellipse} />
           </View>
-          <Text style={[globalStyles.text, styles.pageText]}>
+          <Text
+            style={[
+              globalStyles.text,
+              styles.pageText,
+              preferredTheme === Theme.DARK && globalStyles.darkModeText,
+            ]}>
             quickly{' '}
             <View>
               <LightbulbImg style={styles.lightbulb} />
@@ -68,21 +96,41 @@ const Onboarding = () => {
       icon: Onboarding2Img,
       text: (
         <View>
-          <Text style={[globalStyles.text, styles.pageText]}>
+          <Text
+            style={[
+              globalStyles.text,
+              styles.pageText,
+              preferredTheme === Theme.DARK && globalStyles.darkModeText,
+            ]}>
             Get{' '}
             <View>
               <View style={styles.remindersContainer}>
-                <Text style={[globalStyles.text, styles.pageText]}>
+                <Text
+                  style={[
+                    globalStyles.text,
+                    styles.pageText,
+                    preferredTheme === Theme.DARK && globalStyles.darkModeText,
+                  ]}>
                   reminders
                 </Text>
                 <RemindersEllipseImg style={styles.ellipse} />
               </View>
             </View>
           </Text>
-          <Text style={[globalStyles.text, styles.pageText]}>
+          <Text
+            style={[
+              globalStyles.text,
+              styles.pageText,
+              preferredTheme === Theme.DARK && globalStyles.darkModeText,
+            ]}>
             for uncompleted
           </Text>
-          <Text style={[globalStyles.text, styles.pageText]}>
+          <Text
+            style={[
+              globalStyles.text,
+              styles.pageText,
+              preferredTheme === Theme.DARK && globalStyles.darkModeText,
+            ]}>
             Ibaadah{' '}
             <View>
               <LightbulbImg style={styles.lightbulb} />
@@ -94,7 +142,12 @@ const Onboarding = () => {
     {
       icon: Onboarding3Img,
       text: (
-        <Text style={[globalStyles.text, styles.pageText]}>
+        <Text
+          style={[
+            globalStyles.text,
+            styles.pageText,
+            preferredTheme === Theme.DARK && globalStyles.darkModeText,
+          ]}>
           {'Keep track of your\nDaily, Weekly and\nMonthly Ibaadah'}
         </Text>
       ),
@@ -158,11 +211,19 @@ const Onboarding = () => {
   };
 
   return (
-    <View style={globalStyles.container}>
+    <View
+      style={[
+        globalStyles.container,
+        preferredTheme === Theme.DARK && globalStyles.darkModeContainer,
+      ]}>
       <View style={styles.skipContainer}>
         {currentPageIndex !== ONBOARDING_DATA.length - 1 && (
           <Text
-            style={[globalStyles.text, styles.skipText]}
+            style={[
+              globalStyles.text,
+              styles.skipText,
+              preferredTheme === Theme.DARK && {color: GlobalColors['gray.2']},
+            ]}
             onPress={handleOnPressStartOrSkip}>
             Skip
           </Text>
@@ -188,7 +249,11 @@ const Onboarding = () => {
         ))}
       </AnimatedPagerView>
       <View style={styles.footer}>
-        <PageIndicator data={ONBOARDING_DATA} scrollX={scrollX} />
+        <PageIndicator
+          data={ONBOARDING_DATA}
+          scrollX={scrollX}
+          isDarkMode={preferredTheme === Theme.DARK}
+        />
         {currentPageIndex === ONBOARDING_DATA.length - 1 ? (
           <Button
             text="Get Started"
@@ -207,12 +272,29 @@ const Onboarding = () => {
       </View>
 
       <Modal isOpen={modalVisible} avoidKeyboard>
-        <Modal.Content>
+        <Modal.Content
+          borderRadius={0}
+          backgroundColor={
+            preferredTheme === Theme.DARK
+              ? GlobalColors.darkModeOverlay
+              : undefined
+          }>
           <View style={styles.modalBody}>
-            <Text style={globalStyles.text}>What should we call you</Text>
+            <Text
+              style={[
+                globalStyles.text,
+                globalFonts.spaceGrotesk.medium,
+                preferredTheme === Theme.DARK && globalStyles.darkModeText,
+              ]}>
+              What name should we call you
+            </Text>
             <Input
-              placeholder="Enter your name"
-              style={styles.nameInput}
+              placeholder={t('common:enterName') as string}
+              isDarkMode={preferredTheme === Theme.DARK}
+              style={[
+                styles.nameInput,
+                preferredTheme === Theme.DARK && globalStyles.darkModeOverlay,
+              ]}
               onChangeText={text => setName(text)}
             />
             <Button

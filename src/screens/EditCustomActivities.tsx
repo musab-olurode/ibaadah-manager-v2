@@ -1,5 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, View, Pressable, Text, Image} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Pressable,
+  Text,
+  Image,
+  ViewStyle,
+} from 'react-native';
 import {GlobalColors, globalStyles, normalizeFont} from '../styles/global';
 import ActivityItem from '../components/ActivityItem';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -7,7 +14,7 @@ import {RootNavigatorParamList} from '../navigators/RootNavigator';
 import {Activity} from '../database/entities/Activity';
 import {useIsFocused} from '@react-navigation/native';
 import {ActivityService} from '../services/ActivityService';
-import {ActivityType} from '../types/global';
+import {ActivityType, Theme} from '../types/global';
 import {FlatList, Checkbox, Modal, Actionsheet} from 'native-base';
 import Button from '../components/Button';
 import Input from '../components/Input';
@@ -19,6 +26,7 @@ import {
 import {CUSTOM_ACTIVITY_ICONS} from '../utils/activities';
 import ChevronDownIconImg from '../assets/icons/chevron-down.svg';
 import {useTranslation} from 'react-i18next';
+import usePreferredTheme from '../hooks/usePreferredTheme';
 
 const EditCustomActivities = ({
   route,
@@ -36,6 +44,7 @@ const EditCustomActivities = ({
   const [openActionSheet, setOpenActionSheet] = useState(false);
   const isFocused = useIsFocused();
   const {t} = useTranslation();
+  const preferredTheme = usePreferredTheme();
 
   const handleOnPressItem = (activity: Activity) => {
     const _selectedCustomIcon = CUSTOM_ACTIVITY_ICONS.find(
@@ -61,6 +70,7 @@ const EditCustomActivities = ({
 
   const renderItem = ({item}: {item: Activity}) => (
     <ActivityItem
+      isDarkMode={preferredTheme === Theme.DARK}
       icon={item.icon}
       activity={item.title}
       style={styles.activityItem}
@@ -129,7 +139,10 @@ const EditCustomActivities = ({
   return (
     <>
       <FlatList
-        style={globalStyles.container}
+        style={[
+          globalStyles.container,
+          preferredTheme === Theme.DARK && globalStyles.darkModeContainer,
+        ]}
         data={customActivities}
         renderItem={renderItem}
       />
@@ -139,31 +152,58 @@ const EditCustomActivities = ({
         onClose={() => setModalVisible(false)}
         size="xl">
         <Modal.Content>
-          <View style={styles.modalBody}>
+          <View
+            style={[
+              styles.modalBody,
+              preferredTheme === Theme.DARK && globalStyles.darkModeOverlay,
+            ]}>
             <View style={styles.modalHeader}>
               <Pressable
                 style={styles.closeBtn}
                 onPress={() => setModalVisible(false)}>
-                <ModalCloseIcon />
+                <ModalCloseIcon
+                  style={[
+                    styles.closeBtnIcon as ViewStyle,
+                    preferredTheme === Theme.DARK &&
+                      (globalStyles.darkModeText as ViewStyle),
+                  ]}
+                />
               </Pressable>
-              <Text style={[globalStyles.text, styles.modalHeaderText]}>
+              <Text
+                style={[
+                  globalStyles.text,
+                  styles.modalHeaderText,
+                  preferredTheme === Theme.DARK && globalStyles.darkModeText,
+                ]}>
                 {t(`common:edit${category}Activity`)}
               </Text>
             </View>
             <Input
+              isDarkMode={preferredTheme === Theme.DARK}
               placeholder={t('common:activityTitle') as string}
               defaultValue={activityToEdit?.title}
               onChangeText={handleOnEditCustomActivityTitle}
               style={[styles.input, styles.topInput]}
             />
             <Pressable
-              style={styles.chooseCustomIconBtn}
+              style={[
+                styles.chooseCustomIconBtn,
+                preferredTheme === Theme.DARK &&
+                  globalStyles.darkModeInputBackground,
+                preferredTheme === Theme.DARK && {
+                  borderColor: GlobalColors.darkModeInputBorder,
+                },
+              ]}
               onPress={handleOnPressShowSelectIcon}>
               <Image
                 style={styles.selectedCustomIconPreview}
                 source={selectedCustomIcon.icon}
               />
-              <Text style={styles.chooseCustomIconBtnText}>
+              <Text
+                style={[
+                  styles.chooseCustomIconBtnText,
+                  preferredTheme === Theme.DARK && globalStyles.darkModeText,
+                ]}>
                 {selectedCustomIcon.name}
               </Text>
               <ChevronDownIconImg style={styles.chooseCustomIconChevron} />
@@ -171,7 +211,6 @@ const EditCustomActivities = ({
             <View style={styles.notificationSettings}>
               <Checkbox
                 value="enable-notifications"
-                isDisabled
                 onChange={isSelected => setEnableNotification(isSelected)}>
                 {t('common:enableNotifications')}
               </Checkbox>
@@ -179,10 +218,15 @@ const EditCustomActivities = ({
                 disabled={!enableNotification}
                 style={[
                   styles.timeIndicator,
+                  preferredTheme === Theme.DARK && globalStyles.darkModeOverlay,
                   !enableNotification && styles.disabledBtn,
                 ]}
                 onPress={handleOnPressShowTimePicker}>
-                <Text style={globalStyles.text}>
+                <Text
+                  style={[
+                    globalStyles.text,
+                    preferredTheme === Theme.DARK && globalStyles.darkModeText,
+                  ]}>
                   {formatSelectedTime(notificationTime)}
                 </Text>
               </Pressable>
@@ -210,7 +254,13 @@ const EditCustomActivities = ({
                   style={styles.customActivityIcon}
                   source={customActivityIcon.icon}
                 />
-                <Text style={globalStyles.text}>{customActivityIcon.name}</Text>
+                <Text
+                  style={[
+                    globalStyles.text,
+                    preferredTheme === Theme.DARK && globalStyles.darkModeText,
+                  ]}>
+                  {customActivityIcon.name}
+                </Text>
               </View>
             </Actionsheet.Item>
           ))}
@@ -249,6 +299,9 @@ const styles = StyleSheet.create({
   },
   closeBtn: {
     marginRight: 24,
+  },
+  closeBtnIcon: {
+    color: GlobalColors.gray,
   },
   modalHeaderText: {
     fontWeight: '500',

@@ -22,6 +22,12 @@ export enum SubFilterType {
   TOTAL = 'TOTAL',
 }
 
+export enum Theme {
+  LIGHT = 'LIGHT',
+  DARK = 'DARK',
+  FOLLOW_SYSTEM = 'FOLLOW_SYSTEM',
+}
+
 export interface GlossaryItem {
   sn: number;
   name: string;
@@ -31,10 +37,12 @@ export interface GlossaryItem {
 }
 
 export enum StorageKeys {
-  USER = 'USER',
-  ONBOARDING = 'ONBOARDING',
-  ACTIVITIES = 'ACTIVITIES',
-  USER_LANGUAGE = 'USER_LANGUAGE',
+  USER = '@USER',
+  ONBOARDING = '@ONBOARDING',
+  ACTIVITIES = '@ACTIVITIES',
+  USER_LANGUAGE = '@USER_LANGUAGE',
+  THEME = '@THEME',
+  COLOR_MODE = '@COLOR_MODE',
 }
 
 interface RawActivitySubActivity {

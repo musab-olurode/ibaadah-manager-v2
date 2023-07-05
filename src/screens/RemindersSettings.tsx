@@ -11,12 +11,15 @@ import {
   DateTimePickerEvent,
   DateTimePickerAndroid,
 } from '@react-native-community/datetimepicker';
+import usePreferredTheme from '../hooks/usePreferredTheme';
+import {Theme} from '../types/global';
 
 const RemindersSettings = ({
   route,
 }: NativeStackScreenProps<RootNavigatorParamList>) => {
   const {activity} =
     route.params as RootNavigatorParamList['RemindersSettings'];
+  const preferredTheme = usePreferredTheme();
 
   const handleOnChangeNotificationDate = (
     event: DateTimePickerEvent,
@@ -42,11 +45,16 @@ const RemindersSettings = ({
   };
 
   return (
-    <ScrollView style={globalStyles.container}>
+    <ScrollView
+      style={[
+        globalStyles.container,
+        preferredTheme === Theme.DARK && globalStyles.darkModeContainer,
+      ]}>
       <View>
         {SOLAH.map((action, index) => (
           <ActivityItem
             key={index}
+            isDarkMode={preferredTheme === Theme.DARK}
             hideStartIcon
             activity={action.group}
             style={styles.activityItem}
