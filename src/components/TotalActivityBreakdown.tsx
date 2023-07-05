@@ -1,6 +1,13 @@
 import React from 'react';
 import {useTranslation} from 'react-i18next';
-import {StyleSheet, Text, View, StyleProp, ViewStyle} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  StyleProp,
+  ViewStyle,
+  TextStyle,
+} from 'react-native';
 import * as Progress from 'react-native-progress';
 import {
   GlobalColors,
@@ -15,12 +22,14 @@ export interface TotalActivityBreakdownProps {
   style?: StyleProp<ViewStyle>;
   progress: number;
   activities: TotalEvaluationGroup[];
+  isDarkMode?: boolean;
 }
 
 const TotalActivityBreakdown = ({
   style,
   progress,
   activities,
+  isDarkMode,
 }: TotalActivityBreakdownProps) => {
   const {t} = useTranslation();
 
@@ -29,7 +38,8 @@ const TotalActivityBreakdown = ({
   };
 
   return (
-    <View style={[styles.card, style]}>
+    <View
+      style={[styles.card, style, isDarkMode && globalStyles.darkModeOverlay]}>
       <Progress.Circle
         size={70}
         progress={progress}
@@ -41,7 +51,12 @@ const TotalActivityBreakdown = ({
             : `${percentage.toFixed(2)}%`;
         }}
         style={styles.progress}
-        textStyle={styles.progressText}
+        textStyle={
+          [
+            styles.progressText,
+            isDarkMode && globalStyles.darkModeText,
+          ] as TextStyle
+        }
         color={GlobalColors.primary}
         unfilledColor="#DEEDE7"
         borderColor="#DEEDE7"
@@ -52,11 +67,17 @@ const TotalActivityBreakdown = ({
             key={`breakdown-activity-${index}`}
             style={[index === activities.length - 1 && styles.breakdownItem]}>
             <View style={styles.activityRow}>
-              <Text style={styles.text}>
+              <Text
+                style={[styles.text, isDarkMode && globalStyles.darkModeText]}>
                 {resolveActivityDetails(activity.title, t)}
               </Text>
-              <View style={styles.dots} />
-              <Text style={[styles.text, styles.countText]}>
+              <View style={[styles.dots, isDarkMode && styles.darkModeDots]} />
+              <Text
+                style={[
+                  styles.text,
+                  styles.countText,
+                  isDarkMode && globalStyles.darkModeText,
+                ]}>
                 {formatCount(activity.completedCount)}/{activity.totalCount}
               </Text>
             </View>
@@ -86,7 +107,7 @@ const styles = StyleSheet.create({
     marginRight: 24,
   },
   progressText: {
-    color: '#505050',
+    color: GlobalColors.gray,
     fontSize: normalizeFont(18),
     ...globalFonts.spaceGrotesk.bold,
   },
@@ -111,6 +132,9 @@ const styles = StyleSheet.create({
     borderStyle: 'dotted',
     borderBottomColor: GlobalColors.gray,
     flexGrow: 1,
+  },
+  darkModeDots: {
+    borderBottomColor: GlobalColors.darkModeTextColor,
   },
   countText: {
     ...globalFonts.aeonik.regular,

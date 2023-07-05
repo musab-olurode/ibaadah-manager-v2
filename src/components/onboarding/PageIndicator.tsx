@@ -5,9 +5,11 @@ import {GlobalColors} from '../../styles/global';
 const PageIndicator = ({
   data,
   scrollX,
+  isDarkMode,
 }: {
   data: any[];
   scrollX: Animated.AnimatedInterpolation<string | number>;
+  isDarkMode: boolean;
 }) => {
   const {width} = useWindowDimensions();
 
@@ -28,13 +30,27 @@ const PageIndicator = ({
 
         const opacity = scrollX.interpolate({
           inputRange,
-          outputRange: [0.3, 1, 0.3],
+          outputRange: isDarkMode ? [1, 1, 1] : [0.3, 1, 0.3],
+          extrapolate: 'clamp',
+        });
+
+        const backgroundColor = scrollX.interpolate({
+          inputRange,
+          outputRange: [
+            GlobalColors.darkModeGray,
+            GlobalColors.primary,
+            GlobalColors.darkModeGray,
+          ],
           extrapolate: 'clamp',
         });
 
         return (
           <Animated.View
-            style={[styles.dot, {width: dotWidth, opacity}]}
+            style={[
+              styles.dot,
+              {width: dotWidth, opacity},
+              isDarkMode && {backgroundColor},
+            ]}
             key={`dot-${index}`}
           />
         );

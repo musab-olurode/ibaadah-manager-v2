@@ -1,20 +1,38 @@
 import React from 'react';
 import {StyleSheet, Text, Pressable, StyleProp, ViewStyle} from 'react-native';
-import {GlobalColors, globalFonts, normalizeFont} from '../styles/global';
+import {
+  GlobalColors,
+  globalFonts,
+  globalStyles,
+  normalizeFont,
+} from '../styles/global';
 
 export interface ChipProps {
   title: string;
   style?: StyleProp<ViewStyle>;
   active?: boolean;
   onPress?: () => void;
+  isDarkMode?: boolean;
 }
 
-const Chip = ({title, active, style, onPress}: ChipProps) => {
+const Chip = ({title, active, style, onPress, isDarkMode}: ChipProps) => {
   return (
     <Pressable
-      style={[styles.chip, active && styles.activeChip, style]}
+      style={[
+        styles.chip,
+        active && styles.activeChip,
+        style,
+        isDarkMode && !active ? globalStyles.darkModeOverlay : {},
+      ]}
       onPress={onPress}>
-      <Text style={[styles.text, active && styles.activeText]}>{title}</Text>
+      <Text
+        style={[
+          styles.text,
+          active && styles.activeText,
+          isDarkMode && !active ? globalStyles.darkModeText : {},
+        ]}>
+        {title}
+      </Text>
     </Pressable>
   );
 };

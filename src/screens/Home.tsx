@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -7,6 +7,8 @@ import {
   Pressable,
   Image,
   TextInput,
+  Dimensions,
+  ViewStyle,
 } from 'react-native';
 import {
   GlobalColors,
@@ -26,16 +28,20 @@ import MonthlyActivitiesIconImg from '../assets/icons/monthly-activities.png';
 import {RootNavigatorParamList} from '../navigators/RootNavigator';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useAppSelector} from '../redux/hooks';
-import {ActivityService} from '../services/ActivityService';
-import Button from '../components/Button';
-import {ActivityCategory, FilterType} from '../types/global';
+import {Theme} from '../types/global';
 import {useTranslation} from 'react-i18next';
+import usePreferredTheme from '../hooks/usePreferredTheme';
+
+const {width: SCREEN_WIDTH} = Dimensions.get('window');
+const HEADER_HORIZONTAL_SPACING = 120;
 
 const Home = ({navigation}: NativeStackScreenProps<RootNavigatorParamList>) => {
   const [isSearchInputFocused, setIsSearchInputFocused] = useState(false);
   const searchInputRef = useRef<TextInput | null>(null);
   const {t} = useTranslation();
-  const user = useAppSelector(state => state.user);
+  const {user} = useAppSelector(state => state);
+
+  const preferredTheme = usePreferredTheme();
 
   const ACTIVITIES = [
     {
@@ -75,25 +81,16 @@ const Home = ({navigation}: NativeStackScreenProps<RootNavigatorParamList>) => {
     navigation.navigate('Reminders');
   };
 
-  const handleOnTestPress = async () => {
-    console.log(
-      'test clicked +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++',
-    );
-
-    // delete all activities
-    // await ActivityService.deleteAll();
-    await ActivityService.test();
-
-    // const activities = await ActivityService.find();
-    // console.log('activities', JSON.stringify(activities));
-
-    console.log(
-      'test operation ended --------------------------------------------------------------------------------------------------',
-    );
-  };
+  useEffect(() => {
+    // dispatch(showLoading());
+  }, []);
 
   return (
-    <View style={globalStyles.container}>
+    <View
+      style={[
+        globalStyles.container,
+        preferredTheme === Theme.DARK && globalStyles.darkModeContainer,
+      ]}>
       <View style={styles.header}>
         <Pressable onPress={handleOnPressProfileAvatar}>
           <Image
@@ -113,6 +110,7 @@ const Home = ({navigation}: NativeStackScreenProps<RootNavigatorParamList>) => {
             </Pressable>
           )}
           <Input
+            isDarkMode={preferredTheme === Theme.DARK}
             innerRef={searchInputRef}
             placeholder={t('common:searchActivitiesPlaceholder') as string}
             style={styles.searchInput}
@@ -120,14 +118,33 @@ const Home = ({navigation}: NativeStackScreenProps<RootNavigatorParamList>) => {
             onEndEditing={() => handleOnSearchInputFocus(false)}
           />
         </View>
-        <Pressable onPress={handleOnPressNotifications}>
-          <NotificationIconImg style={styles.headerIcon} />
+        <Pressable
+          style={styles.notificationIconPressable}
+          onPress={handleOnPressNotifications}>
+          <NotificationIconImg
+            style={[
+              styles.headerIcon,
+              preferredTheme === Theme.DARK &&
+                (globalStyles.darkModeText as ViewStyle),
+            ]}
+          />
         </Pressable>
       </View>
-      <ScrollView style={[globalStyles.container, styles.scrollView]}>
+      <ScrollView
+        style={[
+          globalStyles.container,
+          styles.scrollView,
+          preferredTheme === Theme.DARK && globalStyles.darkModeContainer,
+        ]}>
         <View style={styles.greetingContainer}>
           <Text style={styles.salam}>{t('common:salam')}</Text>
-          <Text style={styles.name}>{user.name},</Text>
+          <Text
+            style={[
+              styles.name,
+              preferredTheme === Theme.DARK && globalStyles.darkModeText,
+            ]}>
+            {user.name},
+          </Text>
           {/* <Button text={'Test'} variant="solid" onPress={handleOnTestPress} /> */}
         </View>
 
@@ -136,13 +153,18 @@ const Home = ({navigation}: NativeStackScreenProps<RootNavigatorParamList>) => {
         </View>
 
         <View style={styles.activities}>
-          <Text style={styles.activitiesTitle}>
+          <Text
+            style={[
+              styles.activitiesTitle,
+              preferredTheme === Theme.DARK && globalStyles.darkModeText,
+            ]}>
             {t('common:activitiesTitle')}
           </Text>
 
           <View style={styles.activityList}>
             {ACTIVITIES.map((activity, index) => (
               <ActivityItem
+                isDarkMode={preferredTheme === Theme.DARK}
                 key={index}
                 style={styles.activity}
                 {...activity}
@@ -170,6 +192,10 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     height: 40,
     width: 40,
+    color: GlobalColors.gray,
+  },
+  notificationIconPressable: {
+    marginRight: 4,
   },
   searchInputContainer: {
     flexDirection: 'row',
@@ -181,11 +207,11 @@ const styles = StyleSheet.create({
   },
   searchInputIcon: {
     position: 'absolute',
-    left: '8%',
+    left: 15,
     zIndex: 2,
   },
   searchInput: {
-    flexBasis: '80%',
+    width: SCREEN_WIDTH - HEADER_HORIZONTAL_SPACING,
     paddingLeft: 40,
     height: 40,
   },

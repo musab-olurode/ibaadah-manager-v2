@@ -3,19 +3,21 @@ import {StyleSheet, ScrollView, View} from 'react-native';
 import {globalStyles} from '../styles/global';
 import ActivityItem from '../components/ActivityItem';
 import Accordion from 'react-native-collapsible/Accordion';
-import {ActivityCategory} from '../types/global';
+import {ActivityCategory, Theme} from '../types/global';
 import {resolveActivityDetails, SOLAH} from '../utils/activities';
 import {useIsFocused} from '@react-navigation/native';
 import {ActivityService} from '../services/ActivityService';
 import {Activity} from '../database/entities/Activity';
 import {RawActivity} from '../types/global';
 import {useTranslation} from 'react-i18next';
+import usePreferredTheme from '../hooks/usePreferredTheme';
 
 const Solah = () => {
   const [activeSections, setActiveSections] = useState<number[]>([]);
   const [solahActivities, setSolahActivities] = useState<Activity[]>([]);
   const {t} = useTranslation();
   const isFocused = useIsFocused();
+  const preferredTheme = usePreferredTheme();
 
   const updateSections = (sections: number[]) => {
     setActiveSections(sections);
@@ -53,6 +55,7 @@ const Solah = () => {
   ) => {
     return (
       <ActivityItem
+        isDarkMode={preferredTheme === Theme.DARK}
         icon={section.icon}
         activity={resolveActivityDetails(section.group, t)}
         style={[styles.accordionHeader, !isActive && styles.activityItem]}
@@ -65,11 +68,16 @@ const Solah = () => {
 
   const renderContent = ({group}: {group: string}, _index: number) => {
     return (
-      <View style={styles.content}>
+      <View
+        style={[
+          styles.content,
+          preferredTheme === Theme.DARK && globalStyles.darkModeOverlay,
+        ]}>
         {solahActivities
           .filter(activity => activity.group === group)
           .map((contentItem, contentIndex) => (
             <ActivityItem
+              isDarkMode={preferredTheme === Theme.DARK}
               key={contentIndex}
               icon={contentItem.icon}
               activity={resolveActivityDetails(contentItem.title, t)}
@@ -100,7 +108,11 @@ const Solah = () => {
   }, [isFocused]);
 
   return (
-    <ScrollView style={globalStyles.container}>
+    <ScrollView
+      style={[
+        globalStyles.container,
+        preferredTheme === Theme.DARK && globalStyles.darkModeContainer,
+      ]}>
       <Accordion
         containerStyle={styles.accordion}
         sections={SOLAH}

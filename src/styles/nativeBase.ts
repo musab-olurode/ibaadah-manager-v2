@@ -1,4 +1,6 @@
-import {extendTheme} from 'native-base';
+import {ColorMode, StorageManager, extendTheme} from 'native-base';
+import {globalStyles} from './global';
+import {getNativeBaseColorMode, setNativeBaseColorMode} from '../utils/storage';
 
 const newColorTheme = {
   primary: {
@@ -14,11 +16,45 @@ const newColorTheme = {
     '900': '#000000',
   },
 };
+
 export const nativeBaseTheme = extendTheme({
+  config: {
+    useSystemColorMode: true,
+  },
   colors: newColorTheme,
+  components: {
+    Select: {
+      baseStyle: ({colorMode}: {colorMode: ColorMode}) => {
+        return {
+          _actionSheetContent:
+            colorMode === 'dark' ? globalStyles.darkModeOverlay : {},
+          _item:
+            colorMode === 'dark'
+              ? {...globalStyles.darkModeOverlay, ...globalStyles.darkModeText}
+              : {},
+        };
+      },
+    },
+  },
 });
 
 export const nativeBaseInset = {
   frame: {x: 0, y: 0, width: 0, height: 0},
   insets: {top: 0, left: 0, right: 0, bottom: 0},
+};
+
+export const nativeBaseColorModeManager: StorageManager = {
+  get: async () => {
+    try {
+      let val = await getNativeBaseColorMode();
+      return val === 'dark' ? 'dark' : 'light';
+    } catch (e) {
+      return 'light';
+    }
+  },
+  set: async (value: ColorMode) => {
+    try {
+      await setNativeBaseColorMode(value);
+    } catch (e) {}
+  },
 };

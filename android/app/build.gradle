@@ -133,7 +133,7 @@ def reactNativeArchitectures() {
 }
 
 def getNpmVersion() {
-    def inputFile = new File("../package.json")
+    def inputFile = new File("$rootDir/../package.json")
     def packageJson = new JsonSlurper().parseText(inputFile.text)
     return packageJson["version"]
 }
@@ -272,6 +272,10 @@ dependencies {
     implementation "com.facebook.react:react-native:+"  // From node_modules
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
+
+    // For animated GIF support
+    implementation 'com.facebook.fresco:fresco:2.6.0'
+    implementation 'com.facebook.fresco:animated-gif:2.6.0'
 
     implementation "androidx.core:core-splashscreen:1.0.0"
 
