@@ -6,6 +6,7 @@ import {
   Text,
   Pressable,
   Image,
+  ViewStyle,
 } from 'react-native';
 import {GlobalColors, globalStyles, normalizeFont} from '../styles/global';
 import ActivityItem from '../components/ActivityItem';
@@ -24,13 +25,14 @@ import {
 } from '@react-native-community/datetimepicker';
 import {useIsFocused} from '@react-navigation/native';
 import {ActivityService} from '../services/ActivityService';
-import {ActivityType} from '../types/global';
+import {ActivityType, Theme} from '../types/global';
 import {
   CUSTOM_ACTIVITY_ICONS,
   resolveActivityDetails,
 } from '../utils/activities';
 import ChevronDownIconImg from '../assets/icons/chevron-down.svg';
 import {useTranslation} from 'react-i18next';
+import usePreferredTheme from '../hooks/usePreferredTheme';
 
 const ManageActivities = ({
   navigation,
@@ -49,6 +51,7 @@ const ManageActivities = ({
   const [openActionSheet, setOpenActionSheet] = useState(false);
   const {t} = useTranslation();
   const isFocused = useIsFocused();
+  const preferredTheme = usePreferredTheme();
 
   const ACTIONS = [
     {
@@ -177,9 +180,14 @@ const ManageActivities = ({
 
   return (
     <>
-      <ScrollView style={globalStyles.container}>
+      <ScrollView
+        style={[
+          globalStyles.container,
+          preferredTheme === Theme.DARK && globalStyles.darkModeContainer,
+        ]}>
         {ACTIONS.map((action, index) => (
           <ActivityItem
+            isDarkMode={preferredTheme === Theme.DARK}
             key={index}
             icon={action.icon}
             activity={action.name}
@@ -194,30 +202,57 @@ const ManageActivities = ({
           onClose={() => setModalVisible(false)}
           size="xl">
           <Modal.Content>
-            <View style={styles.modalBody}>
+            <View
+              style={[
+                styles.modalBody,
+                preferredTheme === Theme.DARK && globalStyles.darkModeOverlay,
+              ]}>
               <View style={styles.modalHeader}>
                 <Pressable
                   style={styles.closeBtn}
                   onPress={() => setModalVisible(false)}>
-                  <ModalCloseIcon />
+                  <ModalCloseIcon
+                    style={[
+                      styles.closeBtnIcon as ViewStyle,
+                      preferredTheme === Theme.DARK &&
+                        (globalStyles.darkModeText as ViewStyle),
+                    ]}
+                  />
                 </Pressable>
-                <Text style={[globalStyles.text, styles.modalHeaderText]}>
+                <Text
+                  style={[
+                    globalStyles.text,
+                    styles.modalHeaderText,
+                    preferredTheme === Theme.DARK && globalStyles.darkModeText,
+                  ]}>
                   {t(`common:new${category}Activity`)}
                 </Text>
               </View>
               <Input
+                isDarkMode={preferredTheme === Theme.DARK}
                 placeholder={t('common:activityTitle') as string}
                 onChangeText={handleOnChangeCustomActivityTitle}
                 style={[styles.input, styles.topInput]}
               />
               <Pressable
-                style={styles.chooseCustomIconBtn}
+                style={[
+                  styles.chooseCustomIconBtn,
+                  preferredTheme === Theme.DARK &&
+                    globalStyles.darkModeInputBackground,
+                  preferredTheme === Theme.DARK && {
+                    borderColor: GlobalColors.darkModeInputBorder,
+                  },
+                ]}
                 onPress={handleOnPressShowSelectIcon}>
                 <Image
                   style={styles.selectedCustomIconPreview}
                   source={selectedCustomIcon.icon}
                 />
-                <Text style={styles.chooseCustomIconBtnText}>
+                <Text
+                  style={[
+                    styles.chooseCustomIconBtnText,
+                    preferredTheme === Theme.DARK && globalStyles.darkModeText,
+                  ]}>
                   {selectedCustomIcon.name}
                 </Text>
                 <ChevronDownIconImg style={styles.chooseCustomIconChevron} />
@@ -225,19 +260,25 @@ const ManageActivities = ({
               <View style={styles.notificationSettings}>
                 <Checkbox
                   value="enable-notifications"
-                  isDisabled
+                  // isDisabled
                   onChange={isSelected => setEnableNotification(isSelected)}>
                   {t('common:enableNotifications')}
                 </Checkbox>
-
                 <Pressable
                   disabled={!enableNotification}
                   style={[
                     styles.timeIndicator,
+                    preferredTheme === Theme.DARK &&
+                      globalStyles.darkModeOverlay,
                     !enableNotification && styles.disabledBtn,
                   ]}
                   onPress={handleOnPressShowTimePicker}>
-                  <Text style={globalStyles.text}>
+                  <Text
+                    style={[
+                      globalStyles.text,
+                      preferredTheme === Theme.DARK &&
+                        globalStyles.darkModeText,
+                    ]}>
                     {formatSelectedTime(notificationTime)}
                   </Text>
                 </Pressable>
@@ -266,7 +307,11 @@ const ManageActivities = ({
                   style={styles.customActivityIcon}
                   source={customActivityIcon.icon}
                 />
-                <Text style={globalStyles.text}>
+                <Text
+                  style={[
+                    globalStyles.text,
+                    preferredTheme === Theme.DARK && globalStyles.darkModeText,
+                  ]}>
                   {resolveActivityDetails(customActivityIcon.name, t)}
                 </Text>
               </View>
@@ -307,6 +352,9 @@ const styles = StyleSheet.create({
   },
   closeBtn: {
     marginRight: 24,
+  },
+  closeBtnIcon: {
+    color: GlobalColors.gray,
   },
   modalHeaderText: {
     fontWeight: '500',

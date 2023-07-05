@@ -10,11 +10,12 @@ import {
 import Input from '../components/Input';
 import {GlobalColors, globalStyles, normalizeFont} from '../styles/global';
 import SearchIconImg from '../assets/icons/search.svg';
-import {GlossaryItem} from '../types/global';
+import {GlossaryItem, Theme} from '../types/global';
 import {ORDERED_GLOSSARY} from '../utils/glossary';
 import {Modal} from 'native-base';
 import Button from '../components/Button';
 import {useTranslation} from 'react-i18next';
+import usePreferredTheme from '../hooks/usePreferredTheme';
 
 const Glossary = () => {
   const [isSearchInputFocused, setIsSearchInputFocused] = useState(false);
@@ -24,6 +25,7 @@ const Glossary = () => {
     useState<GlossaryItem[]>(ORDERED_GLOSSARY);
   const searchInputRef = useRef<TextInput | null>(null);
   const {t} = useTranslation();
+  const preferredTheme = usePreferredTheme();
 
   const handleOnPressSearchInputIcon = () => {
     searchInputRef.current?.focus();
@@ -42,8 +44,21 @@ const Glossary = () => {
     <Pressable
       onPress={() => handleOnPressGlossaryItem(item)}
       style={styles.item}>
-      <Text style={styles.word}>{'\u2022'}</Text>
-      <Text style={[styles.itemText, styles.word]}>{item.name}</Text>
+      <Text
+        style={[
+          styles.word,
+          preferredTheme === Theme.DARK && globalStyles.darkModeText,
+        ]}>
+        {'\u2022'}
+      </Text>
+      <Text
+        style={[
+          styles.itemText,
+          styles.word,
+          preferredTheme === Theme.DARK && globalStyles.darkModeText,
+        ]}>
+        {item.name}
+      </Text>
     </Pressable>
   );
 
@@ -64,7 +79,12 @@ const Glossary = () => {
   };
 
   return (
-    <View style={[globalStyles.container, styles.container]}>
+    <View
+      style={[
+        globalStyles.container,
+        styles.container,
+        preferredTheme === Theme.DARK && globalStyles.darkModeContainer,
+      ]}>
       <View style={styles.searchInputContainer}>
         {!isSearchInputFocused && (
           <Pressable
@@ -74,20 +94,44 @@ const Glossary = () => {
           </Pressable>
         )}
         <Input
+          isDarkMode={preferredTheme === Theme.DARK}
           innerRef={searchInputRef}
           placeholder={t('common:searchHere') as string}
-          style={styles.searchInput}
+          style={[
+            styles.searchInput,
+            preferredTheme === Theme.DARK && globalStyles.darkModeOverlay,
+          ]}
           onChangeText={handleOnTypeSearchInput}
           onFocus={() => handleOnSearchInputFocus(true)}
           onEndEditing={() => handleOnSearchInputFocus(false)}
         />
       </View>
       <Modal isOpen={modalVisible} avoidKeyboard>
-        <Modal.Content>
+        <Modal.Content
+          borderRadius={0}
+          backgroundColor={
+            preferredTheme === Theme.DARK
+              ? GlobalColors.darkModeOverlay
+              : undefined
+          }>
           <View style={styles.modalBody}>
-            <Text style={globalStyles.text}>{selectedWord?.name}</Text>
-            <View style={styles.definitionContainer}>
-              <Text style={styles.definitionText}>
+            <Text
+              style={[
+                globalStyles.text,
+                preferredTheme === Theme.DARK && globalStyles.darkModeText,
+              ]}>
+              {selectedWord?.name}
+            </Text>
+            <View
+              style={[
+                styles.definitionContainer,
+                preferredTheme === Theme.DARK && globalStyles.darkModeOverlay,
+              ]}>
+              <Text
+                style={[
+                  styles.definitionText,
+                  preferredTheme === Theme.DARK && globalStyles.darkModeText,
+                ]}>
                 {selectedWord?.explanation}
               </Text>
             </View>

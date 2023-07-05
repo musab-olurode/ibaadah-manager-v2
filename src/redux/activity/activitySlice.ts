@@ -4,7 +4,7 @@ const initialState = {
   firstDay: new Date().toISOString(),
 };
 
-const userSlice = createSlice({
+const activitySlice = createSlice({
   name: 'activity',
   initialState,
   reducers: {
@@ -15,6 +15,6 @@ const userSlice = createSlice({
   },
 });
 
-export const {setGlobalActivityDetails} = userSlice.actions;
+export const {setGlobalActivityDetails} = activitySlice.actions;
 
-export default userSlice.reducer;
+export default activitySlice.reducer;

@@ -9,4 +9,8 @@ export default {
   editCustomWeeklyActivities: 'Edit Custom Weekly Activities',
   editCustomMonthlyActivities: 'Edit Custom Monthly Activities',
   reminders: 'Reminders',
+  profile: 'Profile',
+  glossary: 'Glossary',
+  settings: 'Settings',
+  about: 'About app',
 };

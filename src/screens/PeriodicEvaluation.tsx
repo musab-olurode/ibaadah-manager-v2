@@ -30,6 +30,7 @@ import {
   TotalGroupedActivityEvaluation,
   SubFilterType,
   ActivityCategory,
+  Theme,
 } from '../types/global';
 import {Select} from 'native-base';
 import FilterIconImg from '../assets/icons/filter.svg';
@@ -42,6 +43,7 @@ import {ActivityService} from '../services/ActivityService';
 import {useAppSelector} from '../redux/hooks';
 import {useTranslation} from 'react-i18next';
 import {resolveActivityDetails} from '../utils/activities';
+import usePreferredTheme from '../hooks/usePreferredTheme';
 
 const PeriodicEvaluation = ({
   route,
@@ -69,6 +71,7 @@ const PeriodicEvaluation = ({
   const {t} = useTranslation();
   const isFocused = useIsFocused();
   const globalActivity = useAppSelector(state => state.activity);
+  const preferredTheme = usePreferredTheme();
 
   const handleOnSelectSubFilter = async (value: string) => {
     setSubFilter(value as SubFilterType);
@@ -125,6 +128,7 @@ const PeriodicEvaluation = ({
         color: GlobalColors['primary.900'],
         fontSize: normalizeFont(14),
         ...globalFonts.spaceGrotesk.regular,
+        ...(preferredTheme === Theme.DARK ? globalStyles.darkModeText : {}),
       },
     };
   };
@@ -141,6 +145,7 @@ const PeriodicEvaluation = ({
         color: GlobalColors['primary.900'],
         fontSize: normalizeFont(16),
         ...globalFonts.aeonik.bold,
+        ...(preferredTheme === Theme.DARK ? globalStyles.darkModeText : {}),
       },
       containerStyle: {},
       allowDisabled: false,
@@ -217,9 +222,18 @@ const PeriodicEvaluation = ({
   }, [isFocused]);
 
   return (
-    <ScrollView style={globalStyles.container}>
+    <ScrollView
+      style={[
+        globalStyles.container,
+        preferredTheme === Theme.DARK && globalStyles.darkModeContainer,
+      ]}>
       <View style={styles.calendarTitleRow}>
-        <Text style={[globalStyles.text, styles.date]}>
+        <Text
+          style={[
+            globalStyles.text,
+            styles.date,
+            preferredTheme === Theme.DARK && globalStyles.darkModeText,
+          ]}>
           {currentDate.toDateString()}
         </Text>
         {filter === FilterType.MONTHLY && (
@@ -240,6 +254,7 @@ const PeriodicEvaluation = ({
       </View>
       {calenderDisplay === 'weekly' ? (
         <CollapsedCalender
+          isDarkMode={preferredTheme === Theme.DARK}
           type={
             filter === FilterType.LAST_WEEK
               ? FilterType.LAST_WEEK
@@ -251,7 +266,11 @@ const PeriodicEvaluation = ({
           isDisabled={subFilter === SubFilterType.TOTAL}
         />
       ) : (
-        <View style={styles.calenderContainer}>
+        <View
+          style={[
+            styles.calenderContainer,
+            preferredTheme === Theme.DARK && globalStyles.darkModeOverlay,
+          ]}>
           <CalendarPicker
             previousComponent={<ChevronLeftIcon />}
             nextComponent={<ChevronRightIcon />}
@@ -265,6 +284,11 @@ const PeriodicEvaluation = ({
             todayTextStyle={styles.yearMonthTitle}
             customDatesStyles={customDatesStylesCallback}
             selectedDayTextStyle={styles.yearMonthTitle}
+            disabledDatesTextStyle={
+              preferredTheme === Theme.DARK
+                ? {color: GlobalColors.darkModeBackPressColor}
+                : {}
+            }
             onDateChange={onDateChange}
             selectedStartDate={currentDate}
             minDate={new Date(globalActivity.firstDay)}
@@ -274,14 +298,35 @@ const PeriodicEvaluation = ({
         </View>
       )}
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionHeaderTitle}>
+        <Text
+          style={[
+            styles.sectionHeaderTitle,
+            preferredTheme === Theme.DARK && globalStyles.darkModeText,
+          ]}>
           {resolveActivityDetails(activityGroup, t)}
         </Text>
-        <View style={styles.selectContainer}>
+        <View
+          style={[
+            styles.selectContainer,
+            preferredTheme === Theme.DARK && globalStyles.darkModeOverlay,
+          ]}>
           <Select
             variant="unstyled"
-            style={styles.filter as StyleProp<ViewStyle>}
-            dropdownIcon={<FilterIconImg style={styles.filterIcon} />}
+            style={[
+              styles.filter as StyleProp<ViewStyle>,
+              preferredTheme === Theme.DARK && globalStyles.darkModeOverlay,
+              preferredTheme === Theme.DARK &&
+                (globalStyles.darkModeText as ViewStyle),
+            ]}
+            dropdownIcon={
+              <FilterIconImg
+                style={[
+                  styles.filterIcon,
+                  preferredTheme === Theme.DARK &&
+                    (globalStyles.darkModeText as ViewStyle),
+                ]}
+              />
+            }
             selectedValue={subFilter}
             accessibilityLabel={t('common:chooseFilter') as string}
             placeholder={t('common:chooseFilter') as string}
@@ -309,6 +354,7 @@ const PeriodicEvaluation = ({
         style={styles.chips}>
         {periodicEvaluation.map((activity, index) => (
           <Chip
+            isDarkMode={preferredTheme === Theme.DARK}
             key={index}
             title={resolveActivityDetails(activity.group, t)}
             style={styles.chip}
@@ -323,6 +369,7 @@ const PeriodicEvaluation = ({
           <View>
             {totalPeriodicEvaluation?.map((content, index) => (
               <TotalActivityBreakdown
+                isDarkMode={preferredTheme === Theme.DARK}
                 key={`total-breakdown-${index}`}
                 progress={content.progress}
                 style={styles.breakdownItem}
@@ -334,6 +381,7 @@ const PeriodicEvaluation = ({
           <View>
             {selectedActivityGroup?.activities.map((content, index) => (
               <ActivityItem
+                isDarkMode={preferredTheme === Theme.DARK}
                 key={`breakdown-${index}`}
                 activity={resolveActivityDetails(content.title, t)}
                 defaultCheckboxState={content.completed}

@@ -3,7 +3,7 @@ import {StyleSheet, ScrollView, View, StyleProp, ViewStyle} from 'react-native';
 import {globalStyles} from '../styles/global';
 import ActivityItem from '../components/ActivityItem';
 import {Select} from 'native-base';
-import {ActivityCategory, FilterType} from '../types/global';
+import {ActivityCategory, FilterType, Theme} from '../types/global';
 import FilterIconImg from '../assets/icons/filter.svg';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {ProfileNavigatorParamList} from '../navigators/ProfileNavigator';
@@ -18,6 +18,7 @@ import {getEndOfLastWeek} from '../utils/global';
 import {useAppSelector} from '../redux/hooks';
 import {ActivityService} from '../services/ActivityService';
 import {useTranslation} from 'react-i18next';
+import usePreferredTheme from '../hooks/usePreferredTheme';
 
 const EvaluationList = ({
   route,
@@ -32,6 +33,7 @@ const EvaluationList = ({
     monthly: MONTHLY_ACTIVITIES,
   });
   const {t} = useTranslation();
+  const preferredTheme = usePreferredTheme();
 
   const globalActivity = useAppSelector(state => state.activity);
   const endOfLastWeek = getEndOfLastWeek();
@@ -138,41 +140,68 @@ const EvaluationList = ({
 
   return (
     <>
-      <View style={styles.header}>
-        <Select
-          variant="unstyled"
-          style={styles.filter as StyleProp<ViewStyle>}
-          dropdownIcon={<FilterIconImg style={styles.filterIcon} />}
-          selectedValue={filter}
-          accessibilityLabel={t('common:chooseFilter') as string}
-          placeholder={t('common:chooseFilter') as string}
-          onValueChange={handleOnSelectFilter}>
-          <Select.Item
-            label={t('common:today')}
-            value={FilterType.TODAY}
-            disabled={shouldDisableTodayFilter()}
-          />
-          <Select.Item
-            label={t('common:thisWeek')}
-            value={FilterType.THIS_WEEK}
-            disabled={shouldDisableThisWeekFilter()}
-          />
-          <Select.Item
-            label={t('common:lastWeek')}
-            value={FilterType.LAST_WEEK}
-            disabled={shouldDisableLastWeekFilter()}
-          />
-          <Select.Item label={t('common:monthly')} value={FilterType.MONTHLY} />
-        </Select>
+      <View
+        style={preferredTheme === Theme.DARK && globalStyles.darkModeContainer}>
+        <View
+          style={[
+            styles.header,
+            preferredTheme === Theme.DARK && globalStyles.darkModeOverlay,
+          ]}>
+          <Select
+            variant="unstyled"
+            style={[
+              styles.filter as StyleProp<ViewStyle>,
+              preferredTheme === Theme.DARK && globalStyles.darkModeOverlay,
+              preferredTheme === Theme.DARK &&
+                (globalStyles.darkModeText as ViewStyle),
+            ]}
+            dropdownIcon={
+              <FilterIconImg
+                style={[
+                  styles.filterIcon,
+                  preferredTheme === Theme.DARK &&
+                    (globalStyles.darkModeText as ViewStyle),
+                ]}
+              />
+            }
+            selectedValue={filter}
+            accessibilityLabel={t('common:chooseFilter') as string}
+            placeholder={t('common:chooseFilter') as string}
+            onValueChange={handleOnSelectFilter}>
+            <Select.Item
+              label={t('common:today')}
+              value={FilterType.TODAY}
+              disabled={shouldDisableTodayFilter()}
+            />
+            <Select.Item
+              label={t('common:thisWeek')}
+              value={FilterType.THIS_WEEK}
+              disabled={shouldDisableThisWeekFilter()}
+            />
+            <Select.Item
+              label={t('common:lastWeek')}
+              value={FilterType.LAST_WEEK}
+              disabled={shouldDisableLastWeekFilter()}
+            />
+            <Select.Item
+              label={t('common:monthly')}
+              value={FilterType.MONTHLY}
+            />
+          </Select>
+        </View>
       </View>
 
       <ScrollView
-        style={globalStyles.container}
+        style={[
+          globalStyles.container,
+          preferredTheme === Theme.DARK && globalStyles.darkModeContainer,
+        ]}
         contentContainerStyle={styles.scrollContainer}>
         <View>
           {category === 'Daily' && (
             <View>
               <ActivityItem
+                isDarkMode={preferredTheme === Theme.DARK}
                 icon={SolahIconImg}
                 activity={t('common:solah')}
                 style={styles.activityItem}
@@ -180,6 +209,7 @@ const EvaluationList = ({
               />
               {separatedActivities.daily.map((activity, index) => (
                 <ActivityItem
+                  isDarkMode={preferredTheme === Theme.DARK}
                   key={index}
                   icon={activity.icon}
                   activity={resolveActivityDetails(activity.group, t)}
@@ -193,6 +223,7 @@ const EvaluationList = ({
             <View>
               {separatedActivities.weekly.map((activity, index) => (
                 <ActivityItem
+                  isDarkMode={preferredTheme === Theme.DARK}
                   key={index}
                   icon={activity.icon}
                   activity={resolveActivityDetails(activity.group, t)}
@@ -243,6 +274,7 @@ const styles = StyleSheet.create({
   },
   filterIcon: {
     marginRight: 16,
+    color: '#505050',
   },
 });
 

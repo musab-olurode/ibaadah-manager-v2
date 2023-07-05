@@ -10,12 +10,14 @@ import {RootNavigatorParamList} from '../navigators/RootNavigator';
 import {createChannel, fetchSolatTimeAPI} from '../utils/notificationService';
 import Geolocation from '@react-native-community/geolocation';
 import {getApiReminderData, setApiReminderData} from '../utils/storage';
-import {ActivityCategory} from '../types/global';
+import {ActivityCategory, Theme} from '../types/global';
+import usePreferredTheme from '../hooks/usePreferredTheme';
 
 const Reminders = ({
   navigation,
 }: NativeStackScreenProps<RootNavigatorParamList>) => {
   const [apiSolah, setApiSolah] = useState({});
+  const preferredTheme = usePreferredTheme();
 
   const ACTIONS = [
     {
@@ -88,11 +90,22 @@ const Reminders = ({
     navigation.push('RemindersList', {category, apiSolah});
   }
   return (
-    <ScrollView style={globalStyles.container}>
-      <Text style={styles.header}>Set reminders for activities</Text>
+    <ScrollView
+      style={[
+        globalStyles.container,
+        preferredTheme === Theme.DARK && globalStyles.darkModeContainer,
+      ]}>
+      <Text
+        style={[
+          styles.header,
+          preferredTheme === Theme.DARK && globalStyles.darkModeText,
+        ]}>
+        Set reminders for activities
+      </Text>
       <View>
         {ACTIONS.map((action, index) => (
           <ActivityItem
+            isDarkMode={preferredTheme === Theme.DARK}
             key={index}
             icon={action.icon}
             activity={action.name}

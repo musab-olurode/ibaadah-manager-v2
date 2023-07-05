@@ -8,7 +8,7 @@ import {
   StyleProp,
   ViewStyle,
 } from 'react-native';
-import {globalFonts, globalStyles} from '../styles/global';
+import {GlobalColors, globalFonts, globalStyles} from '../styles/global';
 import ChevronUpIconImg from '../assets/icons/chevron-up.svg';
 import ChevronDownIconImg from '../assets/icons/chevron-down.svg';
 import {Checkbox} from 'native-base';
@@ -29,6 +29,7 @@ export interface ActivityItemProps {
   disableCheckbox?: boolean;
   defaultCheckboxState?: boolean;
   bindItemToCheckbox?: boolean;
+  isDarkMode?: boolean;
 }
 
 const ActivityItem = ({
@@ -46,6 +47,7 @@ const ActivityItem = ({
   disableCheckbox,
   defaultCheckboxState,
   bindItemToCheckbox,
+  isDarkMode,
 }: ActivityItemProps) => {
   const handleOnPressItem = () => {
     if (!disabled && onPress) {
@@ -58,20 +60,40 @@ const ActivityItem = ({
 
   return (
     <Pressable
-      style={[styles.activityItem, disabled && styles.disabled, style]}
+      style={[
+        styles.activityItem,
+        disabled && styles.disabled,
+        isDarkMode && globalStyles.darkModeOverlay,
+        style,
+      ]}
       onPress={handleOnPressItem}>
       {!hideStartIcon && (
         <Image style={styles.startIcon} source={icon || ZhurIconImg} />
       )}
-      <Text style={[styles.activity, hideStartIcon && styles.noStartIcon]}>
+      <Text
+        style={[
+          styles.activity,
+          isDarkMode && globalStyles.darkModeText,
+          hideStartIcon && styles.noStartIcon,
+        ]}>
         {activity}
       </Text>
       {showEndIcon
         ? customEndIcon ||
           (endIcon === 'chevron-up' ? (
-            <ChevronUpIconImg />
+            <ChevronUpIconImg
+              style={[
+                styles.chevronIcon as ViewStyle,
+                isDarkMode && (globalStyles.darkModeText as ViewStyle),
+              ]}
+            />
           ) : endIcon === 'chevron-down' ? (
-            <ChevronDownIconImg />
+            <ChevronDownIconImg
+              style={[
+                styles.chevronIcon as ViewStyle,
+                isDarkMode && (globalStyles.darkModeText as ViewStyle),
+              ]}
+            />
           ) : (
             <Checkbox
               value={checkboxValue || 'checkbox'}
@@ -97,6 +119,9 @@ const styles = StyleSheet.create({
   startIcon: {
     width: 48,
     height: 48,
+  },
+  chevronIcon: {
+    color: GlobalColors.gray,
   },
   noStartIcon: {
     marginLeft: 8,

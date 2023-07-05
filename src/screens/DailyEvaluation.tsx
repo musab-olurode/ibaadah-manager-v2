@@ -7,8 +7,9 @@ import DailyActivityEvaluationCard from '../components/DailyActivityEvaluationCa
 import {ProfileNavigatorParamList} from '../navigators/ProfileNavigator';
 import {ActivityService} from '../services/ActivityService';
 import {globalFonts, globalStyles} from '../styles/global';
-import {GroupedActivityEvaluation} from '../types/global';
+import {GroupedActivityEvaluation, Theme} from '../types/global';
 import {resolveActivityDetails} from '../utils/activities';
+import usePreferredTheme from '../hooks/usePreferredTheme';
 
 const DailyEvaluation = ({
   route,
@@ -20,6 +21,7 @@ const DailyEvaluation = ({
   >([]);
   const {t} = useTranslation();
   const isFocused = useIsFocused();
+  const preferredTheme = usePreferredTheme();
 
   const getCurrentDate = () => {
     return new Date().toDateString();
@@ -36,11 +38,23 @@ const DailyEvaluation = ({
   }, [isFocused]);
 
   return (
-    <ScrollView style={globalStyles.container}>
-      <Text style={[globalStyles.text, styles.date]}>{getCurrentDate()}</Text>
+    <ScrollView
+      style={[
+        globalStyles.container,
+        preferredTheme === Theme.DARK && globalStyles.darkModeContainer,
+      ]}>
+      <Text
+        style={[
+          globalStyles.text,
+          styles.date,
+          preferredTheme === Theme.DARK && globalStyles.darkModeText,
+        ]}>
+        {getCurrentDate()}
+      </Text>
       {dailyActivitiesEvaluation.map((activity, index) => (
         <DailyActivityEvaluationCard
           key={`activity-${index}`}
+          isDarkMode={preferredTheme === Theme.DARK}
           style={styles.card}
           group={resolveActivityDetails(activity.group, t)}
           progress={activity.progress}

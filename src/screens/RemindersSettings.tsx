@@ -11,16 +11,19 @@ import {
   WEEKLY_ACTIVITIES,
   resolveActivityDetails,
 } from '../utils/activities';
-
 import {StorageKeys} from '../types/global';
 import {ClockButton} from '../components/ClockButton';
 import {useTranslation} from 'react-i18next';
+import usePreferredTheme from '../hooks/usePreferredTheme';
+import {Theme} from '../types/global';
 
 const RemindersSettings = ({
   route,
 }: NativeStackScreenProps<RootNavigatorParamList>) => {
   const {activity, category, apiSolah} =
     route.params as RootNavigatorParamList['RemindersSettings'];
+  const preferredTheme = usePreferredTheme();
+
   let All_ACTIVITIES;
   let reminderKeyInDb: string;
   let uniqueId: number;
@@ -48,12 +51,17 @@ const RemindersSettings = ({
   );
 
   return (
-    <ScrollView style={globalStyles.container}>
+    <ScrollView
+      style={[
+        globalStyles.container,
+        preferredTheme === Theme.DARK && globalStyles.darkModeContainer,
+      ]}>
       <View>
         {activity === t('common:solah')
           ? SOLAH.map((action, index) => (
               <ActivityItem
                 key={index}
+                isDarkMode={preferredTheme === Theme.DARK}
                 hideStartIcon
                 activity={action.group}
                 style={styles.activityItem}
@@ -75,6 +83,7 @@ const RemindersSettings = ({
           : filteredActivity.map(action =>
               action.activities.map((content, index) => (
                 <ActivityItem
+                  isDarkMode={preferredTheme === Theme.DARK}
                   key={index}
                   hideStartIcon
                   activity={resolveActivityDetails(content.title, t)}

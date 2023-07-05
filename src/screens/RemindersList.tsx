@@ -12,6 +12,8 @@ import {
 } from '../utils/activities';
 import ReminderIconImg from '../assets/icons/reminder.png';
 import {useTranslation} from 'react-i18next';
+import usePreferredTheme from '../hooks/usePreferredTheme';
+import {Theme} from '../types/global';
 
 const RemindersList = ({
   route,
@@ -20,16 +22,23 @@ const RemindersList = ({
   const {category, apiSolah} =
     route.params as RootNavigatorParamList['RemindersList'];
   const {t} = useTranslation();
+  const preferredTheme = usePreferredTheme();
+
   const handleOnPressItem = (activity: string) => {
     navigation.push('RemindersSettings', {activity, category, apiSolah});
   };
 
   return (
-    <ScrollView style={globalStyles.container}>
+    <ScrollView
+      style={[
+        globalStyles.container,
+        preferredTheme === Theme.DARK && globalStyles.darkModeContainer,
+      ]}>
       <View>
         {category === 'Daily' && (
           <View>
             <ActivityItem
+              isDarkMode={preferredTheme === Theme.DARK}
               hideStartIcon
               activity={t('common:solah')}
               style={styles.activityItem}
@@ -41,6 +50,7 @@ const RemindersList = ({
             />
             {DAILY_ACTIVITIES.map((activity, index) => (
               <ActivityItem
+                isDarkMode={preferredTheme === Theme.DARK}
                 key={index}
                 hideStartIcon
                 activity={resolveActivityDetails(activity.group, t)}
@@ -61,6 +71,7 @@ const RemindersList = ({
             {WEEKLY_ACTIVITIES.map((activity, index) => (
               <ActivityItem
                 key={index}
+                isDarkMode={preferredTheme === Theme.DARK}
                 hideStartIcon
                 activity={resolveActivityDetails(activity.group, t)}
                 style={styles.activityItem}
@@ -80,6 +91,7 @@ const RemindersList = ({
             {MONTHLY_ACTIVITIES.map((activity, index) => (
               <ActivityItem
                 key={index}
+                isDarkMode={preferredTheme === Theme.DARK}
                 hideStartIcon
                 activity={resolveActivityDetails(activity.group, t)}
                 style={styles.activityItem}

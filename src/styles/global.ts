@@ -15,6 +15,7 @@ export const normalizeFont = (size: number) => {
 
 export const GlobalColors = {
   background: '#F3F4F6',
+  darkModeBackground: '#0E0E0E',
   primary: '#338F6C',
   'primary.50': '#9DDCC4',
   'primary.100': '#8ED7BB',
@@ -27,8 +28,15 @@ export const GlobalColors = {
   'primary.800': '#07130E',
   'primary.900': '#000000',
   textColor: '#151515',
+  darkModeTextColor: '#FFFFFF',
   gray: '#505050',
   'gray.2': '#808080',
+  darkModeGray: 'rgba(255, 255, 255, 0.5)',
+  darkModeOverlay: '#1C1C1C',
+  darkModeInputBackground: '#1E1E1E',
+  darkModeInputBorder: 'rgba(255, 255, 255, 0.5)',
+  backPressColor: 'rgba(0, 0, 0, .32)',
+  darkModeBackPressColor: 'rgba(255, 255, 255, .32)',
 };
 
 export const GlobalFontSizes = {
@@ -45,10 +53,25 @@ export const globalStyles = StyleSheet.create({
     padding: 16,
     backgroundColor: GlobalColors.background,
   },
+  darkModeContainer: {
+    backgroundColor: GlobalColors.darkModeBackground,
+  },
+  darkModeOverlay: {
+    backgroundColor: GlobalColors.darkModeOverlay,
+  },
+  darkModeInputBackground: {
+    backgroundColor: GlobalColors.darkModeInputBackground,
+  },
   text: {
     color: GlobalColors.textColor,
     fontWeight: '400',
     fontSize: GlobalFontSizes.md,
+  },
+  darkModeText: {
+    color: GlobalColors.darkModeTextColor,
+  },
+  darkModeGrayView: {
+    backgroundColor: GlobalColors.darkModeGray,
   },
 });
 

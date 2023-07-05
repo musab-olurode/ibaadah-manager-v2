@@ -9,13 +9,13 @@ import PlusIconImg from '../assets/icons/plus.svg';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useIsFocused} from '@react-navigation/native';
 import {RootNavigatorParamList} from '../navigators/RootNavigator';
-import {ActivityCategory} from '../types/global';
+import {ActivityCategory, Theme} from '../types/global';
 import {DAILY_ACTIVITIES, resolveActivityDetails} from '../utils/activities';
 import {Activity} from '../database/entities/Activity';
 import {ActivityService} from '../services/ActivityService';
 import {RawActivity} from '../types/global';
-import {In} from 'typeorm';
 import {useTranslation} from 'react-i18next';
+import usePreferredTheme from '../hooks/usePreferredTheme';
 
 const DailyActivities = ({
   navigation,
@@ -24,6 +24,7 @@ const DailyActivities = ({
   const [dailyActivities, setDailyActivities] = useState<Activity[]>([]);
   const {t} = useTranslation();
   const isFocused = useIsFocused();
+  const preferredTheme = usePreferredTheme();
 
   const updateSections = (sections: number[]) => {
     setActiveSections(sections);
@@ -59,6 +60,7 @@ const DailyActivities = ({
     };
     setDailyActivities(_dailyActivities);
     await ActivityService.update(id, _dailyActivities[changedActivityIndex]);
+    await getDailyActivities();
   };
 
   const renderHeader = (
@@ -75,6 +77,7 @@ const DailyActivities = ({
     } else {
       return (
         <ActivityItem
+          isDarkMode={preferredTheme === Theme.DARK}
           icon={section.icon}
           activity={resolveActivityDetails(section.group, t)}
           style={[styles.accordionHeader, !isActive && styles.activityItem]}
@@ -88,11 +91,16 @@ const DailyActivities = ({
 
   const renderContent = ({group}: {group: string}, _index: number) => {
     return (
-      <View style={styles.content}>
+      <View
+        style={[
+          styles.content,
+          preferredTheme === Theme.DARK && globalStyles.darkModeOverlay,
+        ]}>
         {dailyActivities
           .filter(activity => activity.group === group)
           .map((contentItem, contentIndex) => (
             <ActivityItem
+              isDarkMode={preferredTheme === Theme.DARK}
               key={contentIndex}
               icon={contentItem.icon}
               activity={resolveActivityDetails(contentItem.title, t)}
@@ -111,19 +119,25 @@ const DailyActivities = ({
     );
   };
 
+  const getDailyActivities = async () => {
+    const _dailyActivities = await ActivityService.getOrCreateForToday({
+      category: ActivityCategory.Daily,
+    });
+    setDailyActivities(_dailyActivities);
+  };
+
   useEffect(() => {
-    const getDailyActivities = async () => {
-      const _dailyActivities = await ActivityService.getOrCreateForToday({
-        category: In([ActivityCategory.Daily, ActivityCategory.Solah]),
-      });
-      setDailyActivities(_dailyActivities);
-    };
     getDailyActivities();
   }, [isFocused]);
 
   return (
-    <ScrollView style={globalStyles.container}>
+    <ScrollView
+      style={[
+        globalStyles.container,
+        preferredTheme === Theme.DARK && globalStyles.darkModeContainer,
+      ]}>
       <ActivityItem
+        isDarkMode={preferredTheme === Theme.DARK}
         icon={SolahIconImg}
         activity={t('common:solah')}
         style={styles.activityItem}

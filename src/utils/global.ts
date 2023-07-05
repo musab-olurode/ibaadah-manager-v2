@@ -8,6 +8,8 @@ import {
   startOfWeek,
   subWeeks,
 } from 'date-fns';
+import {Theme} from '../types/global';
+import {ColorMode} from 'native-base';
 
 export const capitalizeFirstLetter = (s: string) =>
   s.charAt(0).toUpperCase() + s.substring(1).toLowerCase();
@@ -57,4 +59,17 @@ export const getWeeksDifference = (startDate: Date, endDate: Date) => {
 export const getMonthsDifference = (startDate: Date, endDate: Date) => {
   const monthsDifference = differenceInMonths(endDate, startDate);
   return monthsDifference;
+};
+
+export const resolveTheme = (
+  preferredTheme: Theme,
+  deviceTheme: ColorMode,
+): Exclude<Theme, Theme.FOLLOW_SYSTEM> => {
+  if (preferredTheme === Theme.FOLLOW_SYSTEM) {
+    return (
+      (deviceTheme?.toUpperCase() as Exclude<Theme, Theme.FOLLOW_SYSTEM>) ||
+      Theme.LIGHT
+    );
+  }
+  return preferredTheme;
 };

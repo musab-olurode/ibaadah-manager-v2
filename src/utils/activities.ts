@@ -375,7 +375,7 @@ export const resolveActivityDetails = (
     {'Qur’an': t('common:quran')},
     {Tilawah: t('common:tilawah')},
     {Hifdh: t('common:hifdh')},
-    {'Muraja’ah': t('common:murajah')},
+    {'Muraja’ah': t('common:murajaah')},
     {Tadabur: t('common:tadabur')},
     {'Health Habits': t('common:healthHabits')},
     {'Daily Exercise': t('common:exercise')},
