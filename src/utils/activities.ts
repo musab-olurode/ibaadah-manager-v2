@@ -71,7 +71,7 @@ import CustomActivityIcon7Img from '../assets/icons/custom-icon-7.png';
 import CustomActivityIcon8Img from '../assets/icons/custom-icon-8.png';
 import CustomActivityIcon9Img from '../assets/icons/custom-icon-9.png';
 import CustomActivityIcon10Img from '../assets/icons/custom-icon-10.png';
-import {TFunction} from 'i18next';
+import i18next, {TFunction} from 'i18next';
 
 export const SOLAH: RawActivity[] = [
   {
@@ -347,10 +347,8 @@ export const CUSTOM_ACTIVITY_ICONS = [
   },
 ];
 
-export const resolveActivityDetails = (
-  title: string,
-  t: TFunction<'translation', undefined, 'translation'>,
-) => {
+export const getTranslatedActivityTitle = (title: string) => {
+  const t = i18next.t;
   const spellings: {[key: string]: string}[] = [
     {Solah: t('common:solah')},
     {Rawatib: t('common:rawatib')},

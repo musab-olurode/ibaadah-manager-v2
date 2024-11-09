@@ -31,6 +31,8 @@ import {useAppSelector} from '../redux/hooks';
 import {Theme} from '../types/global';
 import {useTranslation} from 'react-i18next';
 import usePreferredTheme from '../hooks/usePreferredTheme';
+import {ReminderService} from '../services/ReminderService';
+import {useToast} from 'native-base';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 const HEADER_HORIZONTAL_SPACING = 120;
@@ -39,9 +41,9 @@ const Home = ({navigation}: NativeStackScreenProps<RootNavigatorParamList>) => {
   const [isSearchInputFocused, setIsSearchInputFocused] = useState(false);
   const searchInputRef = useRef<TextInput | null>(null);
   const {t} = useTranslation();
-  const {user} = useAppSelector(state => state);
-
+  const user = useAppSelector(state => state.user);
   const preferredTheme = usePreferredTheme();
+  const toast = useToast();
 
   const ACTIVITIES = [
     {
@@ -81,8 +83,21 @@ const Home = ({navigation}: NativeStackScreenProps<RootNavigatorParamList>) => {
     navigation.navigate('Reminders');
   };
 
+  const getSolahTimings = async () => {
+    try {
+      await ReminderService.getUserSolahTimings();
+    } catch (err: any) {
+      toast.show({
+        title: err.message,
+      });
+    }
+  };
+
   useEffect(() => {
     // dispatch(showLoading());
+    getSolahTimings().finally(() => {
+      ReminderService.checkNotificationPermission();
+    });
   }, []);
 
   return (
@@ -124,6 +139,7 @@ const Home = ({navigation}: NativeStackScreenProps<RootNavigatorParamList>) => {
           <NotificationIconImg
             style={[
               styles.headerIcon,
+              styles.notificationIcon as ViewStyle,
               preferredTheme === Theme.DARK &&
                 (globalStyles.darkModeText as ViewStyle),
             ]}
@@ -192,6 +208,8 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     height: 40,
     width: 40,
+  },
+  notificationIcon: {
     color: GlobalColors.gray,
   },
   notificationIconPressable: {

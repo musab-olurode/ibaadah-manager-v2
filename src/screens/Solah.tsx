@@ -3,8 +3,8 @@ import {StyleSheet, ScrollView, View} from 'react-native';
 import {globalStyles} from '../styles/global';
 import ActivityItem from '../components/ActivityItem';
 import Accordion from 'react-native-collapsible/Accordion';
-import {ActivityCategory, Theme} from '../types/global';
-import {resolveActivityDetails, SOLAH} from '../utils/activities';
+import {ActivityCategoryheme} from '../types/global';
+import {getTranslatedActivityTitle, SOLAH} from '../utils/activities';
 import {useIsFocused} from '@react-navigation/native';
 import {ActivityService} from '../services/ActivityService';
 import {Activity} from '../database/entities/Activity';
@@ -57,7 +57,7 @@ const Solah = () => {
       <ActivityItem
         isDarkMode={preferredTheme === Theme.DARK}
         icon={section.icon}
-        activity={resolveActivityDetails(section.group, t)}
+        title={getTranslatedActivityTitle(section.group)}
         style={[styles.accordionHeader, !isActive && styles.activityItem]}
         showEndIcon={true}
         endIcon={isActive ? 'chevron-up' : 'chevron-down'}
@@ -80,7 +80,7 @@ const Solah = () => {
               isDarkMode={preferredTheme === Theme.DARK}
               key={contentIndex}
               icon={contentItem.icon}
-              activity={resolveActivityDetails(contentItem.title, t)}
+              title={getTranslatedActivityTitle(contentItem.title)}
               style={styles.contentItemActivity}
               showEndIcon={true}
               endIcon={'checkbox'}

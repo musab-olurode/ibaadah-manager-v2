@@ -8,7 +8,7 @@ import {ProfileNavigatorParamList} from '../navigators/ProfileNavigator';
 import {ActivityService} from '../services/ActivityService';
 import {globalFonts, globalStyles} from '../styles/global';
 import {GroupedActivityEvaluation, Theme} from '../types/global';
-import {resolveActivityDetails} from '../utils/activities';
+import {getTranslatedActivityTitle} from '../utils/activities';
 import usePreferredTheme from '../hooks/usePreferredTheme';
 
 const DailyEvaluation = ({
@@ -56,7 +56,7 @@ const DailyEvaluation = ({
           key={`activity-${index}`}
           isDarkMode={preferredTheme === Theme.DARK}
           style={styles.card}
-          group={resolveActivityDetails(activity.group, t)}
+          group={getTranslatedActivityTitle(activity.group)}
           progress={activity.progress}
           activities={activity.activities}
         />

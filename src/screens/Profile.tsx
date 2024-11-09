@@ -232,7 +232,7 @@ const Profile = ({
             isDarkMode={preferredTheme === Theme.DARK}
             key={index}
             icon={action.icon}
-            activity={action.name}
+            title={action.name}
             style={styles.activityItem}
             onPress={action.onPress}
           />
@@ -250,7 +250,7 @@ const Profile = ({
       <ActivityItem
         isDarkMode={preferredTheme === Theme.DARK}
         icon={GlossaryIconImg}
-        activity={t('common:meaningOfWords') as string}
+        title={t('common:meaningOfWords') as string}
         style={[styles.activityItem, styles.glossaryItem]}
         onPress={handleOnPressGotoGlossary}
       />

@@ -4,7 +4,10 @@ import {globalStyles} from '../styles/global';
 import ActivityItem from '../components/ActivityItem';
 import Accordion from 'react-native-collapsible/Accordion';
 import {ActivityCategory, Theme} from '../types/global';
-import {resolveActivityDetails, WEEKLY_ACTIVITIES} from '../utils/activities';
+import {
+  getTranslatedActivityTitle,
+  WEEKLY_ACTIVITIES,
+} from '../utils/activities';
 import PlusIconImg from '../assets/icons/plus.svg';
 import {Fab} from 'native-base';
 import {useIsFocused} from '@react-navigation/native';
@@ -74,7 +77,7 @@ const WeeklyActivities = ({
         <ActivityItem
           isDarkMode={preferredTheme === Theme.DARK}
           icon={section.icon}
-          activity={section.group}
+          title={section.group}
           style={[styles.accordionHeader, !isActive && styles.activityItem]}
           showEndIcon={true}
           endIcon={isActive ? 'chevron-up' : 'chevron-down'}
@@ -98,7 +101,7 @@ const WeeklyActivities = ({
               isDarkMode={preferredTheme === Theme.DARK}
               key={contentIndex}
               icon={contentItem.icon}
-              activity={resolveActivityDetails(contentItem.title, t)}
+              title={getTranslatedActivityTitle(contentItem.title)}
               style={styles.contentItemActivity}
               showEndIcon={true}
               endIcon={'checkbox'}

@@ -16,7 +16,7 @@ import {
   normalizeFont,
 } from '../styles/global';
 import {TotalEvaluationGroup} from '../types/global';
-import {resolveActivityDetails} from '../utils/activities';
+import {getTranslatedActivityTitle} from '../utils/activities';
 
 export interface TotalActivityBreakdownProps {
   style?: StyleProp<ViewStyle>;
@@ -69,7 +69,7 @@ const TotalActivityBreakdown = ({
             <View style={styles.activityRow}>
               <Text
                 style={[styles.text, isDarkMode && globalStyles.darkModeText]}>
-                {resolveActivityDetails(activity.title, t)}
+                {getTranslatedActivityTitle(activity.title)}
               </Text>
               <View style={[styles.dots, isDarkMode && styles.darkModeDots]} />
               <Text

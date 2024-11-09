@@ -73,3 +73,17 @@ export const resolveTheme = (
   }
   return preferredTheme;
 };
+
+export const getOrdinalSuffix = (n: number) => {
+  let ordinalSuffix = 'th';
+
+  if (n % 10 === 1 && n % 100 !== 11) {
+    ordinalSuffix = 'st';
+  } else if (n % 10 === 2 && n % 100 !== 12) {
+    ordinalSuffix = 'nd';
+  } else if (n % 10 === 3 && n % 100 !== 13) {
+    ordinalSuffix = 'rd';
+  }
+
+  return ordinalSuffix;
+};

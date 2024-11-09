@@ -86,14 +86,14 @@ const Settings = ({
             </Text>
           }
           icon={ThemeIconImg}
-          activity="Theme"
+          title="Theme"
         />
         <ActivityItem
           isDarkMode={preferredTheme === Theme.DARK}
           onPress={handleOnPressAbout}
           style={styles.activityItem}
           icon={AboutIconImg}
-          activity="About"
+          title="About"
         />
       </ScrollView>
       <Modal isOpen={showThemeModal} onClose={() => setShowThemeModal(false)}>

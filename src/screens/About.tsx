@@ -79,7 +79,7 @@ const About = ({
               {appVersion}
             </Text>
           }
-          activity={t('common:version')}
+          title={t('common:version')}
         />
         {LINKS.map((link, index) => (
           <ActivityItem
@@ -87,7 +87,7 @@ const About = ({
             key={`link-${index}`}
             style={styles.activityItem}
             hideStartIcon
-            activity={link.title}
+            title={link.title}
             onPress={link.action}
           />
         ))}

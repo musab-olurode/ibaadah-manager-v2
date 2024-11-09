@@ -11,7 +11,7 @@ import SolahIconImg from '../assets/icons/solah.png';
 import {
   DAILY_ACTIVITIES,
   MONTHLY_ACTIVITIES,
-  resolveActivityDetails,
+  getTranslatedActivityTitle,
   WEEKLY_ACTIVITIES,
 } from '../utils/activities';
 import {getEndOfLastWeek} from '../utils/global';
@@ -203,7 +203,7 @@ const EvaluationList = ({
               <ActivityItem
                 isDarkMode={preferredTheme === Theme.DARK}
                 icon={SolahIconImg}
-                activity={t('common:solah')}
+                title={t('common:solah')}
                 style={styles.activityItem}
                 onPress={() => handleOnPressItem('Solah')}
               />
@@ -212,7 +212,7 @@ const EvaluationList = ({
                   isDarkMode={preferredTheme === Theme.DARK}
                   key={index}
                   icon={activity.icon}
-                  activity={resolveActivityDetails(activity.group, t)}
+                  title={getTranslatedActivityTitle(activity.group)}
                   style={styles.activityItem}
                   onPress={() => handleOnPressItem(activity.group)}
                 />
@@ -226,7 +226,7 @@ const EvaluationList = ({
                   isDarkMode={preferredTheme === Theme.DARK}
                   key={index}
                   icon={activity.icon}
-                  activity={resolveActivityDetails(activity.group, t)}
+                  title={getTranslatedActivityTitle(activity.group)}
                   style={styles.activityItem}
                   onPress={() => handleOnPressItem(activity.group)}
                 />
@@ -239,7 +239,7 @@ const EvaluationList = ({
                 <ActivityItem
                   key={index}
                   icon={activity.icon}
-                  activity={resolveActivityDetails(activity.group, t)}
+                  title={getTranslatedActivityTitle(activity.group)}
                   style={styles.activityItem}
                   onPress={() => handleOnPressItem(activity.group)}
                 />

@@ -28,7 +28,7 @@ import {ActivityService} from '../services/ActivityService';
 import {ActivityType, Theme} from '../types/global';
 import {
   CUSTOM_ACTIVITY_ICONS,
-  resolveActivityDetails,
+  getTranslatedActivityTitle,
 } from '../utils/activities';
 import ChevronDownIconImg from '../assets/icons/chevron-down.svg';
 import {useTranslation} from 'react-i18next';
@@ -190,7 +190,7 @@ const ManageActivities = ({
             isDarkMode={preferredTheme === Theme.DARK}
             key={index}
             icon={action.icon}
-            activity={action.name}
+            title={action.name}
             style={styles.activityItem}
             disabled={index !== 0 && customActivityCount === 0}
             onPress={action.onPress}
@@ -312,7 +312,7 @@ const ManageActivities = ({
                     globalStyles.text,
                     preferredTheme === Theme.DARK && globalStyles.darkModeText,
                   ]}>
-                  {resolveActivityDetails(customActivityIcon.name, t)}
+                  {getTranslatedActivityTitle(customActivityIcon.name)}
                 </Text>
               </View>
             </Actionsheet.Item>

@@ -7,9 +7,13 @@ import {
   DateTimePickerAndroid,
 } from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {setReminder} from '../utils/storage';
-import {ReminderStorage} from '../types/global';
-
+import {getApiReminderData, setReminder} from '../utils/storage';
+import {
+  ActivityCategory,
+  RawActivity,
+  ReminderStorage,
+  SolahApiData,
+} from '../types/global';
 import {
   GlobalColors,
   globalFonts,
@@ -17,38 +21,59 @@ import {
   normalizeFont,
 } from '../styles/global';
 import {
-  getOrdinalSuffix,
+  ReminderService,
   monthNames,
-  notificationMessage,
-  setPushNotifcation,
   weekDays,
-} from '../utils/notificationService';
+} from '../services/ReminderService';
 import {useTranslation} from 'react-i18next';
-import {resolveActivityDetails} from '../utils/activities';
+import {getTranslatedActivityTitle} from '../utils/activities';
 import PushNotification from 'react-native-push-notification';
+import {getOrdinalSuffix} from '../utils/global';
+import {Reminder} from '../database/entities/Reminder';
+
+export type ClockButtonProps = {
+  activityLabel: string;
+  activityGroup: string;
+  index: number;
+  category: ActivityCategory;
+  reminderKeyInDb: string;
+  repeatType: 'day' | 'week' | 'time';
+};
 
 export const ClockButton = ({
-  action,
-  activity,
+  activityLabel,
+  activityGroup,
   index,
   category,
   reminderKeyInDb,
   repeatType,
-  apiSolah,
-}: any) => {
+}: ClockButtonProps) => {
   const {t} = useTranslation();
-  const [notset, setNotset] = useState(true);
-  const [hour, setHour] = useState<number | number>(0);
-  const [minute, setMinute] = useState<number | number>(0);
-  const [monthDate, setMonthDate] = useState<string>(
-    t('common:timeNotSet') as string,
-  );
+
+  const [solahTimings, setSolahTimings] = useState<SolahApiData>();
+  const [timeNotSet, setTimeNotSet] = useState(true);
+  const [hour, setHour] = useState<number>(0);
+  const [minute, setMinute] = useState<number>(0);
+  const [monthDate, setMonthDate] = useState<string>(t('common:timeNotSet'));
   const [isDaily, setIsDaily] = useState(true);
   const [isWeekly, setIsWeekly] = useState(true);
   const [defaultDate, setDefaultDate] = useState<Date>(new Date());
 
+  const IS_DAILY_REMINDER = category === ActivityCategory.Daily,
+    IS_WEEKLY_REMINDER = category === ActivityCategory.Weekly;
+  const REPEAT_TIME = IS_WEEKLY_REMINDER ? 1 : 30;
+
   let reminderParams: string;
   const repeatTime = isWeekly ? 1 : 30;
+
+  useEffect(() => {
+    const getSolahTimings = async () => {
+      const solahTimings = (await getApiReminderData()) as SolahApiData;
+      setSolahTimings(solahTimings);
+    };
+    getSolahTimings();
+  }, []);
+
   useEffect(() => {
     reminderKeyInDb !== 'DAILY_REMINDER' && setIsDaily(false);
     reminderKeyInDb !== 'WEEKLY_REMINDER' && setIsWeekly(false);
@@ -58,33 +83,35 @@ export const ClockButton = ({
         const parsedResult: ReminderStorage[] = JSON.parse(result!);
         // runOnce && console.log(parsedResult);
         let elementTitle: string;
-        if (activity === t('common:solah')) {
-          elementTitle = action.group;
+        if (activityGroup === t('common:solah')) {
+          elementTitle = activityLabel;
         } else {
-          elementTitle = resolveActivityDetails(action.title, t);
+          elementTitle = getTranslatedActivityTitle(activityLabel);
         }
+
+        console.log(activityLabel, elementTitle);
 
         if (result) {
           parsedResult.forEach(element => {
             if (
-              (activity === t('common:solah') ||
+              (activityGroup === t('common:solah') ||
                 elementTitle === t('common:dhua')) &&
-              element.title !== activity &&
-              element.particularActivity !== elementTitle
+              element.group !== activityGroup &&
+              element.title !== elementTitle
             ) {
               if (runOnce) {
-                setDefaultSolatTime(elementTitle);
+                setDefaultSolahTime(elementTitle);
                 runOnce = false;
               }
-            } else if (activity === t('common:fasting')) {
+            } else if (activityGroup === t('common:fasting')) {
               setDefaultMonthlyFasting();
             }
 
             if (
-              element.title === activity &&
-              element.particularActivity === elementTitle
+              element.group === activityGroup &&
+              element.title === elementTitle
             ) {
-              setNotset(false);
+              setTimeNotSet(false);
               reminderKeyInDb !== 'WEEKLY_REMINDER'
                 ? setMonthDate(
                     `${element.date}${getOrdinalSuffix(element.date!)} ${t(
@@ -100,39 +127,38 @@ export const ClockButton = ({
               element.month && defaultDate.setMonth(element.month);
               setDefaultDate(defaultDate);
               if (
-                activity === t('common:fasting') &&
+                activityGroup === t('common:fasting') &&
                 reminderKeyInDb === 'MONTHLY_REMINDER'
               ) {
-                apiSolah.Fajr
+                solahTimings?.timings.Fajr
                   ? (elementTitle =
-                      action.title.split('the')[0] + apiSolah.hijri.month.en)
+                      activityLabel.split('the')[0] +
+                      solahTimings?.date.hijri.month.en)
                   : null;
               }
-              const message = notificationMessage(
+              const message = ReminderService.getNotificationMessage(
                 defaultDate,
                 elementTitle,
-                activity,
+                activityGroup,
                 category,
-                t,
               );
-              setPushNotifcation(
+              ReminderService.setPushNotification(
                 message,
-                activity,
+                activityGroup,
                 defaultDate,
                 index,
                 repeatType,
                 repeatTime,
-                t,
               );
               PushNotification.cancelLocalNotification(`${index}${index}`);
             }
           });
         } else if (
-          activity === t('common:solah') ||
+          activityGroup === t('common:solah') ||
           elementTitle === t('common:dhua')
         ) {
-          setDefaultSolatTime(elementTitle);
-        } else if (activity === t('common:fasting')) {
+          setDefaultSolahTime(elementTitle);
+        } else if (activityGroup === t('common:fasting')) {
           setDefaultMonthlyFasting();
         }
       });
@@ -140,11 +166,11 @@ export const ClockButton = ({
     getReminder();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [apiSolah]);
+  }, [solahTimings]);
 
   const setDefaultMonthlyFasting = () => {
     if (reminderKeyInDb === 'MONTHLY_REMINDER') {
-      const fastingDay = Number(action.title.slice(0, 2));
+      const fastingDay = Number(activityLabel.slice(0, 2));
       const date = new Date();
       const getDaysInMonth = (monthIndex: number) => {
         return new Date(
@@ -154,7 +180,7 @@ export const ClockButton = ({
         ).getDate();
       };
 
-      const hijriDay = Number(apiSolah.hijri.day);
+      const hijriDay = Number(solahTimings?.date.hijri.day);
       let monthName = date.getMonth();
       const daysTo = fastingDay - hijriDay;
       let gregDay = daysTo + new Date().getDate();
@@ -171,47 +197,44 @@ export const ClockButton = ({
       date!.setSeconds(0);
       date!.setMilliseconds(0);
       date.setMinutes(0);
-      date.setHours(apiSolah.Fajr.slice(0, 2) - 3);
+      date.setHours(Number(solahTimings?.timings.Fajr.slice(0, 2)) - 3);
       date.setDate(gregDay);
       date.setMonth(monthName);
       setMinute(date.getMinutes());
       setHour(date.getHours());
       const elementTitle =
-        action.title.split('the')[0] + apiSolah.hijri.month.en;
-      const message = notificationMessage(
+        activityLabel.split('the')[0] + solahTimings?.date.hijri.month.en;
+      const message = ReminderService.getNotificationMessage(
         date,
         elementTitle,
-        activity,
+        activityGroup,
         category,
-        t,
       );
       // console.log(message);
-      setPushNotifcation(
+      ReminderService.setPushNotification(
         message,
-        activity,
+        activityGroup,
         date,
         index,
         repeatType,
         repeatTime,
-        t,
         true,
       );
       defaultDate.setMinutes(date.getMinutes());
       defaultDate.setHours(date.getHours());
       defaultDate.setDate(date.getDate());
       defaultDate.setMonth(date.getMonth());
-      setNotset(false);
+      setTimeNotSet(false);
       setMonthDate(result);
       date.setDate(gregDay - 1);
-      date.setHours(Number(apiSolah.Maghrib.slice(0, 2)) + 1);
-      setPushNotifcation(
+      date.setHours(Number(solahTimings?.timings.Maghrib.slice(0, 2)) + 1);
+      ReminderService.setPushNotification(
         message,
-        activity,
+        activityGroup,
         date,
         Number(`${index}${index}`),
         repeatType,
         repeatTime,
-        t,
         true,
       );
     } else if (reminderKeyInDb === 'WEEKLY_REMINDER') {
@@ -219,8 +242,10 @@ export const ClockButton = ({
       weekFastingDate.setMilliseconds(0);
       weekFastingDate.setSeconds(0);
       weekFastingDate.setMinutes(0);
-      weekFastingDate.setHours(apiSolah.Fajr.slice(0, 2) - 3);
-      const day = weekDays.indexOf(action.title) - new Date().getDay();
+      weekFastingDate.setHours(
+        Number(solahTimings?.timings.Fajr.slice(0, 2)) - 3,
+      );
+      const day = weekDays.indexOf(activityLabel) - new Date().getDay();
       weekFastingDate.setDate(new Date().getDate() + day);
       setMonthDate(
         weekFastingDate.toLocaleDateString('en-US', {
@@ -229,66 +254,66 @@ export const ClockButton = ({
       );
       setMinute(weekFastingDate.getMinutes());
       setHour(weekFastingDate.getHours());
-      setNotset(false);
-      const message = notificationMessage(
+      setTimeNotSet(false);
+      const message = ReminderService.getNotificationMessage(
         weekFastingDate,
-        action.title,
-        activity,
+        activityLabel,
+        activityGroup,
         category,
-        t,
       );
       // console.log(message);
-      setPushNotifcation(
+      ReminderService.setPushNotification(
         message,
-        activity,
+        activityGroup,
         defaultDate,
         index,
         repeatType,
         repeatTime,
-        t,
         true,
       );
     }
   };
 
-  const setDefaultSolatTime = (elementTitle: string) => {
-    if (apiSolah.Fajr) {
+  const setDefaultSolahTime = (elementTitle: string) => {
+    if (solahTimings?.timings.Fajr) {
       reminderParams = elementTitle;
-      setNotset(false);
+      setTimeNotSet(false);
 
-      const reusableSet = (indexSolah: string) => {
+      const reusableSet = (indexSolah: keyof typeof solahTimings.timings) => {
         const date = new Date();
         const localElementTitle = indexSolah;
-        const apiHour = apiSolah[localElementTitle].slice(0, 2);
-        const apiMinute = apiSolah[localElementTitle].slice(3, 5);
+        const apiHour = Number(
+          solahTimings.timings[localElementTitle].slice(0, 2),
+        );
+        const apiMinute = Number(
+          solahTimings.timings[localElementTitle].slice(3, 5),
+        );
         date.setMilliseconds(0);
         date.setSeconds(0);
         date.setMinutes(apiMinute);
         date.setHours(apiHour);
         setHour(apiHour);
         setMinute(apiMinute);
-        const message = notificationMessage(
+        const message = ReminderService.getNotificationMessage(
           date,
           reminderParams,
-          activity,
+          activityGroup,
           category,
-          t,
         );
-        setPushNotifcation(
+        ReminderService.setPushNotification(
           message,
-          activity,
+          activityGroup,
           date,
           index,
           repeatType,
           1,
-          t,
           true,
         );
       };
 
-      Object.keys(apiSolah).forEach(indexSolah => {
+      Object.keys(solahTimings.timings).forEach(indexSolah => {
         if (indexSolah.startsWith(elementTitle.slice(0, 3))) {
-          reusableSet(indexSolah);
+          reusableSet(indexSolah as keyof typeof solahTimings.timings);
         }
       });
       elementTitle === t('common:dhua') && reusableSet('Sunrise');
@@ -298,8 +323,7 @@ export const ClockButton = ({
   const setReminderToDb = async (newReminder: ReminderStorage) => {
     await AsyncStorage.getItem(reminderKeyInDb)?.then(result => {
       const filteredReminders = JSON.parse(result!)?.filter(
-        (reminder: ReminderStorage) =>
-          reminder.particularActivity !== newReminder.particularActivity,
+        (reminder: ReminderStorage) => reminder.title !== newReminder.title,
       );
       filteredReminders
         ? setReminder([...filteredReminders, newReminder], reminderKeyInDb)
@@ -307,77 +331,80 @@ export const ClockButton = ({
     });
   };
 
-  const handleOnChangeNotificationDate = (
+  const handleOnChangeNotificationDate = async (
     event: DateTimePickerEvent,
     date?: Date,
   ) => {
-    let newReminder: ReminderStorage;
-    if (activity === t('common:solah')) {
-      reminderParams = action.group;
-    } else {
-      reminderParams = action.title;
+    if (event.type !== 'set') {
+      return;
     }
-    const message = notificationMessage(
+
+    const activityTitle = getTranslatedActivityTitle(activityLabel);
+
+    const message = ReminderService.getNotificationMessage(
       date!,
-      resolveActivityDetails(reminderParams, t),
-      activity,
+      activityTitle,
+      activityGroup,
       category,
-      t,
     );
-    switch (event.type) {
-      case 'set':
-        date!.setSeconds(0);
-        date!.setMilliseconds(0);
-        if (isDaily) {
-          newReminder = {
-            title: activity,
-            message,
-            particularActivity: resolveActivityDetails(reminderParams, t),
-            hour: date!.getHours(),
-            minute: date!.getMinutes(),
-          };
-          setPushNotifcation(message, activity, date!, index, repeatType, 1, t);
-          setReminderToDb(newReminder);
-          setHour(date!.getHours());
-          setMinute(date!.getMinutes());
-          defaultDate.setMinutes(date!.getMinutes());
-          defaultDate.setHours(date!.getHours());
-          defaultDate.setDate(date!.getDate());
-          defaultDate.setMonth(date!.getMonth());
-          setDefaultDate(defaultDate);
-          setNotset(false);
-        } else {
-          if (monthDate === t('common:timeNotSet')) {
-            date?.setMinutes(new Date().getMinutes());
-            date?.setHours(new Date().getHours());
-          }
-          DateTimePickerAndroid.open({
-            mode: 'time',
-            value: date!,
-            onChange: handleOnChangeMonthTime,
-            is24Hour: false,
-          });
-        }
-        break;
-      default:
-        break;
+
+    date!.setSeconds(0);
+    date!.setMilliseconds(0);
+
+    if (isDaily) {
+      const reminder = new Reminder();
+      reminder.title = activityTitle;
+      reminder.message = message;
+      reminder.group = activityGroup;
+      reminder.time = date!;
+
+      await ReminderService.create(reminder);
+
+      ReminderService.setPushNotification(
+        message,
+        activityGroup,
+        date!,
+        index,
+        repeatType,
+        1,
+      );
+
+      setHour(date!.getHours());
+      setMinute(date!.getMinutes());
+      defaultDate.setMinutes(date!.getMinutes());
+      defaultDate.setHours(date!.getHours());
+      defaultDate.setDate(date!.getDate());
+      defaultDate.setMonth(date!.getMonth());
+      setDefaultDate(defaultDate);
+      setTimeNotSet(false);
+    } else {
+      if (monthDate === t('common:timeNotSet')) {
+        date?.setMinutes(new Date().getMinutes());
+        date?.setHours(new Date().getHours());
+      }
+      DateTimePickerAndroid.open({
+        mode: 'time',
+        value: date!,
+        onChange: handleOnChangeMonthTime,
+        is24Hour: false,
+      });
     }
   };
+
   const handleOnChangeMonthTime = (event: DateTimePickerEvent, date?: Date) => {
-    const message = notificationMessage(
+    const message = ReminderService.getNotificationMessage(
       date!,
-      resolveActivityDetails(reminderParams, t),
-      activity,
+      getTranslatedActivityTitle(reminderParams),
+      activityGroup,
       category,
-      t,
     );
 
     switch (event.type) {
       case 'set':
         let newReminder: ReminderStorage = {
-          title: activity,
+          group: activityGroup,
           message,
-          particularActivity: resolveActivityDetails(reminderParams, t),
+          title: getTranslatedActivityTitle(reminderParams),
           hour: date!.getHours(),
           minute: date!.getMinutes(),
           date: date?.getDate(),
@@ -386,14 +413,13 @@ export const ClockButton = ({
           }),
           month: date?.getMonth(),
         };
-        setPushNotifcation(
+        ReminderService.setPushNotification(
           message,
-          activity,
+          activityGroup,
           date!,
           index,
           repeatType,
           repeatTime,
-          t,
         );
         setReminderToDb(newReminder);
         setHour(date!.getHours());
@@ -409,7 +435,7 @@ export const ClockButton = ({
                 'common:ofEveryMonth',
               )}`,
             );
-        setNotset(false);
+        setTimeNotSet(false);
         break;
       default:
     }
@@ -422,7 +448,7 @@ export const ClockButton = ({
     } else {
       mode = 'date';
     }
-    if (notset) {
+    if (timeNotSet) {
       defaultDate.setHours(new Date().getHours());
       defaultDate.setMinutes(new Date().getMinutes());
     }
@@ -438,8 +464,8 @@ export const ClockButton = ({
   return (
     <Pressable
       style={styles.timePickerBtn}
-      onPress={() => handleOnPressShowTimePicker(action)}>
-      {notset ? (
+      onPress={() => handleOnPressShowTimePicker(activityLabel)}>
+      {timeNotSet ? (
         <Text style={styles.timePickerBtnText}>{t('common:timeNotSet')}</Text>
       ) : !isDaily ? (
         <Text style={styles.timePickerBtnText}>

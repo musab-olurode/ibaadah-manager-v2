@@ -72,7 +72,7 @@ const EditCustomActivities = ({
     <ActivityItem
       isDarkMode={preferredTheme === Theme.DARK}
       icon={item.icon}
-      activity={item.title}
+      title={item.title}
       style={styles.activityItem}
       onPress={() => handleOnPressItem(item)}
     />

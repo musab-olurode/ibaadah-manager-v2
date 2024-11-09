@@ -28,13 +28,14 @@ import {ActivityCategory, Theme} from '../types/global';
 import EditCustomActivities from '../screens/EditCustomActivities';
 import RemoveCustomActivities from '../screens/RemoveCustomActivities';
 import {useTranslation} from 'react-i18next';
-import {resolveActivityDetails} from '../utils/activities';
+import {getTranslatedActivityTitle} from '../utils/activities';
 import {LoadingModal} from '../components/LoadingModal';
 import {RootState} from '../redux/store';
 import {setAppTheme} from '../redux/theme/themeSlice';
 import usePreferredTheme from '../hooks/usePreferredTheme';
 import {HeaderBackButton} from '@react-navigation/elements';
 import {HeaderBackButtonProps} from '@react-navigation/native-stack/lib/typescript/src/types';
+import {ReminderService} from '../services/ReminderService';
 
 export type RootNavigatorParamList = {
   Onboarding: undefined;
@@ -56,12 +57,10 @@ export type RootNavigatorParamList = {
   Reminders: undefined;
   RemindersList: {
     category: Exclude<ActivityCategory, ActivityCategory.Solah>;
-    apiSolah: any;
   };
   RemindersSettings: {
-    activity: string;
-    category: 'Daily' | 'Weekly' | 'Monthly' | 'Solah';
-    apiSolah: any;
+    group: string;
+    category: ActivityCategory;
   };
 };
 
@@ -69,7 +68,7 @@ const Stack = createNativeStackNavigator<RootNavigatorParamList>();
 
 const RootNavigator = () => {
   const [showOnboarding, setShowOnboarding] = useState<boolean>(true);
-  const {loading} = useAppSelector<RootState>((state: RootState) => state);
+  const loading = useAppSelector(state => state.loading);
   const dispatch = useAppDispatch();
   const {t} = useTranslation();
   const preferredTheme = usePreferredTheme();
@@ -101,6 +100,8 @@ const RootNavigator = () => {
     await ActivityService.synchronizeActivities();
     const firstDayDate = await ActivityService.getFirstRecordedDay();
     dispatch(setGlobalActivityDetails({firstDay: firstDayDate}));
+
+    ReminderService.createNotificationChannel();
 
     RNBootSplash.hide({fade: true});
   };
@@ -267,7 +268,7 @@ const RootNavigator = () => {
           options={({route, navigation}) =>
             customHeader(
               navigation,
-              resolveActivityDetails(route.params.activity, t),
+              getTranslatedActivityTitle(route.params.group),
             )
           }
         />

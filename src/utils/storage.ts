@@ -1,17 +1,20 @@
-import {StorageKeys, Theme, ReminderStorage} from '../types/global';
+import {
+  StorageKeys,
+  Theme,
+  ReminderStorage,
+  Coordinates,
+  User,
+  SolahApiData,
+} from '../types/global';
 import {ColorMode} from 'native-base';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-export interface User {
-  name: string;
-  avatarPath?: string;
-}
+import {ABUJA_COORDINATES} from './constants';
 
 export const getUser = async (): Promise<User> => {
   const stringifiedState = await AsyncStorage.getItem(StorageKeys.USER);
 
   if (!stringifiedState) {
-    return {name: '', avatarPath: ''};
+    return {name: '', avatarPath: ''} as User;
   }
   const state = JSON.parse(stringifiedState);
 
@@ -22,6 +25,21 @@ export const setUser = async (state: User) => {
   await AsyncStorage.setItem(StorageKeys.USER, JSON.stringify(state));
 };
 
+export const getCoordinates = async () => {
+  const stringifiedState = await AsyncStorage.getItem(StorageKeys.COORDINATES);
+
+  if (!stringifiedState) {
+    return ABUJA_COORDINATES as Coordinates;
+  }
+  const state = JSON.parse(stringifiedState);
+
+  return state as Coordinates;
+};
+
+export const setCoordinates = async (state: Coordinates) => {
+  await AsyncStorage.setItem(StorageKeys.COORDINATES, JSON.stringify(state));
+};
+
 export const setReminder = async (state: ReminderStorage[], db: string) => {
   await AsyncStorage.setItem(db, JSON.stringify(state));
 };
@@ -29,16 +47,29 @@ export const clearReminder = async (state: string) => {
   await AsyncStorage.removeItem(state);
 };
 
-export const setApiReminderData = async (data: string) => {
-  await AsyncStorage.setItem(StorageKeys.APISOLAT, data);
+export const setApiReminderData = async (data: SolahApiData) => {
+  await AsyncStorage.setItem(
+    StorageKeys.API_REMINDER_DATA,
+    JSON.stringify(data),
+  );
 };
 
 export const getApiReminderData = async () => {
-  return await AsyncStorage.getItem(StorageKeys.APISOLAT);
+  const stringifiedState = await AsyncStorage.getItem(
+    StorageKeys.API_REMINDER_DATA,
+  );
+
+  if (!stringifiedState) {
+    return null;
+  }
+
+  const state = JSON.parse(stringifiedState);
+
+  return state as SolahApiData;
 };
 
 export const clearApiReminderData = async () => {
-  await AsyncStorage.removeItem(StorageKeys.APISOLAT);
+  await AsyncStorage.removeItem(StorageKeys.API_REMINDER_DATA);
 };
 
 export const setUserLanguage = async (language: string) => {

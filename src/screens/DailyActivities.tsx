@@ -10,7 +10,10 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useIsFocused} from '@react-navigation/native';
 import {RootNavigatorParamList} from '../navigators/RootNavigator';
 import {ActivityCategory, Theme} from '../types/global';
-import {DAILY_ACTIVITIES, resolveActivityDetails} from '../utils/activities';
+import {
+  DAILY_ACTIVITIES,
+  getTranslatedActivityTitle,
+} from '../utils/activities';
 import {Activity} from '../database/entities/Activity';
 import {ActivityService} from '../services/ActivityService';
 import {RawActivity} from '../types/global';
@@ -79,7 +82,7 @@ const DailyActivities = ({
         <ActivityItem
           isDarkMode={preferredTheme === Theme.DARK}
           icon={section.icon}
-          activity={resolveActivityDetails(section.group, t)}
+          title={getTranslatedActivityTitle(section.group)}
           style={[styles.accordionHeader, !isActive && styles.activityItem]}
           showEndIcon={true}
           endIcon={isActive ? 'chevron-up' : 'chevron-down'}
@@ -103,7 +106,7 @@ const DailyActivities = ({
               isDarkMode={preferredTheme === Theme.DARK}
               key={contentIndex}
               icon={contentItem.icon}
-              activity={resolveActivityDetails(contentItem.title, t)}
+              title={getTranslatedActivityTitle(contentItem.title)}
               style={styles.contentItemActivity}
               showEndIcon={true}
               endIcon={'checkbox'}
@@ -139,7 +142,7 @@ const DailyActivities = ({
       <ActivityItem
         isDarkMode={preferredTheme === Theme.DARK}
         icon={SolahIconImg}
-        activity={t('common:solah')}
+        title={t('common:solah')}
         style={styles.activityItem}
         onPress={onPressSolah}
       />

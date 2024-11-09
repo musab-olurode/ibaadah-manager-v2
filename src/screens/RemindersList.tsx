@@ -8,7 +8,7 @@ import {
   DAILY_ACTIVITIES,
   MONTHLY_ACTIVITIES,
   WEEKLY_ACTIVITIES,
-  resolveActivityDetails,
+  getTranslatedActivityTitle,
 } from '../utils/activities';
 import ReminderIconImg from '../assets/icons/reminder.png';
 import {useTranslation} from 'react-i18next';
@@ -19,13 +19,12 @@ const RemindersList = ({
   route,
   navigation,
 }: NativeStackScreenProps<RootNavigatorParamList>) => {
-  const {category, apiSolah} =
-    route.params as RootNavigatorParamList['RemindersList'];
+  const {category} = route.params as RootNavigatorParamList['RemindersList'];
   const {t} = useTranslation();
   const preferredTheme = usePreferredTheme();
 
   const handleOnPressItem = (activity: string) => {
-    navigation.push('RemindersSettings', {activity, category, apiSolah});
+    navigation.push('RemindersSettings', {group: activity, category});
   };
 
   return (
@@ -40,7 +39,7 @@ const RemindersList = ({
             <ActivityItem
               isDarkMode={preferredTheme === Theme.DARK}
               hideStartIcon
-              activity={t('common:solah')}
+              title={t('common:solah')}
               style={styles.activityItem}
               showEndIcon
               customEndIcon={
@@ -53,14 +52,14 @@ const RemindersList = ({
                 isDarkMode={preferredTheme === Theme.DARK}
                 key={index}
                 hideStartIcon
-                activity={resolveActivityDetails(activity.group, t)}
+                title={getTranslatedActivityTitle(activity.group)}
                 style={styles.activityItem}
                 showEndIcon
                 customEndIcon={
                   <Image style={styles.bellIcon} source={ReminderIconImg} />
                 }
                 onPress={() =>
-                  handleOnPressItem(resolveActivityDetails(activity.group, t))
+                  handleOnPressItem(getTranslatedActivityTitle(activity.group))
                 }
               />
             ))}
@@ -73,14 +72,14 @@ const RemindersList = ({
                 key={index}
                 isDarkMode={preferredTheme === Theme.DARK}
                 hideStartIcon
-                activity={resolveActivityDetails(activity.group, t)}
+                title={getTranslatedActivityTitle(activity.group)}
                 style={styles.activityItem}
                 showEndIcon
                 customEndIcon={
                   <Image style={styles.bellIcon} source={ReminderIconImg} />
                 }
                 onPress={() =>
-                  handleOnPressItem(resolveActivityDetails(activity.group, t))
+                  handleOnPressItem(getTranslatedActivityTitle(activity.group))
                 }
               />
             ))}
@@ -93,14 +92,14 @@ const RemindersList = ({
                 key={index}
                 isDarkMode={preferredTheme === Theme.DARK}
                 hideStartIcon
-                activity={resolveActivityDetails(activity.group, t)}
+                title={getTranslatedActivityTitle(activity.group)}
                 style={styles.activityItem}
                 showEndIcon
                 customEndIcon={
                   <Image style={styles.bellIcon} source={ReminderIconImg} />
                 }
                 onPress={() =>
-                  handleOnPressItem(resolveActivityDetails(activity.group, t))
+                  handleOnPressItem(getTranslatedActivityTitle(activity.group))
                 }
               />
             ))}

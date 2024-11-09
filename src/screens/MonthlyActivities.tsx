@@ -3,8 +3,11 @@ import {StyleSheet, ScrollView, View} from 'react-native';
 import {globalStyles} from '../styles/global';
 import ActivityItem from '../components/ActivityItem';
 import Accordion from 'react-native-collapsible/Accordion';
-import {ActivityCategory, Theme} from '../types/global';
-import {MONTHLY_ACTIVITIES, resolveActivityDetails} from '../utils/activities';
+import {ActivityCategoryheme} from '../types/global';
+import {
+  MONTHLY_ACTIVITIES,
+  getTranslatedActivityTitle,
+} from '../utils/activities';
 import PlusIconImg from '../assets/icons/plus.svg';
 import {Fab} from 'native-base';
 import {useIsFocused} from '@react-navigation/native';
@@ -74,7 +77,7 @@ const MonthlyActivities = ({
         <ActivityItem
           isDarkMode={preferredTheme === Theme.DARK}
           icon={section.icon}
-          activity={resolveActivityDetails(section.group, t)}
+          title={getTranslatedActivityTitle(section.group)}
           style={[styles.accordionHeader, !isActive && styles.activityItem]}
           showEndIcon={true}
           endIcon={isActive ? 'chevron-up' : 'chevron-down'}
@@ -98,7 +101,7 @@ const MonthlyActivities = ({
               isDarkMode={preferredTheme === Theme.DARK}
               key={contentIndex}
               icon={contentItem.icon}
-              activity={resolveActivityDetails(contentItem.title, t)}
+              title={getTranslatedActivityTitle(contentItem.title)}
               style={styles.contentItemActivity}
               showEndIcon={true}
               endIcon={'checkbox'}

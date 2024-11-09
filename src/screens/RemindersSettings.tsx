@@ -9,9 +9,8 @@ import {
   MONTHLY_ACTIVITIES,
   SOLAH,
   WEEKLY_ACTIVITIES,
-  resolveActivityDetails,
+  getTranslatedActivityTitle,
 } from '../utils/activities';
-import {StorageKeys} from '../types/global';
 import {ClockButton} from '../components/ClockButton';
 import {useTranslation} from 'react-i18next';
 import usePreferredTheme from '../hooks/usePreferredTheme';
@@ -20,34 +19,30 @@ import {Theme} from '../types/global';
 const RemindersSettings = ({
   route,
 }: NativeStackScreenProps<RootNavigatorParamList>) => {
-  const {activity, category, apiSolah} =
+  const {group, category} =
     route.params as RootNavigatorParamList['RemindersSettings'];
   const preferredTheme = usePreferredTheme();
+  const {t} = useTranslation();
+
+  console.log(group);
 
   let All_ACTIVITIES;
-  let reminderKeyInDb: string;
-  let uniqueId: number;
   let repeatType: 'day' | 'week' | 'time' = 'day';
-  const {t} = useTranslation();
+
   if (category === 'Daily') {
     All_ACTIVITIES = DAILY_ACTIVITIES;
-    reminderKeyInDb = StorageKeys.DAILY_REMINDER;
-    uniqueId = 11;
   } else if (category === 'Weekly') {
     All_ACTIVITIES = WEEKLY_ACTIVITIES;
-    reminderKeyInDb = StorageKeys.WEEKLY_REMINDER;
     repeatType = 'week';
-    uniqueId = 22;
   } else if (category === 'Monthly') {
     All_ACTIVITIES = MONTHLY_ACTIVITIES;
-    reminderKeyInDb = StorageKeys.MONTHLY_REMINDER;
-    uniqueId = 33;
   } else {
     All_ACTIVITIES = MONTHLY_ACTIVITIES;
     repeatType = 'day';
   }
-  const filteredActivity = All_ACTIVITIES.filter(
-    i => resolveActivityDetails(i.group, t) === activity,
+
+  const FILTERED_ACTIVITIES = All_ACTIVITIES.filter(
+    i => getTranslatedActivityTitle(i.group) === group,
   );
 
   return (
@@ -57,48 +52,44 @@ const RemindersSettings = ({
         preferredTheme === Theme.DARK && globalStyles.darkModeContainer,
       ]}>
       <View>
-        {activity === t('common:solah')
+        {group === t('common:solah')
           ? SOLAH.map((action, index) => (
               <ActivityItem
                 key={index}
                 isDarkMode={preferredTheme === Theme.DARK}
                 hideStartIcon
-                activity={action.group}
+                title={action.group}
                 style={styles.activityItem}
                 showEndIcon
                 customEndIcon={
                   <ClockButton
-                    action={action}
-                    activity={activity}
-                    route={route}
-                    index={index + uniqueId + action.icon}
+                    activityLabel={action.group}
+                    activityGroup={group}
                     category={category}
-                    reminderKeyInDb={reminderKeyInDb}
                     repeatType={repeatType}
-                    apiSolah={apiSolah}
+                    reminderKeyInDb={''}
+                    index={0}
                   />
                 }
               />
             ))
-          : filteredActivity.map(action =>
-              action.activities.map((content, index) => (
+          : FILTERED_ACTIVITIES.map(filteredActivity =>
+              filteredActivity.activities.map((groupActivity, index) => (
                 <ActivityItem
                   isDarkMode={preferredTheme === Theme.DARK}
                   key={index}
                   hideStartIcon
-                  activity={resolveActivityDetails(content.title, t)}
+                  title={getTranslatedActivityTitle(groupActivity.title)}
                   style={styles.activityItem}
                   showEndIcon
                   customEndIcon={
                     <ClockButton
-                      action={content}
-                      activity={activity}
-                      route={route}
-                      index={index + uniqueId + action.icon}
+                      activityLabel={groupActivity.title}
+                      activityGroup={group}
                       category={category}
-                      reminderKeyInDb={reminderKeyInDb}
                       repeatType={repeatType}
-                      apiSolah={apiSolah}
+                      index={0}
+                      reminderKeyInDb={''}
                     />
                   }
                 />

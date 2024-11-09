@@ -16,7 +16,7 @@ import ZhurIconImg from '../assets/icons/dhur.png';
 
 export interface ActivityItemProps {
   icon?: ImageSourcePropType;
-  activity: string;
+  title: string;
   style?: StyleProp<ViewStyle>;
   disabled?: boolean;
   onPress?: () => void;
@@ -34,7 +34,7 @@ export interface ActivityItemProps {
 
 const ActivityItem = ({
   icon,
-  activity,
+  title,
   disabled,
   onPress,
   style,
@@ -72,11 +72,11 @@ const ActivityItem = ({
       )}
       <Text
         style={[
-          styles.activity,
+          styles.title,
           isDarkMode && globalStyles.darkModeText,
           hideStartIcon && styles.noStartIcon,
         ]}>
-        {activity}
+        {title}
       </Text>
       {showEndIcon
         ? customEndIcon ||
@@ -99,7 +99,7 @@ const ActivityItem = ({
               value={checkboxValue || 'checkbox'}
               onChange={onCheckboxChange}
               isChecked={defaultCheckboxState}
-              accessibilityLabel={activity}
+              accessibilityLabel={title}
               isDisabled={disableCheckbox}
             />
           ))
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
   noStartIcon: {
     marginLeft: 8,
   },
-  activity: {
+  title: {
     marginLeft: 24,
     ...globalStyles.text,
     ...globalFonts.aeonik.regular,

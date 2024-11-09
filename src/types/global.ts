@@ -1,3 +1,8 @@
+export interface User {
+  name: string;
+  avatarPath?: string;
+}
+
 export enum ActivityCategory {
   Solah = 'Solah',
   Daily = 'Daily',
@@ -43,10 +48,20 @@ export enum StorageKeys {
   USER_LANGUAGE = '@USER_LANGUAGE',
   THEME = '@THEME',
   COLOR_MODE = '@COLOR_MODE',
+  COORDINATES = '@COORDINATES',
   DAILY_REMINDER = '@DAILY_REMINDER',
   WEEKLY_REMINDER = '@WEEKLY_REMINDER',
   MONTHLY_REMINDER = '@MONTHLY_REMINDER',
-  APISOLAT = '@APISOLAT',
+  API_REMINDER_DATA = '@API_REMINDER_DATA',
+}
+
+export enum NotificationChannelId {
+  REMINDERS = 'reminders',
+}
+
+export interface Coordinates {
+  latitude: number;
+  longitude: number;
 }
 
 interface RawActivitySubActivity {
@@ -101,13 +116,71 @@ export interface TotalGroupedActivityEvaluation {
   activities: TotalEvaluationGroup[];
 }
 export interface ReminderStorage {
-  title: string;
+  group: string;
   message: string;
   bigText?: string;
-  particularActivity: string;
+  title: string;
   hour: number;
   minute: number;
   date?: number;
   day?: string;
   month?: number;
+}
+
+export interface SolahApiData {
+  timings: {
+    Fajr: string;
+    Sunrise: string;
+    Dhuhr: string;
+    Asr: string;
+    Sunset: string;
+    Maghrib: string;
+    Isha: string;
+    Imsak: string;
+    Midnight: string;
+    Firstthird: string;
+    Lastthird: string;
+  };
+  date: {
+    readable: string;
+    timestamp: string;
+    hijri: {
+      date: string;
+      format: string;
+      day: string;
+      weekday: {
+        en: string;
+        ar: string;
+      };
+      month: {
+        number: number;
+        en: string;
+        ar: string;
+      };
+      year: string;
+      designation: {
+        abbreviated: string;
+        expanded: string;
+      };
+      holidays: any[];
+    };
+    gregorian: {
+      date: string;
+      format: string;
+      day: string;
+      weekday: {
+        en: string;
+      };
+      month: {
+        number: number;
+        en: string;
+      };
+      year: string;
+      designation: {
+        abbreviated: string;
+        expanded: string;
+      };
+    };
+  };
+  coordinates: Coordinates;
 }

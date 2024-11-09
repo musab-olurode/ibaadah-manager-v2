@@ -42,7 +42,7 @@ import {useIsFocused} from '@react-navigation/native';
 import {ActivityService} from '../services/ActivityService';
 import {useAppSelector} from '../redux/hooks';
 import {useTranslation} from 'react-i18next';
-import {resolveActivityDetails} from '../utils/activities';
+import {getTranslatedActivityTitle} from '../utils/activities';
 import usePreferredTheme from '../hooks/usePreferredTheme';
 
 const PeriodicEvaluation = ({
@@ -303,7 +303,7 @@ const PeriodicEvaluation = ({
             styles.sectionHeaderTitle,
             preferredTheme === Theme.DARK && globalStyles.darkModeText,
           ]}>
-          {resolveActivityDetails(activityGroup, t)}
+          {getTranslatedActivityTitle(activityGroup)}
         </Text>
         <View
           style={[
@@ -356,7 +356,7 @@ const PeriodicEvaluation = ({
           <Chip
             isDarkMode={preferredTheme === Theme.DARK}
             key={index}
-            title={resolveActivityDetails(activity.group, t)}
+            title={getTranslatedActivityTitle(activity.group)}
             style={styles.chip}
             active={selectedGroup === activity.group}
             onPress={() => handleActivityGroupSelection(activity.group)}
@@ -383,7 +383,7 @@ const PeriodicEvaluation = ({
               <ActivityItem
                 isDarkMode={preferredTheme === Theme.DARK}
                 key={`breakdown-${index}`}
-                activity={resolveActivityDetails(content.title, t)}
+                title={getTranslatedActivityTitle(content.title)}
                 defaultCheckboxState={content.completed}
                 hideStartIcon={true}
                 showEndIcon={true}

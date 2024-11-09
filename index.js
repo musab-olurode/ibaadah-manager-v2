@@ -9,7 +9,6 @@ import PushNotification from 'react-native-push-notification';
 
 AppRegistry.registerComponent(appName, () => App);
 PushNotification.configure({
-  // (optional) Called when Token is generated (iOS and Android)
   onNotification: function (notification) {
     console.log('NOTIFICATION:', notification);
   },

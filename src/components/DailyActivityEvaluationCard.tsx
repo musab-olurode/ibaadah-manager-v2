@@ -16,7 +16,7 @@ import {
   globalStyles,
   normalizeFont,
 } from '../styles/global';
-import {resolveActivityDetails} from '../utils/activities';
+import {getTranslatedActivityTitle} from '../utils/activities';
 
 export interface DailyActivityEvaluationCardProps {
   group: string;
@@ -76,10 +76,10 @@ const DailyActivityEvaluationCard = ({
                   styles.actionTitle,
                   isDarkMode && globalStyles.darkModeText,
                 ]}>
-                {resolveActivityDetails(activity.title, t)}
+                {getTranslatedActivityTitle(activity.title)}
               </Text>
               <Checkbox
-                value={resolveActivityDetails(activity.title, t)}
+                value={getTranslatedActivityTitle(activity.title)}
                 accessibilityLabel={`${activity.title} check`}
                 size="sm"
                 isDisabled

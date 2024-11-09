@@ -11,7 +11,7 @@ import Button from '../components/Button';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootNavigatorParamList} from '../navigators/RootNavigator';
 import {useTranslation} from 'react-i18next';
-import {resolveActivityDetails} from '../utils/activities';
+import {getTranslatedActivityTitle} from '../utils/activities';
 import usePreferredTheme from '../hooks/usePreferredTheme';
 
 const RemoveCustomActivities = ({
@@ -73,7 +73,7 @@ const RemoveCustomActivities = ({
     <ActivityItem
       isDarkMode={preferredTheme === Theme.DARK}
       icon={item.icon}
-      activity={resolveActivityDetails(item.title, t)}
+      title={getTranslatedActivityTitle(item.title)}
       style={styles.activityItem}
       showEndIcon
       bindItemToCheckbox

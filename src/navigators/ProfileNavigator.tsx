@@ -13,7 +13,7 @@ import {capitalizeFirstLetter} from '../utils/global';
 import PeriodicEvaluation from '../screens/PeriodicEvaluation';
 import Glossary from '../screens/Glossary';
 import {useTranslation} from 'react-i18next';
-import {resolveActivityDetails} from '../utils/activities';
+import {getTranslatedActivityTitle} from '../utils/activities';
 import SettingsIconImg from '../assets/icons/settings.png';
 import Settings from '../screens/Settings';
 import About from '../screens/About';
@@ -152,7 +152,7 @@ const ProfileNavigator = () => {
         options={({route, navigation}) =>
           customHeader(
             navigation,
-            `${resolveActivityDetails(route.params.activityGroup, t)} (${t(
+            `${getTranslatedActivityTitle(route.params.activityGroup)} (${t(
               'common:today',
             )})`,
           )
@@ -164,7 +164,7 @@ const ProfileNavigator = () => {
         options={({route, navigation}) =>
           customHeader(
             navigation,
-            `${resolveActivityDetails(route.params.activityGroup, t)} (${t(
+            `${getTranslatedActivityTitle(route.params.activityGroup, t)} (${t(
               `common:${formatFilter(route.params.filter)}`,
             )})`,
           )
